@@ -1,0 +1,7 @@
+.buildpath
+.directory
+.project
+.pydevproject
+.settings/*
+py/__pycache__/*
+

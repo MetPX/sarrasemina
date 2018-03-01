@@ -1,0 +1,11 @@
+===============
+ Release Notes 
+===============
+
+lists all changes between versions.
+
+
+**0.0.1**
+* development began August 2017.
+
+* Initial release
