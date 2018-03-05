@@ -248,7 +248,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script>
-            var jsonURLs = ['/data/','/json/ui-texts.json<?= $v ?>'];
+            var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>'];
         </script>
         <script src="/js/CancellationTokenSource.js<?= $v ?>"></script>
         <script src="/js/main.js<?= $v ?>"></script>

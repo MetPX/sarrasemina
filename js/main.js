@@ -7,6 +7,14 @@
 // ---------------------------------------------------------------------
 
             /*#*/DEBUG = false;/*#*/
+            /*#*/if( DEBUG ){ console.time   ( "   " ); console.group(me("--- WARMING UP ---"));};/*#*/
+
+            'use strict';
+            
+            // ---------------------------------------------------------------------
+            //  GLOBAL VARS
+            // ---------------------------------------------------------------------
+            
             const GUI = {   STATE_READY     : 0,
                             STATE_RESET     : 1,
                             STATE_LOADING   : 2,
@@ -36,23 +44,21 @@
                         stg: ['<strong">','</strong>']
                     },
                   nl  = '\n',
+                  DATA_SEPARATOR     = "|",
+                  CATALOG_TYPE       = "toc",
+                  id_NB_FILES        = 0,
+                  id_TOC_RANGE_START = 1,
+                  id_TOC_RANGE_STOP  = 2,
+                  id_TOTAL_SIZE      = 3,
+                  id_TOX_RANGE_START = 4,
+                  id_TOX_RANGE_STOP  = 5,
+                  id_RANGE_START     = CATALOG_TYPE === "toc" ? id_TOC_RANGE_START : id_TOX_RANGE_START,
+                  id_RANGE_STOP      = CATALOG_TYPE === "toc" ? id_TOC_RANGE_STOP  : id_TOX_RANGE_STOP,
                   numberOfFilesToShowProgressBar = 5000;
-            
-            // ---------------------------------------------------------------------
-            //  Initialize Engine
-            // ---------------------------------------------------------------------
-            
-            /*#*/if( DEBUG ){ console.time   ( "   " ); console.group(me("--- WARMING UP ---"));};/*#*/
-
-            'use strict';
             
             if( $.cookie( "lang" ) === undefined )                                  // Detect browser's default language and set cookie
                 $.cookie( "lang", (/fr/.test(navigator.languages[0]) ? 'fr':'en') );
 
-            // ---------------------------------------------------------------------
-            //  GLOBAL VARS
-            // ---------------------------------------------------------------------
-            
             var t       = {},                                                       // GUI's text container
                 lang    = $.cookie("lang"),                                         // Select user's prefered language
                 selectedFilesCatalogue,                                             // ### NOTE ### The catalogue data is splitted in two files: .json for folders and .toc for files
@@ -98,6 +104,10 @@
                                     }
                 };
             });
+            
+            // ---------------------------------------------------------------------
+            //  Initialize Engine
+            // ---------------------------------------------------------------------
             
             _initialize_();
             
@@ -166,6 +176,7 @@
                 
                     let dataDirs = data[0]; // raw data: need processing
                     let GUItexts = data[1];
+                    let DOCtexts = data[2];
                     let dirBase  = jsonURLs[0];
                     let catalogs = [];
                     $(dataDirs).find('a[href$="/"]').each( function(){ 
@@ -218,7 +229,7 @@
                         selector.html( mySelector );
                         $('#catalogueSelector').on('change', function(){
                             let selectedCatalogue = $(this).find("option:selected").val();
-                            selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ "toc";
+                            selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG_TYPE;
                             $("#msg").hide();
 
                             loadFoldersCatalogueData( selectedCatalogue );
@@ -340,12 +351,29 @@
             
             // ---------------------------------------------------------------------
             //
+            // Reset statistics
+            
+            function resetStatistics( part = "" ) {
+                
+                switch( part ) {
+                
+                    case "catalogue": statistics.catalogue = {}; break;
+                    case "search":    statistics.search    = {}; break;
+                    case "results":   statistics.results   = {}; break;
+                    default:
+                        statistics = { catalog:{}, search: {}, results: {} };
+                }
+            }
+            
+            
+            // ---------------------------------------------------------------------
+            //
             // fetchFileRange returns an httpGet object.
             // that contains texts of the url file within byte range
             
             async function fetchFileRange(url, byteRanges=[""]) {
 //                let DEBUG = true;
-            /*#*/if( DEBUG ){ console.time   ( "   " ); logMe(url +nl+"   - "+ byteRanges.join(), '-');};/*#*/
+            /*#*/if( DEBUG ){ logMe(url +nl+"   - ["+ byteRanges +"]", '-');};/*#*/
 
                 try {
                     let rangeText = "";
@@ -353,12 +381,12 @@
                         let objFileInfo = await getFileSize( url, byteRanges[i] );
                         rangeText      += await httpGet( url, objFileInfo, byteRanges[i] );
                     }
-            /*#*/if( DEBUG ){ console.timeEnd( "   " ); logMe('-','-');};/*#*/
+            /*#*/if( DEBUG ){ 'rangeText',nl,rangeText,nl,logMe('-','-');};/*#*/
                     return rangeText;
                 }
                 catch(err) {
-                    console.log( err );
-            /*#*/if( DEBUG ){ console.timeEnd( "   " ); logMe('-','-');};/*#*/
+                    console.log( "ERR : ", err );
+            /*#*/if( DEBUG ){ logMe('-','-');};/*#*/
                 }
             }
             
@@ -555,7 +583,7 @@
                         $("ui.tree").hide();
                         bigData_Folders = foldersData;
 
-                        let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.info[1]; s.bytes += folder.info[4]; }); return s; };
+                        let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[id_NB_FILES]; s.bytes += folder.inf[id_TOTAL_SIZE]; }); return s; };
                         let total       = getSums( foldersData );
                         let fmtTotal    = { folders : plural(t.folder, total.folders, '0,0', W.CV),
                                             files   : plural(t.file,   total.files,   '0,0', W.CR),
@@ -564,6 +592,7 @@
                         let catalogInfo    = wrap( t.thisCatalogue +t.comma+" "+ fmtTotal.folders +",&nbsp;"+ fmtTotal.files +"&nbsp;"+ fmtTotal.bytes.replace(' ','&nbsp;'), ['<span>','</span>']);
                         let cataloguePaths = selectedCatalogue.split("/");
                         let catalogueName  = cataloguePaths[cataloguePaths.length -2];
+                        resetStatistics();
                         statistics.catalog = { name: catalogueName, folders: total.folders, files: total.files, bytes: total.bytes };
                         
                         _init_data_tabs(total.folders,total.files);
@@ -616,8 +645,8 @@
                         }
                         
                     },
-                    error: function(){
-                        console.log( t.error + " - loadFoldersCatalogueData("+ selectedCatalogue +")" );
+                    error: function(XMLHttpRequest, textStatus, errorThrown){
+                        console.log( t.error + " - loadFoldersCatalogueData("+ selectedCatalogue +")",nl,'XMLHttpRequest',XMLHttpRequest,nl,'textStatus',textStatus,nl,'errorThrown',errorThrown );
                     }
                 });
 
@@ -628,42 +657,41 @@
             //  Sarra Stuff
             // ==========================================================================================================================================
             
+            async function wait(ms) { return new Promise( r => setTimeout(r, ms) ); }
+                        
             // ---------------------------------------------------------------------
             //
             // getBigDataFiles
             // - It receives an array texts where each line contains file size and file path
             // - It returns an array of objects containing path and size
             
-            async function wait(ms) { return new Promise( r => setTimeout(r, ms) ); }
-                        
-            async function getBigDataFiles( folders, catalogueFiles = selectedFilesCatalogue, cancel ) {
+            async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalogue, cancel ) {
 //                 let DEBUG = true;
-                /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(catalogueFiles, nl, folders, nl,nl, "cancellationToken",nl,cancellationToken );};/*#*/
+                /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log("selectedCatalogue [",selectedCatalogue,"]\nFolders", folders );};/*#*/
 
                 let dataFiles = [];
                 if( folders.matched ) {
                     
-                    let multipartRanges = optimizeMultipartRanges( folders.matched.map( file => { return [ file.info[2], file.info[3] ]; } ) );
+                    let multipartRanges = optimizeMultipartRanges( folders.matched.map( file => { return [ file.inf[id_RANGE_START], file.inf[id_RANGE_STOP], file.id ]; } ) );
                     let percent = 0, count=0, total = multipartRanges.length;
-                    /*#*/if( DEBUG ){ console.log("multipartRanges", nl, multipartRanges );};/*#*/
                     if( showProgressBar ) { progressBar.init( total, {ln1:t.data.gathering, ln2:t.data.files }, C.BLUE ); await wait( 10 ); } // Give some time to progress-bar beeing refreshed...
 
                     // Can't use forEach on async/await functions... -> go for traditional way...
                     for (let multipartRange of multipartRanges) {
+                        
                         count++;
-                        if( showProgressBar ) { progressBar.set(count, dataFiles.length ); await wait( 10 ); }
+                        if( showProgressBar ) { progressBar.set(count, dataFiles.length ); await wait( 1 ); }
                         if( cancel.token.isSearchCancelled() ) {
                             cleanUpCancelledSearch();
                         }
-                        else{
+                        else {
                             
-                            let files = await fetchFileRange( catalogueFiles, [multipartRange] );
+                            let files = await fetchFileRange( selectedCatalogue, [multipartRange] );
                             let lines = files.split("\n");
-                            /*#*/if( DEBUG ){ console.log( "progress: "+count+"/"+total+" ["+percent+"%]lines ["+ lines.length +"]" );};/*#*/
                             lines.forEach( (line) => {
-                                let fileInfo = line.split(' /');
-                                if( fileInfo.length == 2 ) {
-                                    dataFiles.push( { path: '/'+fileInfo[1], size: parseInt(fileInfo[0].trim()) });
+                                let fileInfo = line.split(DATA_SEPARATOR);
+                                if( fileInfo.length == 3 ) {
+                                    dataFiles.push( { path: bigData_Folders[parseInt(fileInfo[0].trim())]['dir']+'/'+fileInfo[2], size: parseInt(fileInfo[1].trim()) });
                                 }
                             });
                         }
@@ -671,7 +699,7 @@
                     if( showProgressBar ) { await wait( 100 ); progressBar.doHide(); }
                 }
                 
-                /*#*/if( DEBUG ){ console.log("dataFiles :",nl,dataFiles); console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
+                /*#*/if( DEBUG ){ console.log("dataFiles",dataFiles); console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
                 return dataFiles;
             }
             
@@ -693,7 +721,7 @@
                     }
                     else {
 
-                        let multipartRanges = optimizeMultipartRanges( filesInFolders.matched.map( (file) => { return [ file.info[2], file.info[3] ]; } ) );
+                        let multipartRanges = optimizeMultipartRanges( filesInFolders.matched.map( (file) => { return [ file.inf[id_RANGE_START], file.inf[id_RANGE_STOP], file.id ]; } ) );
                         multipartRanges.forEachAsync(
                             ( multipartRange ) => {
                                 fetchFileRange( selectedFilesCatalogue, [multipartRange] )
@@ -727,20 +755,22 @@
                 let unmatch = [];
                 
                 for( let i = 0; i < len; i++ ) {
-                    if( foldersData[i].title.match( regex ) ) {
+                    if( foldersData[i].dir.match( regex ) ) {
                         matched.push(foldersData[i]);
-                        if(foldersData[i].info[1] > 0) {
-                            stats.matched.nbFiles += foldersData[i].info[1];
-                            stats.matched.totSize += foldersData[i].info[4];
-                            stats.matched.ranges.push( foldersData[i].info[2]+'-'+foldersData[i].info[3] );
+                        matched[matched.length - 1].id = i;
+                        if(foldersData[i].inf[id_NB_FILES] > 0) {
+                            stats.matched.nbFiles += foldersData[i].inf[id_NB_FILES];
+                            stats.matched.totSize += foldersData[i].inf[id_TOTAL_SIZE];
+                            stats.matched.ranges.push( foldersData[i].inf[id_RANGE_START]+'-'+foldersData[i].inf[id_RANGE_STOP] );
                         }
                     }
                     else {
                         unmatch.push(foldersData[i]);
-                        if(foldersData[i].info[1] > 0) {
-                            stats.unmatch.nbFiles += foldersData[i].info[1];
-                            stats.unmatch.totSize += foldersData[i].info[4];
-                            stats.unmatch.ranges.push( foldersData[i].info[2]+'-'+foldersData[i].info[3] );
+                        unmatch[unmatch.length - 1].id = i;
+                        if(foldersData[i].inf[id_NB_FILES] > 0) {
+                            stats.unmatch.nbFiles += foldersData[i].inf[id_NB_FILES];
+                            stats.unmatch.totSize += foldersData[i].inf[id_TOTAL_SIZE];
+                            stats.unmatch.ranges.push( foldersData[i].inf[id_RANGE_START]+'-'+foldersData[i].inf[id_RANGE_STOP] );
                         }
                     }
                 }
@@ -791,6 +821,8 @@
                         switch( r ) {
 
                             case firstReg:
+                                
+                                continue loopRegex;
 
                                 if( !filesData[ line ].path.match( subtopic ) )
                                     continue loopLines;
@@ -945,12 +977,11 @@
             
             async function performSearch ( allFilters ) {
 //                 let DEBUG = true;
-            /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('allFilters :',nl,allFilters); };/*#*/
+            /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('Filters',allFilters); };/*#*/
             
                 setGUIstate( GUI.STATE_SEARCHING );
-                cancelByUser = false;
                 
-                let AMQPfilter          = allFilters[0][0];   // AMQP filter    is the first item of allFilters list; -> Extract and remove it from the list
+                let AMQPfilter          = allFilters[0][0];     // AMQP filter    is the first item of allFilters list; -> Extract and remove it from the list
                 let acceptRejectFilters = allFilters;           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
                 let subtopicFilter      = AMQPfilter            // Convert AMQP subtopicFilter to a RegExp filter;      -> JavaScript will be able to search!
                                             .replace(/(.*)/, "^/$1")                // add ^/ before and $ after the string
@@ -975,6 +1006,7 @@
                 // from a previous search...
                 // --------------------------------------------------
                 STm = getSubtopicMatch( bigData_Folders, subtopicFilter );              // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
+                resetStatistics("search");
                 statistics.search.subtopic = [{
                     filter:AMQPfilter,
                     matched: {folders: STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize },
@@ -987,6 +1019,8 @@
                     filesInFolders.stats.matched.totSize += match.stats.matched.totSize;
                     $.merge(filesInFolders.matched, match.matched);
                 });
+                
+            /*#*/if( DEBUG ){ console.log('STm',STm); };/*#*/
                 
                 // Grab user's config
                 // --------------------------------------------------
@@ -1046,8 +1080,9 @@
 
                     let matchfiles = [],
                         total      = bigData_Files.length,
-                        initArrStr = { ln1:t.data.searching, ln2:(t.data.foundOn+ numeral(total).format('0,0') +t.data.files +" - "+ numeral(nbFolders).format('0,0') +t.data.folders ) };
-                        initArrStr = { ln1:t.data.searching, ln2:( t.data.foundFF[0]+ numeral(total).format('0,0') +t.data.foundFF[1]+ numeral(nbFolders).format('0,0') +t.data.foundFF[2] ) };
+                        initArrStr = { ln1:t.data.searching, ln2:( t.data.foundOn   + numeral(total).format('0,0') +t.data.files +" - "+ numeral(nbFolders).format('0,0') +t.data.folders ) };
+                        
+                    initArrStr = { ln1:t.data.searching, ln2:( t.data.foundFF[0]+ numeral(total).format('0,0') +t.data.foundFF[1]  + numeral(nbFolders).format('0,0') +t.data.foundFF[2] ) };
                         
                     if( showProgressBar ) { progressBar.init( total, initArrStr );  await wait(1); }
                     
@@ -1072,14 +1107,11 @@
                     updateFilesTab( filesInFolders, withARFilters );
                 }
                 else {
-                    
+
                     updateFilesTab( filesInFolders );
-                    
                 }
-//                 updateResults();
+                /*#*/if( DEBUG ){ console.log('filesInFolders',filesInFolders); };/*#*/
                 
-                if( DEBUG ){ console.log(' ############## filters ',acceptRejectFilters,nl,nl,'############## filesInFolders',nl,filesInFolders); };
-            
                 $("#logger").html( ( nbFiles < 1 ) ? t.searchHits[0] : nbFoldersHtml +" "+t.contains[0]+" "+ plural(t.file, nbFiles, '0,0', W.CR) );
 
                 setGUIstate(GUI.STATE_READY);
@@ -1098,7 +1130,7 @@
             function updateResultsStatistics( files, size ) {
                 
                 statistics.results.files = files == 0 ? "": numeral(files).format('0,0');
-                statistics.results.size  = size  == 0 ? "": "("+numeral(size).format('0.0 b')+")";
+                statistics.results.size  = size  == 0 ? "": "("+numeral(size).format('0.00 b')+")";
                 statistics.results.str   = files < 2  ? t.searchHits[ files ] : t.searchHits[2] ;
                 
             }
@@ -1110,13 +1142,16 @@
             // Update content of Results Tab
             
             function updateResultsTab() {
+//                 let DEBUG = true;
+            /*#*/if( DEBUG ){ console.group(me()); logMe('-','-'); console.log('>>> statistics[', statistics, ']'); };/*#*/
                 
                 let numFolders = statistics.catalog.folders,
                     numFiles   = statistics.catalog.files,
                     strFolders = plural( t.folder, -numFolders ),
                     strFiles   = plural( t.file,   -numFiles   );
-                    numFolders = numeral(numFolders).format('0,0');
-                    numFiles   = numeral(numFiles).format('0,0');
+                    
+                numFolders = numeral(numFolders).format('0,0');
+                numFiles   = numeral(numFiles).format('0,0');
                 
                 // --------------------------------------
                 // Selected Catalog
@@ -1124,8 +1159,7 @@
                 let tbody_catalog = `
                     <tbody id="catalogue">
                         <tr><th colspan="4" class="title">${t.data.table.catalogue} [ ${statistics.catalog.name} ]</th></tr>
-                        <tr class="c-bleu"><td></td><td>${numFolders}</td><td colspan="2"> ${strFolders} </td></tr>
-                        <tr class="c-bleu"><td></td><td>${numFiles}</td><td colspan="2"> ${strFiles} </td></tr>
+                        <tr class="c-bleu"><td></td><td>${numFiles}<br>${numFolders}</td><td colspan="2"> ${strFiles} <br> ${strFolders}</td></tr>
                     </tbody>`;
                 
                 // --------------------------------------
@@ -1136,12 +1170,13 @@
                 for( let n = 0; n < statistics.search.subtopic.length; n++ ) {
                     let numFolders = statistics.search.subtopic[n].matched.folders,
                         numFiles   = statistics.search.subtopic[n].matched.files,
-                        strFolders = plural( t.folder, -numFolders ),
-                        strFiles   = plural( t.file,   -numFiles   );
-                        numFolders = numeral(numFolders).format('0,0');
-                        numFiles   = numeral(numFiles).format('0,0');
+                        strFolders = numFolders == 0 ? t.noFolders : plural( t.folder, -numFolders ),
+                        strFiles   = numFiles   == 0 ? t.noFiles   : plural( t.file,   -numFiles   );
+                        
+                    numFolders = numFolders == 0 ? "" : numeral(numFolders).format('0,0');
+                    numFiles   = numFiles   == 0 ? "" : numeral(numFiles).format('0,0');
                     tr_findings   += `
-                        <tr class="sub"><td>${t.data.table.subtopic}</td><td>${numFiles}<br>( ${numFolders}</td><td>${ strFiles }<br>${ strFolders } )</td><td>${statistics.search.subtopic[n].filter}</td></tr>`;
+                        <tr class="sub"><td>${t.data.table.subtopic}</td><td>${numFiles}<br>${numFolders}</td><td>${ strFiles }<br>${ strFolders } &nbsp;</td><td>&nbsp; ${statistics.search.subtopic[n].filter}</td></tr>`;
                 }
                 
                 // Accepts - Rejects
@@ -1164,26 +1199,29 @@
                         plural = files > 1 ? "s":"";
                         files  = numeral(files).format('0,0');
                         filter = n < lastAcceptReject ? statistics.search.accept_reject[n].filter : "";
-                        elem   = n < lastAcceptReject ? t.file+plural : t.data.table['unmatch'+plural];
+                        elem   = t.file+plural; // n < lastAcceptReject ? t.file+plural : t.data.table['unmatch'+plural];
                         tr_findings  += `
-                        <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} &nbsp; (${ numeral(size).format("0.00 b") })</td><td>${filter}</td></tr>`;
+                        <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} (${ numeral(size).format("0.00 b") }) &nbsp;</td><td>&nbsp; ${filter}</td></tr>`;
                     }
                 }
 
                 let tbody_search = `
                     <tbody id="search">
-                        <tr class="tr"><th class="th1" colspan="3">${t.data.table.search}</th><th class="th2">${t.data.table.filter}</th></tr>
+                        <tr class="tr"><th class="th1" colspan="2">${t.data.table.search}</th><th class="th2">${t.data.table.results}</th><th class="th2">${t.data.table.filter}</th></tr>
                         ${tr_findings}
                     </tbody>`;
                 
                 // --------------------------------------
                 // Results
                 // --------------------------------------
-                let tbody_results = `
+                let tbody_results = "";
+                if( statistics.search.accept_reject ) {
+                    tbody_results = `
                     <tbody id="results">
-                        <tr><th colspan="4" class="title">${t.data.table.result}</th></tr>
+                        <tr><th colspan="4" class="title">${t.data.table.summary}</th></tr>
                         <tr><td></td><td>${statistics.results.files}</td><td colspan="2"> ${statistics.results.str} ${statistics.results.size}</td></tr>
                     </tbody>`;
+                }
                     
                 // --------------------------------------
                 // Table wrap
@@ -1196,6 +1234,7 @@
                 </table>`;
                 
                 $("#stats").html( table );
+            /*#*/if( DEBUG ){ logMe('-','-'); console.groupEnd();};/*#*/
             }
             
             
@@ -1213,7 +1252,7 @@
             /**/
             function optimizeMultipartRanges( multipartRanges ) {
 //                let DEBUG = true;
-                /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('multipartRanges :',nl,multipartRanges);};/*#*/
+                /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('multipartRanges',multipartRanges);};/*#*/
                 
                 if( multipartRanges.length == 0 )
                     return [];
@@ -1250,9 +1289,6 @@
                         maxByteRangeParts = 1;
                         newByteRange = rr;
                     }
-                    
-                    /*#*/if( DEBUG ){ console.log('xxx newByteRange :',nl,newByteRange,nl,nl,"xxx r :",nl, r );};/*#*/
-                        
                 }
                 // ====
                 
@@ -1261,7 +1297,7 @@
                 let allRanges = newByteRange.map( (range) => { return range.join('-') });
                 while( allRanges.length > 0 ) slicedRange.push( "bytes=" + allRanges.splice(0,maxByteRangeParts).join(',') );
                 
-                /*#*/if( DEBUG ){ console.log('newByteRange :',nl,newByteRange,nl,nl,"allRanges :",nl,allRanges,nl,nl,"slicedRange :",nl,slicedRange);};/*#*/
+                /*#*/if( DEBUG ){ console.log('newByteRange',newByteRange,nl,nl,"allRanges",allRanges,nl,"slicedRange",slicedRange);};/*#*/
                 /*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
                 return slicedRange;
             }
@@ -1640,7 +1676,7 @@
                     let lines = "", de = display.shown, a = de + display.lines;
 
                     // build content & update container
-                    folders.forEachFromTo( (folder) => { lines += '<li>'+ folder.title +'</li>'; }, de, a );
+                    folders.forEachFromTo( (folder) => { lines += '<li>'+ folder.dir +'</li>'; }, de, a );
                     ( replace ) ? $("#folders .tree").html( lines ) : $("#folders .tree").append( lines );
                     
                     display.shown += display.lines;

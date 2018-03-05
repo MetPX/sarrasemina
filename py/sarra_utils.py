@@ -32,6 +32,10 @@ def num_fmt(num):
 def getTime():
     return time.time()
 
+def getDateTimeFormatted():
+    from datetime import datetime, date
+    return datetime.today().strftime('%Y-%m-%d - %H:%M:%S (%A, %d %B %Y)')
+
 def file_size(fname):
         import os
         statinfo = os.stat(fname)
