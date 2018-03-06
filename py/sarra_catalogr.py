@@ -7,20 +7,47 @@
 import array, copy, fnmatch, os, math, shutil, stat, sys
 from sarra_utils import *
 
+# ======================================================================================
+# default configs
+# ======================================================================================
+#default_configs = { 'dir':{'source':'./__pycache__/', 'target':'./data'} }              # default source & target directories
+#default_configs = { 'dir':{'source':'.', 'target':'./data'} }                           # default source & target directories
+
+'''
+'''
+VERSION = 'SarraCatalogr 0.9'
+parser = argparse.ArgumentParser(prog            = 'sarra_catalogr.py',
+                                 description     = 'Parse a directory recursively and creates a catalogue of its content.',
+                                 formatter_class = argparse.RawDescriptionHelpFormatter)
+parser.add_argument('-s',              action='store',      dest='source_folder', help="Source folder to parse...........(default: .)",           default = '.')
+parser.add_argument('-o',              action='store',      dest='output_folder', help="Output folder for catalogues.....(default: /tmp/_data/)", default = '/tmp/_data/')
+parser.add_argument('-l', '--log',     action='store_true', dest='log',           help="Add log files to output folder...(default: none)",        default = False)
+parser.add_argument('-v', '--version', action='version',    version=VERSION,      help="Show program's version number and exit")
+
+args = parser.parse_args()
+if args.output_folder[-1] != '/':
+    args.output_folder = args.output_folder +'/'
+
+print()
+if len(sys.argv) < 2:
+    print( 'Usage:        sarra_catalogr.py [-h] [-s SOURCE_FOLDER] [-o OUTPUT_FOLDER] [-l] [-v]' )
+print( 'Source folder [{}]'.format(args.source_folder))
+print( 'Output folder [{}]'.format(args.output_folder))
+print( 'Write logs?   {}'.format(args.log))
+print()
+
 # ------------------------------------------------------------------------------------
 # INIT VARS
 # ------------------------------------------------------------------------------------
 
 my           = {}
 documents    = {}
-t_dir        = '/tmp/_data/'
+path         = args.source_folder
+t_dir        = args.output_folder
+withLogs     = args.log
 withLinks    = True
 withoutLinks = False
 
-if __name__ == '__main__':
-    path     = sys.argv[1] if len(sys.argv) > 1 else '.'
-    t_dir    = sys.argv[2] if len(sys.argv) > 2 else t_dir
-    
 directory    = os.path.abspath( path )
 norme        = os.path.basename(os.path.normpath( directory ))
 dirBase      = '/'.join(directory.split('/')[:-1])
@@ -121,18 +148,20 @@ def writeDocumentsFiles( sortedPaths ):
     h_scanned = '\n   Scanned Dir : {}\n   Scanned Date: {}'.format( directory, getDateTimeFormatted() )
     h_catalog = t_title.format('Paths',h_scanned,' Number of:  | catalogue\nSubDir|Files | ByteRange     | Dir ID | Paths' )
     h_paths   = t_title.format('Paths - Includes directories containing no files ("x")',h_scanned,' Number of:  | catalogue\nSubDir|Files | ByteRange     | Dir ID | Paths' )
-    h_files   = t_title.format('Files',h_scanned,' Dir ID | File Size | Full Path')
+    h_files   = t_title.format('Files',h_scanned,' Dir ID |  File Size  | Full Path')
 
-    fLC = open(t_log,'w+')
-    fLP = open(t_log_paths,'w+')
-    fLF = open(t_log_files,'w+')
     fC  = open(t_cat,'w+')
     fJ  = open(t_jsn,'w+')
-    
     fJ.write( '[\n' )
-    fLC.write( h_catalog )
-    fLP.write( h_paths )
-    fLF.write( h_files )
+
+    if withLogs:
+        fLC = open(t_log,'w+')
+        fLP = open(t_log_paths,'w+')
+        fLF = open(t_log_files,'w+')
+    
+        fLC.write( h_catalog )
+        fLP.write( h_paths )
+        fLF.write( h_files )
 
     for path in sortedPaths :
         sortedFiles = sorted( documents[path]['files'] )
@@ -144,8 +173,8 @@ def writeDocumentsFiles( sortedPaths ):
             if path != oldPath :
                 pathNum += 1
                 oldPath  = path
-            file_inf  = '{}|{}|{}'             .format(pathNum, documents[path]['files'][file], file)
-            file_info = '{:>7} | {:>9} | {}/{}'.format(pathNum, documents[path]['files'][file], path, file)
+            file_inf  = '{}|{}|{}'              .format(pathNum, documents[path]['files'][file], file)
+            file_info = '{:>7} | {:>11} | {}/{}'.format(pathNum, documents[path]['files'][file], path, file)
         
             bit_stop  += len(file_inf)
             byte_stop += len(file_info)
@@ -154,7 +183,8 @@ def writeDocumentsFiles( sortedPaths ):
             bit_stop  += 1
             byte_stop += 1
             fC.write( '{}\n'.format(file_inf) )
-            fLF.write( '{}\n'.format(file_info) )
+            if withLogs:
+                fLF.write( '{}\n'.format(file_info) )
         
         nbDirs  = documents[path]['D']
         nbFiles = len(documents[path]['files'])
@@ -163,8 +193,10 @@ def writeDocumentsFiles( sortedPaths ):
             byte_range = '-  [{},{}]'.format(byte_start,byte_stop)
         else:
             byte_range = '   [{},{}]'.format(byte_start,documents[path]['R'][1])
-            fLC.write( '{:>4}  | {:>3}{:<20} {:>5}   {}\n'.format(nbDirs, nbFiles, byte_range, pathNum, path) )
-        fLP.write( '{:>4}  | {:>3}{:<20} {:>5}   {}\n'.format(nbDirs, nbFiles, byte_range, pathNum, path) )
+            if withLogs:
+                fLC.write( '{:>4}  | {:>3}{:<20} {:>5}   {}\n'.format(nbDirs, nbFiles, byte_range, pathNum, path) )
+        if withLogs:
+            fLP.write( '{:>4}  | {:>3}{:<20} {:>5}   {}\n'.format(nbDirs, nbFiles, byte_range, pathNum, path) )
         
         if documents[path]['F'] > 0:
             if firstPass:
@@ -176,12 +208,13 @@ def writeDocumentsFiles( sortedPaths ):
             fJ.write( '"inf":[{1},{2},{3},{4}],"dir":"{0}"'.format(path, documents[path]['F'], documents[path]['b'][0], documents[path]['b'][1], documents[path]['S']) +'}' )
     
     fJ.write( '\n]' )
-                
-    fLC.close()
-    fLP.close()
-    fLF.close()
     fC.close()
     fJ.close()
+    
+    if withLogs:
+        fLC.close()
+        fLP.close()
+        fLF.close()
 
     # it's show time!
     return getTime() - starttime
