@@ -1,7 +1,7 @@
 /*
    -------------------------------------------------------
     Description: Sarra Semina Style based on Bootstrap 3
-    Author:      Daniel Leveille
+    Author:      Daniel Léveillé
    -------------------------------------------------------
 */
 
@@ -159,7 +159,7 @@ ul.nav-tabs > li.active > a:focus { color: #555; background-color: #fff; border-
 #files p { font: 13px 'Ubuntu Mono', monospace; color: #960; }
 #files pre { margin: 2px; }
 
-#stats { padding: 20px 15px 0px; white-space: nowrap; }
+#stats { padding: 20px 15px 0px; white-space: nowrap; overflow: auto; }
 #stats table { width: 100%; }
 #stats table tr:nth-child(2) { vertical-align: top; }
 #stats table tr:nth-child(2) td { padding-top: 10px; }
@@ -168,7 +168,7 @@ ul.nav-tabs > li.active > a:focus { color: #555; background-color: #fff; border-
 #stats table tbody tr:last-child td { padding-bottom: 10px; }
 #stats table th { border-bottom: 1px solid #ddd; background-color: #f6f6f6; }
 #stats table td:last-child { width: 80%; }
-#stats table td:nth-child(2) { text-align: right; padding-left: 10px; padding-right: 5px; }
+#stats table td:nth-child(2) { text-align: right; padding-left: 10px; padding-right: 2px; }
 #stats table td:nth-child(2),
 #stats table td:nth-child(4) { font-weight: bold; }
 

@@ -28,7 +28,8 @@
                                 "rejected"  :"Rejeté :",
                                 "unmatch"   :"élément non-filtré",
                                 "unmatchs"  :"éléments non-filtrés",
-                                "result"    :"Resultats",
+                                "results"   :"Resultats",
+                                "summary"   :"En résumé",
                                 "found"     :"trouvé"
                                 }
                             },
@@ -79,7 +80,7 @@
         "results":          "Résultats",
         "search":           "Chercher",
         "searchResults":    "Résultats de recherche",
-        "searchHits":      ["Aucun élément trouvé","1 élément trouvé"," éléments trouvés"],
+        "searchHits":      ["Aucune correspondance","1 correspondance"," correspondances"],
         "selectCatalogue":  "Sélectionnez un catalogue",
         "subtopic":         "Sous-thème",
         "thisCatalogue":    "Ce&nbsp;catalogue&nbsp;contient&nbsp;",
@@ -122,7 +123,8 @@
                                 "rejected"  :"Rejected :",
                                 "unmatch"   :"unmatched file",
                                 "unmatchs"  :"unmatched files",
-                                "result"    :"Results",
+                                "results"   :"Results",
+                                "summary"   :"In Summary",
                                 "found"     :"found"
                                 }
                             },
@@ -176,7 +178,7 @@
         "results":          "Results",
         "search":           "Search",
         "searchResults":    "Search results",
-        "searchHits":      ["No elements found","1 element found"," elements found"],
+        "searchHits":      ["No matchs","1 match"," matchs"],
         "selectCatalogue":  "Select a catalogue",
         "subtopic":         "Subtopic",
         "thisCatalogue":    "This&nbsp;catalogue&nbsp;contains",
