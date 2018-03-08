@@ -13,9 +13,7 @@ from sarra_utils import *
 #default_configs = { 'dir':{'source':'./__pycache__/', 'target':'./data'} }              # default source & target directories
 #default_configs = { 'dir':{'source':'.', 'target':'./data'} }                           # default source & target directories
 
-'''
-'''
-VERSION = 'SarraCatalogr 0.9'
+VERSION = 'SarraCatalogR v0.9'
 parser = argparse.ArgumentParser(prog            = 'sarra_catalogr.py',
                                  description     = 'Parse a directory recursively and creates a catalogue of its content.',
                                  formatter_class = argparse.RawDescriptionHelpFormatter)
@@ -140,11 +138,10 @@ def writeDocumentsFiles( sortedPaths ):
     firstPass = True
     byte_stop = 0       # byte_stop for full paths with file name
     bit_stop  = 0       # bit_stop  for file name only
-    sep       = ',\n'
     pathNum   = -1
     oldPath   = ''
     t_strip   = '-'*150 +'\n'
-    t_title   = t_strip +'\nSarra Catalogr Log [ {} ]\n\n'+ t_strip +'{}\n\n'+ t_strip +'\n{}\n\n'
+    t_title   = t_strip +'\n'+ VERSION +' Log [ {} ]\n\n'+ t_strip +'{}\n\n'+ t_strip +'\n{}\n\n'
     h_scanned = '\n   Scanned Dir : {}\n   Scanned Date: {}'.format( directory, getDateTimeFormatted() )
     h_catalog = t_title.format('Paths',h_scanned,' Number of:  | catalogue\nSubDir|Files | ByteRange     | Dir ID | Paths' )
     h_paths   = t_title.format('Paths - Includes directories containing no files ("x")',h_scanned,' Number of:  | catalogue\nSubDir|Files | ByteRange     | Dir ID | Paths' )
@@ -208,8 +205,8 @@ def writeDocumentsFiles( sortedPaths ):
             fJ.write( '"inf":[{1},{2},{3},{4}],"dir":"{0}"'.format(path, documents[path]['F'], documents[path]['b'][0], documents[path]['b'][1], documents[path]['S']) +'}' )
     
     fJ.write( '\n]' )
-    fC.close()
     fJ.close()
+    fC.close()
     
     if withLogs:
         fLC.close()
@@ -296,7 +293,6 @@ def writeDocumentsFilesFullpath( sortedPaths ):
                 
     firstPass = True
     byte_stop = 0
-    sep       = ',\n'
     n         = 0
     
     for path in sortedPaths :

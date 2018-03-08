@@ -664,7 +664,7 @@
             // getBigDataFiles
             // - It receives an array texts where each line contains file size and file path
             // - It returns an array of objects containing path and size
-            
+
             async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalogue, cancel ) {
 //                 let DEBUG = true;
                 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log("selectedCatalogue [",selectedCatalogue,"]\nFolders", folders );};/*#*/
@@ -672,31 +672,48 @@
                 let dataFiles = [];
                 if( folders.matched ) {
                     
+                    // If the file's byterange is larger than a reasonable size to pick it up with one request, it is broken into smaller multipart chuncks to make it easier to chew ...
                     let multipartRanges = optimizeMultipartRanges( folders.matched.map( file => { return [ file.inf[id_RANGE_START], file.inf[id_RANGE_STOP], file.id ]; } ) );
-                    let percent = 0, count=0, total = multipartRanges.length;
-                    if( showProgressBar ) { progressBar.init( total, {ln1:t.data.gathering, ln2:t.data.files }, C.BLUE ); await wait( 10 ); } // Give some time to progress-bar beeing refreshed...
+                    
+                    let percent = 0,
+                        count   = 0,
+                        buffer  = '',
+                        total   = multipartRanges.length;
+                    
+                    if( showProgressBar ) { progressBar.init( total, {ln1:t.data.gathering, ln2:t.data.files }, C.BLUE ); await wait( 1 ); } // Give some time to progress-bar beeing refreshed...
 
                     // Can't use forEach on async/await functions... -> go for traditional way...
                     for (let multipartRange of multipartRanges) {
                         
                         count++;
-                        if( showProgressBar ) { progressBar.set(count, dataFiles.length ); await wait( 1 ); }
+                        if( showProgressBar ) { progressBar.set(count, dataFiles.length ); await wait( 10 ); }
                         if( cancel.token.isSearchCancelled() ) {
                             cleanUpCancelledSearch();
                         }
                         else {
                             
-                            let files = await fetchFileRange( selectedCatalogue, [multipartRange] );
+                            // If there's more than 1 multipartrange files to fetch and when we're in the middle of the fetch process,
+                            // it is hightly probable that the last line of each fetched file will be incomplete.
+                            // To manage potential problems, the last element of lines array is poped out into a buffer:
+                            // it will take place at the begining of the next file range fetch.
+                            
+                            let files = buffer + await fetchFileRange( selectedCatalogue, [multipartRange] );
                             let lines = files.split("\n");
+                            if( total > 1 && count < total ) {
+                                buffer = lines.pop(); }
+                            else { // The process left an empty line in the last element: remove it.
+                                lines.pop(); } 
+                            
+                            /*#*/if( DEBUG ){ console.log(' count',count,' total',total,' lines[',(typeof lines[lines.length -2].split(DATA_SEPARATOR)[1]),'] #####[',lines[lines.length -1],']#####'); };/*#*/
                             lines.forEach( (line) => {
                                 let fileInfo = line.split(DATA_SEPARATOR);
                                 if( fileInfo.length == 3 ) {
-                                    dataFiles.push( { path: bigData_Folders[parseInt(fileInfo[0].trim())]['dir']+'/'+fileInfo[2], size: parseInt(fileInfo[1].trim()) });
+                                    dataFiles.push( { path: bigData_Folders[parseInt(fileInfo[0])].dir +'/'+ fileInfo[2], size: parseInt(fileInfo[1]) });
                                 }
                             });
                         }
                     }
-                    if( showProgressBar ) { await wait( 100 ); progressBar.doHide(); }
+                    if( showProgressBar ) { await wait( 250 ); progressBar.doHide(); }
                 }
                 
                 /*#*/if( DEBUG ){ console.log("dataFiles",dataFiles); console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
@@ -727,7 +744,7 @@
                                 fetchFileRange( selectedFilesCatalogue, [multipartRange] )
                                 .then( (files) => {
                                     let lines = files.split("\n");
-                                    lines.forEach( (line) => { let fileInfo = line.split(' /'); if( fileInfo.length == 2 ) dataFiles.push({ path: '/'+fileInfo[1], size: parseInt(fileInfo[0].trim()) } ) });
+                                    lines.forEach( (line) => { let fileInfo = line.split(' /'); if( fileInfo.length == 2 ) dataFiles.push({ path: '/'+fileInfo[1], size: parseInt(fileInfo[0]) } ) });
                                 });
                             });
                     }
@@ -1693,7 +1710,7 @@
             // Add more content to the container
                 
             function showMoreFiles( files, replace=false ) {
-                let DEBUG = false;
+//                 let DEBUG = true;
             /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('files :',nl,files);};/*#*/
                 
                 if( replace ) $("#files-tab").data("display").shown = 0;
@@ -1734,7 +1751,6 @@
                         nbFiles = 0;
                         
                     if( withAcceptRejectFilters ) {
-                        
                         filesInFolders.matched.forEach( file => { 
                             files   += file.size.toString().padStart(11) +" "+ file.path +nl;
                             totSize += file.size;
