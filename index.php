@@ -3,24 +3,15 @@
 -[ sarrasemina.ca/index.php ]--------------------------------------------------
 ===============================================================================
 
-        +------------------------------------------------------------+
-        | IMPORTANT NOTE:                                            |
-        +------------------------------------------------------------+
-        | This index.php file is there for development purpose only. |
-        | In PROD, the final index file must be index.html           |
-        +------------------------------------------------------------+
-
-To work properly when using ByteRange with text files,
-Apache Server compression mode must be disabled.
-
-To do so:  $ sudo a2dismod deflate
-Then:      $ service apache2 restart
-
-To enable: $ sudo a2enmod deflate
-Then:      $ service apache2 restart
+    +------------------------------------------------------+
+    | IMPORTANT NOTE:                                      |
+    +------------------------------------------------------+
+    | This index.php file is for development purpose only. |
+    | In PROD, the final index file is index.html          |
+    +------------------------------------------------------+
 
 Created  - 2017-08-24
-Modified - 2018-01-29
+Modified - 2018-03-20
 
 Daniel Léveillé 
 
@@ -42,6 +33,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css<?= $v ?>">
         <link rel="stylesheet" href="/css/style.css<?= $v ?>">
     </head>
     <body>
@@ -81,7 +73,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                     <img height="26" src="/img/sig-blk-fr.svg"/>
                 </div>
                 <div class="col-sm-6 text-right slogo">
-                    <span id="title">Sarracenia</span> &nbsp;
+                    <span id="title">Configurateur Sarracenia Configurator</span> &nbsp;
                     <span><img height="30" src="/img/Weather-sun-clouds-rain.svg"
                     >&nbsp;<img class="currentCondImg" src="//weather.gc.ca/weathericons/10.gif" alt="Nuageux" title="Nuageux"
                     >&nbsp;<button type="button" class="btn btn-default btn-sm" id="switchLang"></button>                    
@@ -104,7 +96,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                 <td width="90"><label class="label-topic" data-label="V02.post">Topic: </label></td>
                                 <td>
                                     <div class="input-group input-group-sm disabled">
-                                        <span id="help-topic" class="input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="left"></span>
+                                        <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
                                         <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
                                             <label class="btn btn-primary btn-topic active" data-label="V02.post" style="border-radius: 0;">
                                                 <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
@@ -122,8 +114,8 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                 </td>
                                 <td>
                                     <div class="subtopic filter input-group input-group-sm disabled">
-                                        <span id="help-subtopic" class="input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="left"></span>
-                                        <input id="input-subtopic" class="form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
+                                        <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                        <input id="input-subtopic" class="text form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
                                         <span id="btnSearchReset" class="input-group-addon"></span>
                                     </div>
                                 </td>
@@ -133,13 +125,13 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                 <td class="err"> </td>
                             </tr>
                         </table>
-                        <hr style="margin: 5px 0;">
+                        <hr>
                         <table class="accept_reject filters">
                             <tr class="entry">
                                 <td width="90"><label class="label-accept_reject" for="input-accept_reject__1">Accept/Reject: </label></td>
                                 <td>
                                     <div class="input-group input-group-sm disabled">
-                                        <span class="help-accept_reject input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="left"></span>
+                                        <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
                                         <div class="filter input-group input-group-sm">
                                             <span class="input-group-btn btn-group-sm" data-toggle="buttons">
                                                 <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
@@ -153,14 +145,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                                     <i aria-hidden="true" class="fa fa-check-circle checked"></i>
                                                 </button>
                                             </span>
-                                            <input class="form-control input-accept_reject" id="input-accept_reject__1" type="text" data-ar="accept" placeholder="..." aria-label="..." />
+                                            <input class="text form-control input-accept_reject" id="input-accept_reject__1" type="text" data-ar="accept" placeholder="..." aria-label="..." />
                                             <span class="input-group-btn"><button class="btn btn-secondary btn-add" type="button" tabindex="-1"><span class="glyphicon glyphicon-plus c-vert"></span></button></span>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                         </table>
-                        <hr style="margin: 5px 0;">
+                        <hr>
                         <table class="accept_unmatch filter">
                             <tr>
                                 <td width="90">
@@ -168,7 +160,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                 </td>
                                 <td style="vertical-align: top;">
                                     <div class="input-group input-group-sm disabled" style="display:inline-table; width: 100px;">
-                                        <span class="help-accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="left"></span>
+                                        <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
                                         <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
                                             <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
                                                 <input type="radio" name="options" id="option1" autocomplete="off">
@@ -182,7 +174,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                             </label>
                                         </div>
                                     </div>
-                                    <span id="descr-accept_unmatch">All unmatched elements</span>
                                     <span class="btn btn-default btn-sm pull-right" id="btnSearch"><span class="glyphicon glyphicon-search"></span> Search</span>
                                 </td>
                             </tr>
@@ -197,45 +188,43 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
             </div>
             <div id="logs" class="col-sm-12">
                 <hr>
-                <button id="btnCopy" class="btn btn-secondary btn-sm pull-left hidden" type="button"><i class="fa fa-clipboard" aria-hidden="true"></i></button>
-                <p><strong id="log_title"></strong></p>
+                <div id="msg">
+                    <noscript>
+                        <h2>
+                            Your browser does not support JavaScript!<br>
+                            <small>You need to enable JavaScript to use this website!</small>
+                        </h2>
+                        <h2>
+                            JavaScript n'est pas activé sur votre navigateur !<br>
+                            <small>Vous devez l'activer pour utiliser les fonctions de ce site web!</small>
+                        </h2>
+                    </noscript>
+                </div>
                 <p id="logger"></p>
-                <pre id="config"></pre>
             </div>
         </div>
 <?php /*
 
         BOT
         -------------------------------------------------------------------- */ ?>
-            <template id="table">
-                <tbody id="catalogue"></tbody>
-                <tbody id="search"></tbody>
-                <tbody id="results"></tbody>
-            </template>
-        
         <div id="tabs" class="row page">
-            <div id="msg"></div>
             <ul class="nav nav-tabs" style="display: none;">
                 <li><a id="folders-tab" href="#folders" data-toggle="tab"></a></li>
+                <li><a id="topics-tab"  href="#topics"  data-toggle="tab"></a></li>
                 <li><a id="files-tab"   href="#files"   data-toggle="tab"></a></li>
                 <li><a id="stats-tab"   href="#stats"   data-toggle="tab"></a></li>
             </ul>
             <div class="tab-content clearfix">
-                <div class="tab-pane" id="folders"><ul class="tree"></ul></div>
-                <div class="tab-pane" id="files"><pre></pre></div>
-                <div class="tab-pane" id="stats"></div>
+                <div id="folders" class="tab-pane cluster-ol"></div>
+                <div id="topics"  class="tab-pane cluster-ol"></div>
+                <div id="files"   class="tab-pane cluster-ol"></div>
+                <div id="stats"   class="tab-pane"></div>
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
         
 <?php /*
-        
         SCRIPTS
-        
-        https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/0.7.17/ua-parser.min.js
-        https://cdnjs.cloudflare.com/ajax/libs/jquery.cookieBar/0.0.3/jquery.cookieBar.min.js
-        https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js
-        
         -------------------------------------------------------------------- */ ?>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
@@ -247,10 +236,10 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js<?= $v ?>"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
+        <script src="/js/plugins/clusterize/clusterize.min.js<?= $v ?>"></script>
         <script>
             var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>'];
         </script>
-        <script src="/js/CancellationTokenSource.js<?= $v ?>"></script>
         <script src="/js/main.js<?= $v ?>"></script>
     </body>
 </html> 

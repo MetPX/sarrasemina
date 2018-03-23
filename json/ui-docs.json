@@ -1,0 +1,165 @@
+{
+    "fr":
+    {
+        "acronym":
+        {
+        },
+        
+        "data":
+        {
+            "files"    : " fichiers ",
+            "folders"  : " répertoires ",
+            "foundOn"  : " trouvés sur ",
+            "foundFF"  :[" trouvés parmis "," fichiers dans "," répertoires"],
+            "gathering": "Préparation des données",
+            "subtopic" : "Sous-thème ",
+            "searching": "Recherche en cours",
+            "table"    :
+            {
+                "catalogue": "Contenu du catalogue ",
+                "config"   : "Configuration AMQP",
+                "folder"   : "répertoire",
+                "file"     : "fichier",
+                "search"   : "Recherche",
+                "filter"   : "Filtre",
+                "subtopic" : "Sous-thème :",
+                "accepted" : "Accepté :",
+                "rejected" : "Rejeté :",
+                "unmatch"  : "élément non-filtré",
+                "unmatchs" : "éléments non-filtrés",
+                "results"  : "Resultats",
+                "summary"  : "En résumé",
+                "found"    : "trouvé"
+            }
+        },
+                            
+        "dialog":
+        {
+            "title":
+            {
+                "attention"      : "Attention!",
+                "wait"           : "Un moment SVP...",
+                "about_catalogue": "À propos du catalogue "
+            },
+            "message":
+            {
+                "tocLoaded"  : "Le catalogue sélectionné a été chargé en mémoire.<br>Il contient la liste de ",
+                "displayToc" : ".<br><br>Afficher à l'écran cette table des matières peut prendre plusieurs secondes...",
+                "buildingToc": "<br><span class='bootstrap-dialog-button-icon glyphicon glyphicon-refresh icon-spin'></span> Création de la table des matières en cours.<br>&nbsp;"
+            }, 
+            "btn":
+            {
+                "continue"      : "Continuer",
+                "display"       : "Afficher",
+                "cancel"        : "Annuler",
+                "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
+                "stop"          : "Arrêter",
+                "stopSearch"    : "Arrêter la recherche maintenant",
+                "continueSearch": "Continuer la recherche..."
+            },
+            "icon"    : "glyphicon glyphicon-cloud-download",
+            "spinicon": "glyphicon glyphicon-refresh"
+        },
+
+        "help":
+        {
+            "tip"  : "Aide",
+            "title":
+            {
+                "topic"        : "Thème (V02)",
+                "subtopic"     : "Sous-thème",
+                "acceptReject" : "Accepter/Rejeter",
+                "acceptUnmatch": "Tous les éléments non filtrés"
+            },
+            "infos":
+            {
+                "topic"        : "<h5 class='red'>Description à compléter...</h5><br>Il y a deux choix de thèmes possibles pour AMQP :<br>&nbsp &bull; V02.post<br>&nbsp &bull; V02.report<br><br>Par défault, c'est <strong>V02.post</strong>.",
+                "subtopic"     : "<h5>Description à compléter...</h5><br>Les règles de ce filtre AMQP sont :",
+                "acceptReject" : "<h5>Description à compléter...</h5><br>Les règles de ce filtre sont des règles RegExp.",
+                "acceptUnmatch": "<h5>Description à compléter...</h5><br>Ce filtre accepte ou rejette tous les éléments restants n'ayant pas été retenus par les filtres précédents."
+            }
+        }
+    },
+
+
+
+    "en": {
+        "acronym":
+        {
+        },
+        
+        "data"   :
+        {
+            "files"    : " files",
+            "folders"  : " folders ",
+            "foundOn"  : " found on ",
+            "foundFF"  :[" found on "," files within "," folders"],
+            "gathering": "Gathering Data",
+            "subtopic" : "<strong>Subtopic</strong> ",
+            "searching": "Searching in progress",
+            "table"    :
+            {
+                "catalogue": "Catalogue Content ",
+                "config"   : "AMQP Configuration ",
+                "folder"   : "folder",
+                "file"     : "file",
+                "search"   : "Search",
+                "filter"   : "Filter",
+                "subtopic" : "Subtopic :",
+                "accepted" : "Accepted :",
+                "rejected" : "Rejected :",
+                "unmatch"  : "unmatched file",
+                "unmatchs" : "unmatched files",
+                "results"  : "Results",
+                "summary"  : "In Summary",
+                "found"    : "found"
+            }
+        },
+
+        "dialog":
+        {
+            "title":
+            {
+                "attention"      : "Attention!",
+                "wait"           : "One Moment Please...",
+                "about_catalogue": "About Catalogue "
+            },
+            "message":
+            {
+                "tocLoaded"  : "Selected catalogue is now loaded into memory.<br>It contains a listing of ",
+                "displayToc" : ".<br><br>Rendering its Table of Content on screen may take several seconds...",
+                "buildingToc": "<br><span class='bootstrap-dialog-button-icon glyphicon glyphicon-refresh icon-spin'></span> Building Table Of Content...<br>&nbsp;"}, 
+            "btn":
+            {
+                "continue"      : "Continue",
+                "display"       : "Display",
+                "cancel"        : "Cancel",
+                "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
+                "stop"          : "Stop",
+                "stopSearch"    : "Stop Search Now",
+                "continueSearch": "Continue Searching..."
+            },
+            "icon"    : "glyphicon glyphicon-cloud-download",
+            "spinicon": "glyphicon glyphicon-refresh"
+        },
+
+        "help":
+        {
+            "tip"  : "Aide",
+            "title":
+            {
+                "topic"        :"Thème (V02)",
+                "subtopic"     :"Sous-thème",
+                "acceptReject" :"Accepter/Rejeter",
+                "acceptUnmatch":"Tous les éléments non filtrés"
+            },
+            "infos":
+            {
+                "topic"        :"<h5 class='red'>Description à compléter...</h5><br>Il y a deux choix de thèmes possibles pour AMQP :<br>&nbsp &bull; V02.post<br>&nbsp &bull; V02.report<br><br>Par défault, c'est <strong>V02.post</strong>.",
+                "subtopic"     :"<h5>Description à compléter...</h5><br>Les règles de ce filtre AMQP sont :",
+                "acceptReject" :"<h5>Description à compléter...</h5><br>Les règles de ce filtre sont des règles RegExp.",
+                "acceptUnmatch":"<h5>Description à compléter...</h5><br>Ce filtre accepte ou rejette tous les éléments restants n'ayant pas été retenus par les filtres précédents."
+            }
+        }
+    }
+}
