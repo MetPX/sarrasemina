@@ -17,8 +17,8 @@
 .cluster-ol .progress-scroll { margin-top: 5px; max-width: 100%; border-radius: 5px; height: 7px; float: left; background-color: #09f; }
 .cluster-ol .clusterize-no-data{ margin: 0; padding: 10px 20px; font-size: 18px; text-align: center; }     /* Centering message that appears when no data provided */
 
-/* Label */
-.label.alert { color: #333; padding: 2px; font-size: 10px; line-height: 1.4em; margin-left: 5px; }
+/* Title in panes */
+.pane-title { color: #333; padding: 5px; font-size: 12px; line-height: 1.4em; display: inline-block; }
 
 /* Visualise scroll progress */
 #scroll-folders.emulate-progress li:hover{ cursor: pointer; font-weight: bold; background-color: #eee; }

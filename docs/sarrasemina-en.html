@@ -1,26 +1,3 @@
-<?php /*
-===============================================================================
--[ sarrasemina.ca/index.php ]--------------------------------------------------
-===============================================================================
-
-    +------------------------------------------------------+
-    | IMPORTANT NOTE:                                      |
-    +------------------------------------------------------+
-    | This index.php file is for development purpose only. |
-    | In PROD, the final index file is index.html          |
-    +------------------------------------------------------+
-
-Created  - 2017-08-24
-Modified - 2018-03-20
-
-Daniel Léveillé 
-
-*/ 
-
-$v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
-
-// ============================================================================
-?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -33,16 +10,10 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css<?= $v ?>">
-        <link rel="stylesheet" href="/css/style.css<?= $v ?>">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180329095012">
+        <link rel="stylesheet" href="/css/style.css?v20180329095012">
     </head>
     <body>
-<?php /*
-        
-        HELPERS
-        
-        Modal Dialog - https://nakupanda.github.io/bootstrap3-dialog/#available-options
-        -------------------------------------------------------------------- */ ?>
         <div class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -50,9 +21,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         <h4 class="modal-title"></h4>
                     </div>
-                    <div class="modal-body">
-                        <p>One fine body…</p>
-                    </div>
+                    <div class="modal-body"><p></p></div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal"></button>
                         <button type="button" class="btn btn-primary"></button>
@@ -63,10 +32,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <div class="notif-cookies">
           <span class="msg"></span> &nbsp; <a><i class="fa fa-times-circle" aria-hidden="true"></i></a>
         </div>
-<?php /*
-
-        TOP
-        -------------------------------------------------------------------- */ ?>
         <div id="docs" class="row page">
             <div class="row">
                 <div class="col-sm-5 logo">
@@ -74,15 +39,11 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 </div>
                 <div class="col-sm-7 text-right slogo">
                     <span style="white-space: nowrap">
-                        <span id="catalogues"></span>
-                        <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""></button>
-                        <button type="button" class="btn btn-default btn-sm help" id="help"  data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""><i class="fa fa-info" aria-hidden="true"></i></button>                    
+                        <h4 style="padding-right: 10px">Sarra Semina Documentation</h4>
                     </span>
+                    <a href="sarrasemina-fr.html"><button type="button" class="btn btn-default btn-sm en" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="Afficher en français" style="display: inline-block;">Français</button></a>
                 </div>
             </div>
-<?php /*
-        User create its own Sarra Config here
-        -------------------------------------------------------------------- */ ?>
             <div id="sarra-formula" class="hidden">
                 <hr>
                 <div class="row">
@@ -185,24 +146,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
             <div id="logs" class="col-sm-12">
                 <hr>
                 <div id="msg">
-                    <noscript>
-                        <h2>
-                            Your browser does not support JavaScript!<br>
-                            <small>You need to enable JavaScript to use this website!</small>
-                        </h2>
-                        <h2>
-                            JavaScript n'est pas activé sur votre navigateur !<br>
-                            <small>Vous devez l'activer pour utiliser les fonctions de ce site web!</small>
-                        </h2>
-                    </noscript>
+                    <h1>Welcome on Sarra&nbsp;Semina<br><small>(The Rules Configurator for Sarracenia)</small></h1>
+                    <p><br><strong>The preliminary drafting of the documentation is in progress...</strong></p>
+                    <p>Thank you for your patience.</p>
+                    <p>&nbsp;</p>
                 </div>
                 <p id="logger"></p>
             </div>
         </div>
-<?php /*
-
-        BOT
-        -------------------------------------------------------------------- */ ?>
         <div id="tabs" class="row page">
             <ul class="nav nav-tabs" style="display: none;">
                 <li><a id="folders-tab" href="#folders" data-toggle="tab"></a></li>
@@ -219,9 +170,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
         
-<?php /*
-        SCRIPTS
-        -------------------------------------------------------------------- */ ?>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -229,13 +177,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-fr_FR.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.41/polyfill.min.js"></script>
-        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js<?= $v ?>"></script>
+        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js?v20180329095012"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
-        <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
-        <script src="/js/plugins/clusterize/clusterize.min.js<?= $v ?>"></script>
-        <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>', '/json/brokers.json<?= $v ?>'];
-        </script>
-        <script src="/js/main.js<?= $v ?>"></script>
     </body>
 </html> 

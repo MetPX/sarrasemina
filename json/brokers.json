@@ -1,0 +1,5 @@
+{
+    "ddi.*" : "amqp://anonymous@ddi.cmc.ec.gc.ca",
+    "dds.*" : "amqp://anonymous@ddsr.cmc.ec.gc.ca",
+    "wxo.*" : "amqps://anonymous@dd.weather.gc.ca"
+}
