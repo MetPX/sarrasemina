@@ -19,6 +19,9 @@
 
 /* Title in panes */
 .pane-title { color: #333; padding: 5px; font-size: 12px; line-height: 1.4em; display: inline-block; }
+.pane-title#files-label { padding-bottom: 0; }
+.pane-title#files-label ol { padding-left: 53px; list-style: none; font-size: 10px; font-weight: bold; }
+
 
 /* Visualise scroll progress */
 #scroll-folders.emulate-progress li:hover{ cursor: pointer; font-weight: bold; background-color: #eee; }

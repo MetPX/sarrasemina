@@ -4,14 +4,14 @@
         <title>Sarracenia Semina</title>
         <meta charset="utf-8">
 
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Open+Sans+Condensed:300|Ubuntu+Mono">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=BenchNine:700|Teko:500|Open+Sans|Open+Sans+Condensed:300|Ubuntu+Mono">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180323085957">
-        <link rel="stylesheet" href="/css/style.css?v20180323085957">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180410101933">
+        <link rel="stylesheet" href="/css/style.css?v20180410101933">
     </head>
     <body>
         <div class="modal fade">
@@ -36,20 +36,16 @@
         </div>
         <div id="docs" class="row page">
             <div class="row">
-                <div class="col-sm-6 logo">
+                <div class="col-sm-5 logo">
                     <img height="26" src="/img/sig-blk-fr.svg"/>
                 </div>
-                <div class="col-sm-6 text-right slogo">
-                    <span id="title">Configurateur Sarracenia Configurator</span> &nbsp;
-                    <span><img height="30" src="/img/Weather-sun-clouds-rain.svg"
-                    >&nbsp;<img class="currentCondImg" src="//weather.gc.ca/weathericons/10.gif" alt="Nuageux" title="Nuageux"
-                    >&nbsp;<button type="button" class="btn btn-default btn-sm" id="switchLang"></button>                    
+                <div class="col-sm-7 text-right slogo">
+                    <span style="white-space: nowrap">
+                        <span id="catalogues"></span>
+                        <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""></button>
+                        <button type="button" class="btn btn-default btn-sm help" id="help"  data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""><i class="fa fa-info" aria-hidden="true"></i></button>                    
                     </span>
                 </div>
-            </div>
-            <hr>
-            <div class="row">
-                <div id="catalogues" class="col-sm-12"><p></p></div>
             </div>
             <div id="sarra-formula" class="hidden">
                 <hr>
@@ -57,15 +53,15 @@
                     <div class="sarra-configs col-xm-12 accepts-rejects">
                         <table>
                             <tr>
-                                <td width="90"><label class="label-topic" data-label="V02.post">Topic: </label></td>
+                                <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                 <td>
                                     <div class="input-group input-group-sm disabled">
                                         <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
                                         <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                            <label class="btn btn-primary btn-topic active" data-label="V02.post" style="border-radius: 0;">
+                                            <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
                                                 <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
                                             </label>
-                                            <label class="btn btn-primary btn-topic" data-label="V02.report">
+                                            <label class="btn btn-primary btn-topic" data-label="v02.report">
                                                 <input type="radio" name="options" id="option2" autocomplete="off"><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> report
                                             </label>
                                         </div>
@@ -79,6 +75,12 @@
                                 <td>
                                     <div class="subtopic filter input-group input-group-sm disabled">
                                         <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                        <span id="products-list" class="catalogue-short-list input-group-addon">
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdown-products-list" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-products-list" data-filter ></ul>
+                                            </div>
+                                        </span>
                                         <input id="input-subtopic" class="text form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
                                         <span id="btnSearchReset" class="input-group-addon"></span>
                                     </div>
@@ -182,7 +184,6 @@
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
-        
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
@@ -190,13 +191,17 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-fr_FR.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.41/polyfill.min.js"></script>
-        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js?v20180323085957"></script>
+        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
-        <script src="/js/plugins/clusterize/clusterize.min.js?v20180323085957"></script>
+        <script src="/js/plugins/clusterize/clusterize.min.js"></script>
+
+        <script src="/js/plugins/bootstrap-dropdown-filter/diacritics.js"></script>
+        <script src="/js/plugins/bootstrap-dropdown-filter/bootstrap-dropdown-filter.js"></script>
+
         <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180323085957', '/json/ui-docs.json?v20180323085957'];
+            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180410101933', '/json/ui-docs.json?v20180410101933', '/json/brokers.json?v20180410101933'];
         </script>
-        <script src="/js/main.js?v20180323085957"></script>
+        <script src="/js/main.js?v20180410101933"></script>
     </body>
 </html> 

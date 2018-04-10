@@ -122,6 +122,14 @@ select.input-sm { line-height: 1.3; height: 28px; }
 .input-group-sm>.input-group-btn>.btn { line-height: 1.3; height: 27px; padding: 5px 8px; }
 .input-group-sm>.text.form-control { font-size: 11px; }
 
+.input-group-sm>.catalogue-short-list { padding: 1px; }
+.input-group-sm>.catalogue-short-list .dropdown-toggle { padding: 3px 6px; }
+.input-group-sm>.catalogue-short-list .dropdown-menu   { padding: 5px; left: auto; /*right: -20px; */ max-height: 360px !important; }
+.input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 12px; }
+.input-group-sm>.catalogue-short-list .dropdown-menu li.header { clear: both; display: block; }
+.input-group-sm>.catalogue-short-list .dropdown-menu li.header h3 { font-size: 1.3em; color: #35d; border-bottom: 1px solid #bcd; background-color: #def; padding: 5px; margin: 3px; }
+.input-group-sm>.catalogue-short-list .dropdown-menu .form-control { width: 100%; border-radius: 4px; padding: 0px 6px; font-size: 12px;  margin:0 auto; margin-bottom: 5px; height: 30px; }
+
 #catalogues { margin: 3px; }
 #info-catalogue span { background-color: #fe9; padding: 1px 3px; }
 #info-catalogue span span { font-weight: bold; }
@@ -149,6 +157,10 @@ select.input-sm { line-height: 1.3; height: 28px; }
   .modal-dialog.modal-sm { width: auto; min-width: 340px; }
   .logo { margin-bottom: 15px; }
   .slogo { text-align: center !important; }
+}
+
+@media (max-width: 500px) {
+  .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: 'BenchNine', sans-serif; font-weight: 500; line-height: 2; }
 }
 
 

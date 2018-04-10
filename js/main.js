@@ -11,6 +11,10 @@
 /*#*/var DEBUG = false;/*#*/
 /*#*/if( DEBUG ){ console.time   ( "   " ); console.group(me("--- WARMING UP ---"));};/*#*/
 
+if( $.cookie( "LANG" ) === undefined )                                  // Detect browser's default language and set cookie
+    $.cookie( "LANG", (/fr/.test(navigator.languages[0]) ? 'fr':'en') );
+
+
 // ---------------------------------------------------------------------
 //  CLASSES
 // ---------------------------------------------------------------------
@@ -46,71 +50,78 @@ class CancellationTokenSource {
 //  GLOBAL VARS
 // ---------------------------------------------------------------------
 
-
-const GUI = { STATE_READY     : 0,
-              STATE_RESET     : 1,
-              STATE_LOADING   : 2,
-              STATE_SEARCHING : 3,
-              STATE_FOUND     : 4 },
-        C = { BLACK :"black",
-              BLUE  :"blue"},
-        W = { H1: ['<h1>','</h1>'],                                     // Predefined tag wrapers
-              cG: ['<span class="c-gris">','</span>'],
-              cJ: ['<span class="c-jaune">','</span>'],
-              cR: ['<span class="c-rouge">','</span>'],
-              cV: ['<span class="c-vert">','</span>'],
-              CN: ['<strong class="c-noir">','</strong>'],
-              CR: ['<strong class="c-rouge">','</strong>'],
-              CV: ['<strong class="c-vert">','</strong>']
+const
+    CONFIG = {
+        options : {
+            broker       : "amqps://anonymous@dd.weather.gc.ca",
+            xchange      : "xpublic",
+            topic        : "v02.post",
+            subtopic     : [],
+            acceptReject : [],
+            acceptUnmatch: "False"
         },
-        nl= '\n',
-        CATALOG_TYPE       = "toc",
-        DATA_SEPARATOR     = "|",
-        id_NB_FILES        = 0,
-        id_TOC_RANGE_START = 1,
-        id_TOC_RANGE_STOP  = 2,
-        id_TOTAL_SIZE      = 3,
-        id_RANGE_START     = id_TOC_RANGE_START,
-        id_RANGE_STOP      = id_TOC_RANGE_STOP,
-        PANE               = { CATALOGUE: "folders", SUBTOPIC: "topics", FILES: "files" },
-        CONFIG             = {
-            options : {
-                broker       : "amqps://anonymous@dd.weather.gc.ca",
-                xchange      : "xpublic",
-                topic        : "v02.post",
-                subtopic     : [],
-                acceptReject : [],
-                acceptUnmatch: "False"
-            },
-            setup   : ( newOptions = {} ) => {
-                CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
-            },
-            write   : () => {
-                let config = "", newOptions = {}, subtopics = [], acceptRejects = [];
-                $( ".input-subtopic" )     .each( (index, item) => { let filter = $(item).val(); if( filter ) subtopics    .push( [filter] ); });
-                $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) acceptRejects.push( [$(item).data('ar'),filter] ); });
-                newOptions.topic         = $(".label-topic").data('label');
-                newOptions.subtopic      = subtopics;
-                newOptions.acceptReject  = acceptRejects;
-                newOptions.acceptUnmatch = $("#btn-accept_unmatch").data('accept_unmatch');
-                CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
+        setup   : ( newOptions = {} ) => {
+            CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
+        },
+        write   : () => {
+            let config = "", newOptions = {}, subtopics = [], acceptRejects = [];
+            $( ".input-subtopic" )     .each( (index, item) => { let filter = $(item).val(); if( filter ) subtopics    .push( [filter] ); });
+            $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) acceptRejects.push( [$(item).data('ar'),filter] ); });
+            newOptions.topic         = $(".label-topic").data('label');
+            newOptions.subtopic      = subtopics;
+            newOptions.acceptReject  = acceptRejects;
+            newOptions.acceptUnmatch = $("#btn-accept_unmatch").data('accept_unmatch');
+            CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
 
-                config  = "broker          "+ CONFIG.options.broker  +nl;
-                config += "exchange        "+ CONFIG.options.xchange +nl;
-                config += "topic_prefix    "+ CONFIG.options.topic   +nl;
-                config += CONFIG.options.subtopic    .reduce( ( str, val, ind, arr ) => { return str +   "subtopic        "+ val    + nl }, "" );
-                config += CONFIG.options.acceptReject.reduce( ( str, val, ind, arr ) => { return str + val[0] +"          "+ val[1] + nl }, "" );
-                config += "accept_unmatch  "+ CONFIG.options.acceptUnmatch;
-                return config;
-            }
-        };
+            config  = "broker          "+ CONFIG.options.broker  +L;
+            config += "exchange        "+ CONFIG.options.xchange +L;
+            config += "topic_prefix    "+ CONFIG.options.topic   +L;
+            config += CONFIG.options.subtopic    .reduce( ( str, val, ind, arr ) => { return str +   "subtopic        "+ val    +L }, "" );
+            config += CONFIG.options.acceptReject.reduce( ( str, val, ind, arr ) => { return str + val[0] +"          "+ val[1] +L }, "" );
+            config += "accept_unmatch  "+ CONFIG.options.acceptUnmatch;
+            return config;
+        }
+    },
+    CATALOG = {
+        FILETYPE       : 'toc',
+        DATA_SEPARATOR : '|',
+        id_NB_FILES    : 0,
+        id_RANGE_START : 1,
+        id_RANGE_STOP  : 2,
+        id_TOTAL_SIZE  : 3
+    },
+    GUI = {
+        state           : 0,
+        STATE_READY     : 0,
+        STATE_RESET     : 1,
+        STATE_LOADING   : 2,
+        STATE_SEARCHING : 3,
+        STATE_FOUND     : 4,
         
-if( $.cookie( "lang" ) === undefined )                                  // Detect browser's default language and set cookie
-    $.cookie( "lang", (/fr/.test(navigator.languages[0]) ? 'fr':'en') );
+        BLACK :'black',
+        BLUE  :'blue'
+    },
+    L    = '\n',
+    LANG = $.cookie("LANG"),                                            // Select user's prefered language
+    PANE = {
+        CATALOGUE: "folders",
+        SUBTOPIC : "topics",
+        FILES    : "files"
+    },
+    TAG = { 
+        H1: ['<h1>','</h1>'],                                       // Predefined tag wrapers
+        cG: ['<span class="c-gris">','</span>'],
+        cJ: ['<span class="c-jaune">','</span>'],
+        cR: ['<span class="c-rouge">','</span>'],
+        cV: ['<span class="c-vert">','</span>'],
+        CN: ['<strong class="c-noir">','</strong>'],
+        CR: ['<strong class="c-rouge">','</strong>'],
+        CV: ['<strong class="c-vert">','</strong>']
+    };
+    
 
-
-var t       = {},                                                       // GUI's text container
-    lang    = $.cookie("lang"),                                         // Select user's prefered language
+var
+    t       = {},                                                       // GUI's text container
     selectedFilesCatalogue,                                             // ### NOTE ### Catalogue is splitted in two data files: .json (contains folder paths) and .toc (contains file names)
     bigData_Folders = [],                                               // Array of objects - folders data (catalogue.json)
     bigData_Files   = [],                                               // Array of objects - files   data (catalogue.toc - byterange)
@@ -126,7 +137,7 @@ var t       = {},                                                       // GUI's
         
         max           : 0,
         str           : {ln1:'',ln2:''},
-        color         : C.BLACK,
+        color         : GUI.BLACK,
         progress      : 0,
         minCount2Show : 5000,                   // minimum number of file count iterations to worth display progress bar...
         isWorth2Display: 0,
@@ -137,7 +148,7 @@ var t       = {},                                                       // GUI's
         init          : function( max, s={ ln1:t.data.searching, ln2:'' }, color ) {
                             this.max      = max;
                             this.str      = s;
-                            this.doColor( color||C.BLACK );
+                            this.doColor( color||GUI.BLACK );
                             this.progress = "0%";
                             this.$progress_bar.width( this.progress );
                             this.$progress_txt.html( `${this.str.ln1} - [ 0% ]${( this.str.ln2 ? `<br>0${this.str.ln2}`:'' )}` );
@@ -176,7 +187,7 @@ function _initialize_() {
 /*#*/if( DEBUG ){ console.group(me());};/*#*/
     
     let switchLangue = { fr: { btn:"English", title:"Display in English" }, en: { btn:"Français", title:"Afficher en français" } }
-    $("#switchLang").attr('title',switchLangue[lang].title).text( switchLangue[lang].btn ).addClass(lang).show();
+    $("#switchLang").attr('title',switchLangue[LANG].title).text( switchLangue[LANG].btn ).addClass(LANG).show();
 
     searchToken.cancel();
     _init_data_tabs();
@@ -209,7 +220,7 @@ function _initialize_() {
         requests    = jsonURLs.map((url) => $.ajax(url)),                // Get JSON requests for GUI texts & catalogue lists from jsonURLs global var
         $catalogues = $("#catalogues");
     
-    $catalogues.html( wrap( msg.ini[lang] ) );
+    $catalogues.html( wrap( msg.ini[LANG] ) );
     testCookies();
     testBrowserCompatibility();
     
@@ -219,7 +230,7 @@ function _initialize_() {
             .catch  ( processError );                                    // Load GUI texts  ### MS IE don't support Promise -> Only MS Edge
     
     function processError(data) {
-        $catalogues.html( wrap( msg.err.loadJSON[lang] + data.status, ['<p style="white-space: pre-wrap; font-size: 10px;">','</p>'] ) );
+        $catalogues.html( wrap( msg.err.loadJSON[LANG] + data.status, ['<p style="white-space: pre-wrap; font-size: 10px;">','</p>'] ) );
     }
 
     function processData(data) {
@@ -238,19 +249,19 @@ function _initialize_() {
             }
         });
         
-        $.extend(t,GUItexts[lang],DOCtexts[lang],GUItexts.icons);
+        $.extend(t,GUItexts[LANG],DOCtexts[LANG],GUItexts.icons);
 
         $("#title")                .html(t.title);
-        $("#msg")                  .html(wrap(t.bienvenue, W.H1));
-        $("#logger")               .html(wrap(t.wait.searchInProgress +" - "+ t.wait.please, W.CN ) );
+        $("#msg")                  .html(wrap(t.bienvenue, TAG.H1));
+        $("#logger")               .html(wrap(t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
         $(".label-topic")          .html(t.topic            +t.comma);
         $(".label-subtopic")       .html(t.subtopic         +t.comma);
         $(".input-subtopic")       .attr("placeholder", t.placeholder.AMQP_filter ).attr("aria-label",t.enterYourFilter);
-        $(".label-accept_reject")  .html(wrap(t.accept,    W.cV) +t.comma);
+        $(".label-accept_reject")  .html(wrap(t.accept,    TAG.cV) +t.comma);
         $(".input-accept_reject")  .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
-        $(".label-accept_unmatch") .html(wrap(t.reject,    W.cR) +t.comma);
+        $(".label-accept_unmatch") .html(wrap(t.reject,    TAG.cR) +t.comma);
 
-        $("#switchLang")                                                                         .data("title", switchLangue[lang].title)   .data("infos", switchLangue[lang].title).tooltip();
+        $("#switchLang")                                                                         .data("title", switchLangue[LANG].title)   .data("infos", switchLangue[LANG].title).tooltip();
         $("#help")                 .attr("title", t.help.tip +" - "+ t.help.title.page)          .data("title", t.help.title.page)          .data("infos", t.help.infos.page).tooltip().show();
         $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)         .data("title", t.help.title.topic)         .data("infos", t.help.infos.topic).tooltip();
         $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)      .data("title", t.help.title.subtopic)      .data("infos", t.help.infos.subtopic).tooltip();
@@ -264,7 +275,7 @@ function _initialize_() {
 
         if( !catalogs ) {
             
-            $catalogues.html(msg.err.noCatalogues[lang]);
+            $catalogues.html(msg.err.noCatalogues[LANG]);
         }
         else {
             
@@ -278,7 +289,7 @@ function _initialize_() {
             $catalogues.html( mySelector );
             $('#catalogueSelector').on('change', function(){
                 let selectedCatalogue = $(this).find("option:selected").val();
-                selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG_TYPE;
+                selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG.FILETYPE;
 
                 loadFoldersCatalogueData( selectedCatalogue );
             });
@@ -292,7 +303,7 @@ function _initialize_() {
     
     function testCookies() {
         if( !$.cookie('cookies') ) {
-            $('.notif-cookies .msg').html( msg.cookie[lang] );
+            $('.notif-cookies .msg').html( msg.cookie[LANG] );
             $('.notif-cookies').show();
         }
     }
@@ -360,11 +371,11 @@ function _initialize_() {
             $.cookie( "browser", "OK", { expires: 365 } );
         }
         else {
-            let pTitle     = ((lang == 'fr') ? "Problème":"Issue"),
-                pMessage   = wrap( msg.err.browserIssue[lang] + browserList +"\n\n"+ msg.err.browserUsed[lang] +"- "+ result.browser.name +" v."+ result.browser.major ),
+            let pTitle     = ((LANG == 'fr') ? "Problème":"Issue"),
+                pMessage   = wrap( msg.err.browserIssue[LANG] + browserList +"\n\n"+ msg.err.browserUsed[LANG] +"- "+ result.browser.name +" v."+ result.browser.major ),
                 pType      = "type-danger",
                 pBtnOK     = { cssClass:'btn-default btn-sm', label:'&nbsp; &nbsp; OK &nbsp; &nbsp;' },
-                pBtnGetRid = { cssClass:'btn-default btn-sm', label:((lang == 'fr') ? "Ne plus afficher ce message":"Don't show this message again"), action:( function(){ $.cookie( "showWarningDialog", "NO", { expires: 365 }) }) };
+                pBtnGetRid = { cssClass:'btn-default btn-sm', label:((LANG == 'fr') ? "Ne plus afficher ce message":"Don't show this message again"), action:( function(){ $.cookie( "showWarningDialog", "NO", { expires: 365 }) }) };
                 // BSDialogPrompt(pMessage,pBtnAccept,pBtnCancel);
                 
                 BootstrapDialog.show({
@@ -422,7 +433,7 @@ function resetStatistics( part = "" ) {
 
 async function fetchFileRange(url, byteRanges=[""]) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ logMe(url +nl+"   - ["+ byteRanges +"]", '-');};/*#*/
+/*#*/if( DEBUG ){ logMe(url +L+"   - ["+ byteRanges +"]", '-');};/*#*/
 
     try {
         let fileInfo, rangeText = "";
@@ -430,7 +441,7 @@ async function fetchFileRange(url, byteRanges=[""]) {
             fileInfo  = await getFileSize( url, byteRanges[i] );
             rangeText+= await httpGet( url, fileInfo, byteRanges[i] );
         }
-/*#* /if( DEBUG ){ 'rangeText',nl,rangeText,nl,logMe('-','-');};/*#*/
+/*#* /if( DEBUG ){ 'rangeText',L,rangeText,L,logMe('-','-');};/*#*/
         return rangeText;
     }
     catch(err) {
@@ -665,6 +676,41 @@ function getDataCluster( pane = PANE.CATALOGUE, data, paneTitle ) {
     });
 }
 
+function getSubtopicDirs() {
+    
+    let shortlist = "", path = "", paths_P = [], paths_SP = [];
+    
+    // for products only = only second level dirs -> subtopics are: *.*.dir2.#                   
+    // otherwise, show source and products only   -> subtopics are: *.dir1.dir2.#
+    
+    bigData_Folders.forEach( (item,index)=>{
+        
+        // Do list Products only
+        path = item.dir.replace(/^\/\d{8}\/[a-z-0-9_]*\/([a-z-0-9_]*)\/.*/i,"*.*.$1.#").
+                        replace(/^\/\d{8}\/([a-z-0-9_]*)\/\d{2}$/i,"*.$1").
+                        replace(/^\/\d{8}\/[a-z-0-9_]*\/([a-z-0-9_]*)/i,"*.*.$1");
+        if( !paths_P.includes(path) ){ paths_P.push(path); }
+
+        // Do Sources & Products only
+        path = item.dir.replace(/^\/\d{8}\/([a-z-0-9_]*)\/([a-z-0-9_]*)\/.*/i,"*.$1.$2.#").
+                        replace(/^\/\d{8}\/([a-z-0-9_]*)\/\d{2}$/i,"*.$1").
+                        replace(/^\/\d{8}\/([a-z-0-9_]*)\/([a-z-0-9_]*)/i,"*.$1.$2");
+        if( !paths_SP.includes(path) ){ paths_SP.push(path); }
+    });
+    
+    paths_P .sort( (a,b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+    paths_SP.sort( (a,b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+    
+    // Add Products & Sources/Products to the short list
+    shortlist += `<li class="dropdown-filter header" role="presentation"><h3>${t.products}</h3></li>`;
+    paths_P .forEach( (path,index)=>{ shortlist += `<li><a class="dropdown-filter" href="">${path}</a></li>` } );
+    shortlist += `<li class="dropdown-filter header" role="presentation"><h3>${t.sources_products}</h3></li>`;
+    paths_SP.forEach( (path,index)=>{ shortlist += `<li><a class="dropdown-filter" href="">${path}</a></li>` } );
+    
+    $("#products-list .dropdown-menu").html( shortlist );
+    $('[data-filter], .dropdown-filter').bsDropDownFilter({ label: t.filter.by });
+}
+
 
 // ---------------------------------------------------------------------
 //
@@ -694,13 +740,13 @@ function loadFoldersCatalogueData( selectedCatalogue ) {
         },
         success: function(foldersData){
             
-            let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[id_NB_FILES]; s.bytes += folder.inf[id_TOTAL_SIZE]; }); return s; };
+            let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[CATALOG.id_NB_FILES]; s.bytes += folder.inf[CATALOG.id_TOTAL_SIZE]; }); return s; };
             
             bigData_Folders = foldersData;
 
             let total       = getSums( foldersData );
-            let fmtTotal    = { folders : plural(t.folder, total.folders, '0,0', W.CV),
-                                files   : plural(t.file,   total.files,   '0,0', W.CR),
+            let fmtTotal    = { folders : plural(t.folder, total.folders, '0,0', TAG.CV),
+                                files   : plural(t.file,   total.files,   '0,0', TAG.CR),
                                 bytes   : ("("+ numeral(total.bytes).format('0.00 b') +")").replace(' ','&nbsp;')
                                 };
             let cataloguePaths = selectedCatalogue.split("/");
@@ -708,8 +754,10 @@ function loadFoldersCatalogueData( selectedCatalogue ) {
             let catalogInfo    = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma}<br>${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}`;
             
             resetStatistics();
+            getSubtopicDirs();
             statistics.catalog = { name: catalogueName, folders: total.folders, files: total.files, bytes: total.bytes };
             cluster.catalog = getDataCluster( PANE.CATALOGUE, bigData_Folders, catalogInfo );
+            
             
             _init_data_tabs(total.folders,total.files);
             setGUIstate( GUI.STATE_LOADING );
@@ -717,7 +765,7 @@ function loadFoldersCatalogueData( selectedCatalogue ) {
         },
         error: function(XMLHttpRequest, textStatus, errorThrown){
             $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small>>> ${errorThrown} <<<</small></h2>`).show();
-            console.log( t.error + " - loadFoldersCatalogueData("+ selectedCatalogue +")",nl,'XMLHttpRequest',XMLHttpRequest,nl,'textStatus',textStatus,nl,'errorThrown',errorThrown );
+            console.log( t.error + " - loadFoldersCatalogueData("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
         }
     });
 
@@ -744,14 +792,14 @@ async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalo
     if( folders.matched ) {
         
         // If the file's byterange is larger than a reasonable size to pick it up with one request, it is broken into smaller multipart chuncks to make it easier to chew ...
-        let multipartRanges = optimizeMultipartRanges( folders.matched.map( file => { return [ file.inf[id_RANGE_START], file.inf[id_RANGE_STOP], file.id ]; } ) );
+        let multipartRanges = optimizeMultipartRanges( folders.matched.map( file => { return [ file.inf[CATALOG.id_RANGE_START], file.inf[CATALOG.id_RANGE_STOP], file.id ]; } ) );
         
         let percent = 0,
             count   = 0,
             buffer  = '',
             total   = multipartRanges.length;
         
-        if( progressBar.isWorthDisplay ) { progressBar.init( total, {ln1:t.data.gathering, ln2:t.data.files }, C.BLUE ); await wait( 1 ); } // Give some time to progress-bar beeing refreshed...
+        if( progressBar.isWorthDisplay ) { progressBar.init( total, {ln1:t.data.gathering, ln2:t.data.files }, GUI.BLUE ); await wait( 1 ); } // Give some time to progress-bar beeing refreshed...
 
         // Can't use forEach on async/await functions... -> go for traditional way...
         for (let multipartRange of multipartRanges) {
@@ -775,9 +823,9 @@ async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalo
                 else { // The process left an empty line in the last element: remove it.
                     lines.pop(); } 
                 
-                /*#*/if( DEBUG ){ console.log(' count',count,' total',total,' lines[',(typeof lines[lines.length -2].split(DATA_SEPARATOR)[1]),'] #####[',lines[lines.length -1],']#####'); };/*#*/
+                /*#*/if( DEBUG ){ console.log(' count',count,' total',total,' lines[',(typeof lines[lines.length -2].split(CATALOG.DATA_SEPARATOR)[1]),'] #####[',lines[lines.length -1],']#####'); };/*#*/
                 lines.forEach( (line) => {
-                    let fileInfo = line.split(DATA_SEPARATOR);
+                    let fileInfo = line.split(CATALOG.DATA_SEPARATOR);
                     if( fileInfo.length == 3 ) {
                         dataFiles.push( { path: bigData_Folders[parseInt(fileInfo[0])].dir +'/'+ fileInfo[2], size: parseInt(fileInfo[1]) });
                     }
@@ -798,7 +846,7 @@ async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalo
 
 function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
 // DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('withARFilter['+withAcceptRejectFilters+'] filesInFolders :',nl,filesInFolders);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('withARFilter['+withAcceptRejectFilters+'] filesInFolders :',L,filesInFolders);};/*#*/
 
     let dataFiles = [];
 
@@ -809,7 +857,7 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
         }
         else {
 
-            let multipartRanges = optimizeMultipartRanges( filesInFolders.matched.map( (file) => { return [ file.inf[id_RANGE_START], file.inf[id_RANGE_STOP], file.id ]; } ) );
+            let multipartRanges = optimizeMultipartRanges( filesInFolders.matched.map( (file) => { return [ file.inf[CATALOG.id_RANGE_START], file.inf[CATALOG.id_RANGE_STOP], file.id ]; } ) );
             multipartRanges.forEachAsync(
                 ( multipartRange ) => {
                     fetchFileRange( selectedFilesCatalogue, [multipartRange] )
@@ -834,7 +882,7 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
 
 function getSubtopicMatch( foldersData, subtopicFilter ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilter+'] foldersData :',nl,foldersData);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilter+'] foldersData :',L,foldersData);};/*#*/
 
     let regex = new RegExp( subtopicFilter );
     let stats = { matched: { nbFiles: 0, totSize: 0, ranges: [] }, unmatch: { nbFiles: 0, totSize: 0, ranges: [] } };
@@ -844,18 +892,18 @@ function getSubtopicMatch( foldersData, subtopicFilter ) {
     for( let i=0, n=foldersData.length; i < n; i++ ) {
         if( regex.test( foldersData[i].dir ) ) {
             matched.push(foldersData[i]);
-            if(foldersData[i].inf[id_NB_FILES] > 0) {
-                stats.matched.nbFiles += foldersData[i].inf[id_NB_FILES];
-                stats.matched.totSize += foldersData[i].inf[id_TOTAL_SIZE];
-                stats.matched.ranges.push( foldersData[i].inf[id_RANGE_START]+'-'+foldersData[i].inf[id_RANGE_STOP] );
+            if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
+                stats.matched.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
+                stats.matched.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
+                stats.matched.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
             }
         }
         else {
             unmatch.push(foldersData[i]);
-            if(foldersData[i].inf[id_NB_FILES] > 0) {
-                stats.unmatch.nbFiles += foldersData[i].inf[id_NB_FILES];
-                stats.unmatch.totSize += foldersData[i].inf[id_TOTAL_SIZE];
-                stats.unmatch.ranges.push( foldersData[i].inf[id_RANGE_START]+'-'+foldersData[i].inf[id_RANGE_STOP] );
+            if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
+                stats.unmatch.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
+                stats.unmatch.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
+                stats.unmatch.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
             }
         }
     }
@@ -873,7 +921,7 @@ function getSubtopicMatch( foldersData, subtopicFilter ) {
 
 async function getAcceptRejectMatch( filesData, reg, cancel ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+reg+']',nl,'filesData :',nl,filesData);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+reg+']',L,'filesData :',L,filesData);};/*#*/
     
     reg[0][0] = reg[0][0].replace('$','.*$');   // First filter is subtopic. When Accept-Reject filters kiks in, make sure subtopic will allow everything beyond its path.
 
@@ -1008,7 +1056,7 @@ function isValidAMQP(filter) {
         let eMessage = '<p>'+ ( !vr1 ? t.err_amqp.nodot : '' ) +
                                 ( !vr2 ? (!vr1 ? '<br>':'') + t.err_amqp.stars : '' ) +
                                 ( !vr3 ? (!vr1 || !vr2 ? '<br>':'') + t.err_amqp.hasht : '' ) +'</p>';
-        $("#err-subtopic .err").html( eTitle + wrap(eMessage, W.cJ) );
+        $("#err-subtopic .err").html( eTitle + wrap(eMessage, TAG.cJ) );
         $("#err-subtopic").show();
     }
     
@@ -1109,8 +1157,8 @@ async function performSearch ( allFilters ) {
     // Extract some info for the logger...
     nbFolders     = STm.matched.length;
     nbFiles       = filesInFolders.stats.matched.nbFiles;
-    nbFoldersHtml = plural(t.folder, nbFolders, '0,0', W.CV);
-    nbFilesHtml   = plural(t.file,   nbFiles,   '0,0', W.CR);
+    nbFoldersHtml = plural(t.folder, nbFolders, '0,0', TAG.CV);
+    nbFilesHtml   = plural(t.file,   nbFiles,   '0,0', TAG.CR);
     
     progressBar.updateDisplay( nbFiles );
 
@@ -1126,18 +1174,18 @@ async function performSearch ( allFilters ) {
         let nbFiles   = filesInFolders.stats.matched.nbFiles,
             totalSize = filesInFolders.stats.matched.totSize;
             
-        nbFilesHtml   = nbFiles > 0 ? plural(t.File, nbFiles, '0,0', W.cR) : nbFiles == 0 ? t.noFiles : "&nbsp;";
+        nbFilesHtml   = nbFiles > 0 ? plural(t.File, nbFiles, '0,0', TAG.cR) : nbFiles == 0 ? t.noFiles : "&nbsp;";
         searchToken.reset();
         bigData_Files = await getBigDataFiles( filesInFolders, selectedFilesCatalogue, searchToken )
                                 .then( (data) => { return data } )
                                 .catch( (err) => {
                                     console.log(me()," err: ",err);
-                                    if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ", nl, err ); }
+                                    if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ",L, err ); }
                                 });
 
-        let totSize   = t.totalSize +t.comma+ totalSize +" "+ t.bytes + (totalSize > 1024 ? ' ('+ numeral(totalSize).format('0.00 b') +')' : '' ) +nl +nl;
+        let totSize   = t.totalSize +t.comma+ totalSize +" "+ t.bytes + (totalSize > 1024 ? ' ('+ numeral(totalSize).format('0.00 b') +')' : '' ) +L +L;
         $("#files-tab").html( nbFilesHtml );
-        $("#files pre").html( totSize + t.FileSize +nl );
+        $("#files pre").html( totSize + t.FileSize +L );
     }
     
     // Apply acceptRejectFilters if any...
@@ -1161,7 +1209,7 @@ async function performSearch ( allFilters ) {
         ARm = await getAcceptRejectMatch( bigData_Files, acceptRejectFilters, searchToken )   // Get Accept/Reject filtered filess
                         .then( (data) => { return data } )
                         .catch( (err) => {
-                            if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ", nl, err ); }
+                            if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ",L, err ); }
                         });
         
         // Reset matched filesInFolders to merge
@@ -1172,7 +1220,7 @@ async function performSearch ( allFilters ) {
             nbFiles += match.length;
         });
         filesInFolders.stats = ARm.stats;
-        nbFilesHtml = plural(t.file,   nbFiles,   '0,0', W.CR);
+        nbFilesHtml = plural(t.file,   nbFiles,   '0,0', TAG.CR);
         
         updateFilesTab( filesInFolders, withARFilters );
     }
@@ -1371,7 +1419,7 @@ function optimizeMultipartRanges( multipartRanges ) {
     let allRanges = newByteRange.map( (range) => { return range.join('-') });
     while( allRanges.length > 0 ) slicedRange.push( "bytes=" + allRanges.splice(0,maxByteRangeParts).join(',') );
     
-    /*#*/if( DEBUG ){ console.log('newByteRange',newByteRange,nl,nl,"allRanges",allRanges,nl,"slicedRange",slicedRange);};/*#*/
+    /*#*/if( DEBUG ){ console.log('newByteRange',newByteRange,L,L,"allRanges",allRanges,L,"slicedRange",slicedRange);};/*#*/
     /*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
     return slicedRange;
 }
@@ -1431,6 +1479,15 @@ $(document).
         setFilterSubtopic( "enable" );
     }).
     
+    on('click', 'a.dropdown-filter', function(e) {
+        $(this).parents('.dropdown-menu').find('.form-control').val( "" );
+        $(this).parents('.catalogue-short-list .dropdown.open').removeClass( "open" );
+        $(this).parents('.subtopic').find('.input-subtopic').val( $(this).text() ).focus();
+        setFilterSubtopic( "enable" );
+        
+        return false;
+    }).
+    
     on('click', '.btn-topic', function(e) {
         $(".label-topic").data('label',$(this).data('label'));
         $("#btnSearch").click();
@@ -1470,25 +1527,25 @@ $(document).
     
     on('click', '.btn-accept-regex', function(e) {
         let dude = $(this).closest(".entry");
-        dude.find('.label-accept_reject').html(wrap(t.accept, W.cV) +t.comma);
+        dude.find('.label-accept_reject').html(wrap(t.accept, TAG.cV) +t.comma);
         dude.find('.input-accept_reject').data("ar","accept");
         $("#btnSearch").click();
     }).
     on('click', '.btn-reject-regex', function(e) {
         let dude = $(this).closest(".entry");
-        dude.find('.label-accept_reject').html(wrap(t.reject, W.cR) +t.comma);
+        dude.find('.label-accept_reject').html(wrap(t.reject, TAG.cR) +t.comma);
         dude.find('.input-accept_reject').data("ar","reject");
         $("#btnSearch").click();
     }).
     
     on('click', '.btn-accept-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','True');
-        $(".label-accept_unmatch").html(wrap(t.accept, W.cV) +t.comma);
+        $(".label-accept_unmatch").html(wrap(t.accept, TAG.cV) +t.comma);
         $("#btnSearch").click();
     }).
     on('click', '.btn-reject-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','False');
-        $(".label-accept_unmatch").html(wrap(t.reject, W.cR) +t.comma);
+        $(".label-accept_unmatch").html(wrap(t.reject, TAG.cR) +t.comma);
         $("#btnSearch").click();
     }).
     
@@ -1710,18 +1767,18 @@ function resetDataDisplay( obj, total=0, shown=0, lines=1000 ) {
 
 function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group('in -> '+me()); console.time( "   " ); console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',nl,filesInFolders,nl,'>>> bigData_Files :',nl,bigData_Files); };/*#*/
+/*#*/if( DEBUG ){ console.group('in -> '+me()); console.time( "   " ); console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); };/*#*/
     
     if( filesInFolders.matched ) {
 
-        let header  = nl+nl+ t.FileSize +nl,
+        let header  = L+L+ t.FileSize +L,
             files   = "",
             totSize = 0,
             nbFiles = 0;
             
         if( withAcceptRejectFilters ) {
             filesInFolders.matched.forEach( file => { 
-                files   += file.size.toString().padStart(11) +" "+ file.path +nl;
+                files   += file.size.toString().padStart(11) +" "+ file.path +L;
                 totSize += file.size;
                 nbFiles ++;
             });
@@ -1742,7 +1799,7 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
         cluster.files = getDataCluster( PANE.FILES, bigData_Files, header );
         if( bigData_Files.length < 1 ) cluster.files.clear();
         
-/*#*/if( DEBUG ){ console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',nl,filesInFolders,nl,'>>> bigData_Files :',nl,bigData_Files); console.groupEnd(); };/*#*/
+/*#*/if( DEBUG ){ console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); console.groupEnd(); };/*#*/
     }
     else {
         
@@ -1805,9 +1862,9 @@ function  setFilterSubtopic( state ) {
 
 function setGUIstate( thisState = GUI.STATE_READY ) {
     
-    if( GUIstate != thisState ) {
+    if( GUI.state != thisState ) {
     
-        GUIstate = thisState;
+        GUI.state = thisState;
         switch (thisState) {
             
             case GUI.STATE_FOUND: 
@@ -1826,7 +1883,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
             case GUI.STATE_LOADING: 
                 document.body.style.cursor = 'wait';
                 $("#logs").show();
-                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, W.CN ) );
+                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
                 $("#tabs").show();
                 $("#msg").hide();
                 $("#tabs .nav-tabs").show();
@@ -1840,8 +1897,8 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
             case GUI.STATE_RESET: 
                 document.body.style.cursor = 'wait';
                 $("#logs").show();
-                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, W.CN ) );
-                $("#files-tab").html(wrap( t.noFiles, W.cG ));
+                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
+                $("#files-tab").html(wrap( t.noFiles, TAG.cG ));
                 $("#files pre").html( "" );
                 $(".input-subtopic").val("");
                 $("#folders-tab").trigger('click');
@@ -1935,8 +1992,8 @@ function adjustTabsHeight( adjust ) {
 
 function setCookie() {
     
-    lang = ( lang == "fr" ? "en":"fr" );
-    $.cookie( "lang",lang );
+    LANG = ( LANG == "fr" ? "en":"fr" );
+    $.cookie( "LANG",LANG );
     
 }
 
@@ -1948,8 +2005,7 @@ function setCookie() {
 
 function switchLangue() {
     
-    lang = ( lang == "fr" ? "en":"fr" );
-    $.cookie( "lang",lang );
+    $.cookie( "LANG", ( LANG == "fr" ? "en":"fr" ) );
     location.reload();
     
 }
@@ -1991,7 +2047,7 @@ function logMe( msg="", pad="-", n = 100 ) {
             if( msg == pad )
                 text = pad.repeat(n);
             else
-                text  += ( msg ) ? ( pad.repeat(n-text.length) + nl +" ".repeat(pad.length + 2) + "- "+msg ) : pad.repeat(n - text.length);
+                text  += ( msg ) ? ( pad.repeat(n-text.length) +L +" ".repeat(pad.length + 2) + "- "+msg ) : pad.repeat(n - text.length);
         }
             
     console.log( text );

@@ -7,11 +7,12 @@
     | IMPORTANT NOTE:                                      |
     +------------------------------------------------------+
     | This index.php file is for development purpose only. |
-    | In PROD, the final index file is index.html          |
+    | The goal is to deploy a completely static website.   |
+    | Thus, in PROD, the final index file is index.html    |
     +------------------------------------------------------+
 
 Created  - 2017-08-24
-Modified - 2018-03-20
+Modified - 2018-04-05
 
 Daniel Léveillé 
 
@@ -27,7 +28,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <title>Sarracenia Semina</title>
         <meta charset="utf-8">
 
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans|Open+Sans+Condensed:300|Ubuntu+Mono">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=BenchNine:700|Teko:500|Open+Sans|Open+Sans+Condensed:300|Ubuntu+Mono">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
@@ -81,7 +82,10 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 </div>
             </div>
 <?php /*
-        User create its own Sarra Config here
+
+        BUILDER
+        
+        User create its Sarra Config here
         -------------------------------------------------------------------- */ ?>
             <div id="sarra-formula" class="hidden">
                 <hr>
@@ -111,6 +115,12 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                 <td>
                                     <div class="subtopic filter input-group input-group-sm disabled">
                                         <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                        <span id="products-list" class="catalogue-short-list input-group-addon">
+                                            <div class="dropdown">
+                                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdown-products-list" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
+                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-products-list" data-filter ></ul>
+                                            </div>
+                                        </span>
                                         <input id="input-subtopic" class="text form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
                                         <span id="btnSearchReset" class="input-group-addon"></span>
                                     </div>
@@ -218,8 +228,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
-        
 <?php /*
+
+        <link  href="/js/plugins/select2/css/select2.min.css" rel="stylesheet" />
+        <script src="/js/plugins/select2/js/select2.min.js"></script>
+
+        <script src="/js/plugins/bootstrap-dropdown-filter/diacritics.js"></script>
+        <script src="/js/plugins/bootstrap-dropdown-filter/bootstrap-dropdown-filter.js"></script>
+
         SCRIPTS
         -------------------------------------------------------------------- */ ?>
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
@@ -229,10 +245,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-fr_FR.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.41/polyfill.min.js"></script>
-        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js<?= $v ?>"></script>
+        <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
-        <script src="/js/plugins/clusterize/clusterize.min.js<?= $v ?>"></script>
+        <script src="/js/plugins/clusterize/clusterize.min.js"></script>
+
+        <script src="/js/plugins/bootstrap-dropdown-filter/diacritics.js"></script>
+        <script src="/js/plugins/bootstrap-dropdown-filter/bootstrap-dropdown-filter.js"></script>
+
         <script>
             var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>', '/json/brokers.json<?= $v ?>'];
         </script>
