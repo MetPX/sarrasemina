@@ -4,11 +4,15 @@
     Author:      Daniel Léveillé
   --------------------------------------------------------
 */
+.select2-container--default .select2-selection--multiple { border-radius: 3px; border-color: #ddd; }
+.select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #aaa !important; }
+.select2-container--default .select2-selection--multiple .select2-selection__rendered li input.select2-search__field { width: 100% !important; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice { border-radius: 3px !important; border: 1px solid #bbb !important; background-color: #eee !important; }
 
 /* -[ GENERAL ]------------------------------------------- */
 
 html   { margin:0; padding:0; font-size:62.5%; background: #26a; }
-body   { background: transparent; font-family: 'Open Sans', sans-serif; font-size:1.2em; line-height: 1.6em; margin:0 auto; min-width:360px; padding: 10px !important; }
+body   { background: transparent; font-family: 'Open Sans', sans-serif; font-size:1.2em; line-height: 1.6em; margin:0 auto; min-width:420px; padding: 10px !important; }
 pre    { font-size: 0.85em; }
 hr     { margin: 3px 0; }
 h1     { font-size:1.8em; }
@@ -20,12 +24,14 @@ label  { padding-right: 5px; margin: 0; }
 th, td { padding: 1px 0 0 0; }
 
 .c-vert  { color: green; }
+.c-cyan  { color: cyan; }
 .c-bleu  { color: blue; }
 .c-gris  { color: #ccc; }
 .c-jaune { color: #b80; }
 .c-noir  { color: #000; }
 .c-rouge { color: red; }
 .c-vin   { color: #a00; }
+.c-ERR   { background: #a00 !important; color: #fc0 !important; border: 1px solid #bb0073 !important; background-image: linear-gradient(to bottom, #f61d57, #c9103e) !important; font-weight: bold; }
 noscript h2 { color: #f00; }
 noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font-weight: bold; }
 
@@ -99,7 +105,7 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 
 .tooltip { white-space: nowrap; }
 .input-group-btn .btn.btn-accept-regex,
-.btn-group .btn.btn-accept-unmatch { border-radius: 0;  }
+.btn-group .btn.btn-accept-unmatch { border-radius: 0; }
 .input-group-addon .fa { color: #07d; }
 .glyphicon { font-size: 12px; }
 .glyphicon.input-group-addon { top: 0; }
@@ -121,20 +127,24 @@ select.input-sm { line-height: 1.3; height: 28px; }
 .input-group-sm>.input-group-addon,
 .input-group-sm>.input-group-btn>.btn { line-height: 1.3; height: 27px; padding: 5px 8px; }
 .input-group-sm>.text.form-control { font-size: 11px; }
+.btn .fa.checked { display:none; }
+.btn .fa.unchecked { display:inline-block; }
+.btn.active .fa.checked { display:inline-block; }
+.btn.active .fa.unchecked { display:none; }
 
 .input-group-sm>.catalogue-short-list { padding: 1px; }
 .input-group-sm>.catalogue-short-list .dropdown-toggle { padding: 3px 6px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu   { padding: 5px; left: auto; /*right: -20px; */ max-height: 360px !important; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 12px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li.header { clear: both; display: block; }
-.input-group-sm>.catalogue-short-list .dropdown-menu li.header h3 { font-size: 1.3em; color: #35d; border-bottom: 1px solid #bcd; background-color: #def; padding: 5px; margin: 3px; }
+.input-group-sm>.catalogue-short-list .dropdown-menu li.header h3 { font-size: .9em; color: #35d; border-bottom: 1px solid #bcd; background-color: #def; padding: 5px; margin: 3px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu .form-control { width: 100%; border-radius: 4px; padding: 0px 6px; font-size: 12px;  margin:0 auto; margin-bottom: 5px; height: 30px; }
 
 #catalogues { margin: 3px; }
 #info-catalogue span { background-color: #fe9; padding: 1px 3px; }
 #info-catalogue span span { font-weight: bold; }
 
-#sarra-formula { padding: 0; margin: 0; width: 100%; }
+#sarra-formula { padding: 0; margin: 0; width: 100%; margin-top: 5px; }
 #sarra-formula .row { margin: 0; }
 #sarra-formula table { width: 100%; }
 #sarra-formula table td.right { width: 90%; }
@@ -192,7 +202,7 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #stats table tr:nth-child(2) { vertical-align: top; }
 #stats table tr:nth-child(2) td { padding-top: 10px; }
 #stats table tr:last-child td { padding-bottom: 10px; }
-#stats table th { border: 1px solid #e6e6e6; background-color: #f6f6f6; padding: 5px; line-height: 1.2em; }
+#stats table th { border-top: 1px solid #e6e6e6; padding: 5px; line-height: 1.2em; }
 #stats table td { padding: 3px 1px; line-height: 1.2em; }
 #stats table td:last-child { width: 80%; }
 #stats table td:nth-child(2) { text-align: right; padding-left: 10px; padding-right: 2px; }
@@ -200,14 +210,19 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #stats table td:nth-child(4) { font-weight: bold; }
 #stats table #user-conf td { padding: 3px 0 10px 0; text-align: left; }
 #stats table #user-conf .flex { width: 100%; display: flex; align-items: stretch; }
-#stats table #user-conf #btnCopy { border: 1px solid #d33; color: #f00; background-color: #f6f6f6; margin: 0 0 0 3px; font-size: 20px; padding: 10px 20px; line-height: 9px; }
-#stats table #user-conf #btnCopy:hover { background-color:  #eee; }
+#stats table #user-conf #btnCopy { border: 1px solid #ccc; color: #f00; background-color: #f6f6f6; margin: 0 3px 0 0; font-size: 20px; padding: 10px 20px; line-height: 9px; width: 70px; }
+#stats table #user-conf #btnCopy:hover { background-color:  #eee; border-color: #d99; }
 #stats table #user-conf #btnCopy span { font-size: 9px; }
+#stats table #user-conf .tooltip.fade.bottom { left:55px !important; }
+#stats table #user-conf .tooltip.fade.bottom .tooltip-arrow { left: 10px !important; }
 #stats table #user-conf #config { flex-grow: 1; margin: 0; font-weight: bold; }
 #stats table #user-conf .results { text-align: center; color: #b80; font-weight: bold; }
 
-#stats table #results { background-color: lightgrey; border-top: 1px solid lightgrey; border-bottom: 1px solid darkgrey; }
+#stats table #results { border-top: 1px solid lightgrey; border-bottom: 1px solid darkgrey; }
 #stats table #results th { border-bottom: 1px solid darkgrey; }
 
+#topics .amqp-filter,
+#topics .amqp-filters { font-size:0.85em; font-weight: bold; }
+#topics .amqp-filters { margin-left: 10px; display: inline-block; }
 
 /* ------------------------------------------------------ */

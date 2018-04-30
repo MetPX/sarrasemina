@@ -10,8 +10,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180410101933">
-        <link rel="stylesheet" href="/css/style.css?v20180410101933">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180430101720">
+        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20180430101720">
+        <link rel="stylesheet" href="/css/style.css?v20180430101720">
     </head>
     <body>
         <div class="modal fade">
@@ -47,111 +48,6 @@
                     </span>
                 </div>
             </div>
-            <div id="sarra-formula" class="hidden">
-                <hr>
-                <div class="row">
-                    <div class="sarra-configs col-xm-12 accepts-rejects">
-                        <table>
-                            <tr>
-                                <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
-                                <td>
-                                    <div class="input-group input-group-sm disabled">
-                                        <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
-                                        <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                            <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
-                                                <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
-                                            </label>
-                                            <label class="btn btn-primary btn-topic" data-label="v02.report">
-                                                <input type="radio" name="options" id="option2" autocomplete="off"><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> report
-                                            </label>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                  <label class="label-subtopic" for="input-subtopic">Subtopic: </label>
-                                </td>
-                                <td>
-                                    <div class="subtopic filter input-group input-group-sm disabled">
-                                        <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
-                                        <span id="products-list" class="catalogue-short-list input-group-addon">
-                                            <div class="dropdown">
-                                                <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdown-products-list" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
-                                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-products-list" data-filter ></ul>
-                                            </div>
-                                        </span>
-                                        <input id="input-subtopic" class="text form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
-                                        <span id="btnSearchReset" class="input-group-addon"></span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr id="err-subtopic">
-                                <td> </td>
-                                <td class="err"> </td>
-                            </tr>
-                        </table>
-                        <hr>
-                        <table class="accept_reject filters">
-                            <tr class="entry">
-                                <td width="90"><label class="label-accept_reject" for="input-accept_reject__1">Accept/Reject: </label></td>
-                                <td>
-                                    <div class="input-group input-group-sm disabled">
-                                        <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
-                                        <div class="filter input-group input-group-sm">
-                                            <span class="input-group-btn btn-group-sm" data-toggle="buttons">
-                                                <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
-                                                    <input type="radio" name="options" id="option1" autocomplete="off">
-                                                    <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                    <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                </button>
-                                                <button class="btn btn-reject-regex btn-danger" tabindex="-1">
-                                                    <input type="radio" name="options" id="option2" autocomplete="off">
-                                                    <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                    <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                </button>
-                                            </span>
-                                            <input class="text form-control input-accept_reject" id="input-accept_reject__1" type="text" data-ar="accept" placeholder="..." aria-label="..." />
-                                            <span class="input-group-btn"><button class="btn btn-secondary btn-add" type="button" tabindex="-1"><span class="glyphicon glyphicon-plus c-vert"></span></button></span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                        <hr>
-                        <table class="accept_unmatch filter">
-                            <tr>
-                                <td width="90">
-                                    <label class="label-accept_unmatch" style="padding:0;">Accept: </label>&nbsp; 
-                                </td>
-                                <td style="vertical-align: top;">
-                                    <div class="input-group input-group-sm disabled" style="display:inline-table; width: 100px;">
-                                        <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
-                                        <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
-                                            <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
-                                                <input type="radio" name="options" id="option1" autocomplete="off">
-                                                <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                            </label>
-                                            <label class="btn btn-reject-unmatch btn-danger active" tabindex="-1">
-                                                <input type="radio" name="options" id="option2" autocomplete="off">
-                                                <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <span class="btn btn-default btn-sm pull-right" id="btnSearch"><span class="glyphicon glyphicon-search"></span> Search</span>
-                                </td>
-                            </tr>
-                        </table>
-                       <div class="progress">
-                          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                          <br>
-                          <span class="info pull-left"></span>
-                       </div>
-                    </div>
-                </div>
-            </div>
             <div id="logs" class="col-sm-12">
                 <hr>
                 <div id="msg">
@@ -170,38 +66,133 @@
             </div>
         </div>
         <div id="tabs" class="row page">
-            <ul class="nav nav-tabs" style="display: none;">
-                <li><a id="folders-tab" href="#folders" data-toggle="tab"></a></li>
+            <ul class="nav nav-tabs">
+                <li><a id="builder-tab" href="#builder" data-toggle="tab"></a></li>
+                <li><a id="stats-tab"   href="#stats"   data-toggle="tab"></a></li>
                 <li><a id="topics-tab"  href="#topics"  data-toggle="tab"></a></li>
                 <li><a id="files-tab"   href="#files"   data-toggle="tab"></a></li>
-                <li><a id="stats-tab"   href="#stats"   data-toggle="tab"></a></li>
             </ul>
             <div class="tab-content clearfix">
-                <div id="folders" class="tab-pane cluster-ol"></div>
+                <div id="builder" class="tab-pane">
+                    <div id="sarra-formula">
+                        <div class="row">
+                            <div class="sarra-configs col-xm-12 accepts-rejects">
+                                <table>
+                                    <tr>
+                                        <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
+                                        <td>
+                                            <div class="input-group input-group-sm disabled">
+                                                <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
+                                                    <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
+                                                        <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
+                                                    </label>
+                                                    <label class="btn btn-primary btn-topic" data-label="v02.report">
+                                                        <input type="radio" name="options" id="option2" autocomplete="off"><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> report
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr id="err-subtopic"><td> </td><td class="err"> </td></tr>
+                                    <tr>
+                                        <td><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
+                                        <td>
+                                            <div class="subtopic filter input-group input-group-sm disabled">
+                                                <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <input id="input-subtopics" class="subtopic" placeholder="..." value="" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <hr>
+                                <table class="accept_reject filters">
+                                    <tr class="entry">
+                                        <td width="90"><label class="label-accept_reject" for="input-accept_reject__1">Accept/Reject: </label></td>
+                                        <td>
+                                            <div class="input-group input-group-sm disabled">
+                                                <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <div class="filter input-group input-group-sm">
+                                                    <span class="input-group-btn btn-group-sm" data-toggle="buttons">
+                                                        <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
+                                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                        </button>
+                                                        <button class="btn btn-reject-regex btn-danger" tabindex="-1">
+                                                            <input type="radio" name="options" id="option2" autocomplete="off">
+                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                        </button>
+                                                    </span>
+                                                    <input class="text form-control input-accept_reject" id="input-accept_reject__1" type="text" data-ar="accept" placeholder="..." aria-label="..." />
+                                                    <span class="input-group-btn"><button class="btn btn-secondary btn-add" type="button" tabindex="-1"><span class="glyphicon glyphicon-plus c-vert"></span></button></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <hr>
+                                <table class="accept_unmatch filter">
+                                    <tr>
+                                        <td width="90">
+                                            <label class="label-accept_unmatch" style="padding:0;">Accept: </label>&nbsp; 
+                                        </td>
+                                        <td style="vertical-align: top;">
+                                            <div class="input-group input-group-sm disabled" style="display:inline-table; width: 100px;">
+                                                <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
+                                                    <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
+                                                        <input type="radio" name="options" id="option1" autocomplete="off">
+                                                        <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                        <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                    </label>
+                                                    <label class="btn btn-reject-unmatch btn-danger active" tabindex="-1">
+                                                        <input type="radio" name="options" id="option2" autocomplete="off">
+                                                        <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                        <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <span class="btn btn-default btn-sm pull-right" id="btnSearch"><span class="glyphicon glyphicon-search"></span> Search</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                <br>
+                                <span class="info pull-left"></span>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="folders" class="tab-pane cluster-ol"></div>
+                </div>
+                <div id="stats"   class="tab-pane"></div>
                 <div id="topics"  class="tab-pane cluster-ol"></div>
                 <div id="files"   class="tab-pane cluster-ol"></div>
-                <div id="stats"   class="tab-pane"></div>
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
-        <script src="https://code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-fr_FR.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.41/polyfill.min.js"></script>
+        <script src="//code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+        <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+        
+        <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-fr_FR.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/js-polyfills/0.1.41/polyfill.min.js"></script>
+
         <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
 
-        <script src="/js/plugins/bootstrap-dropdown-filter/diacritics.js"></script>
-        <script src="/js/plugins/bootstrap-dropdown-filter/bootstrap-dropdown-filter.js"></script>
-
+        <script src="/js/plugins/selectize/js/selectize.js"></script>
         <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180410101933', '/json/ui-docs.json?v20180410101933', '/json/brokers.json?v20180410101933'];
+            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180430101720', '/json/ui-docs.json?v20180430101720', '/json/brokers.json?v20180430101720'];
         </script>
-        <script src="/js/main.js?v20180410101933"></script>
+        <script src="/js/main.js?v20180430101720"></script>
     </body>
 </html> 

@@ -46,11 +46,17 @@ class CancellationTokenSource {
     reset()         { this.token.reset(); }
 }
 
+
 // ---------------------------------------------------------------------
 //  GLOBAL VARS
 // ---------------------------------------------------------------------
 
 const
+    FILTER = {
+        CHAR_DELIMITER : '|',
+        MAX_SUBTOPICS  : null,                  // User may enter an unlimited number of subtopics...
+        INPUT_AMQP_SRC : '#input-subtopics'
+    },
     CONFIG = {
         options : {
             broker       : "amqps://anonymous@dd.weather.gc.ca",
@@ -65,8 +71,12 @@ const
         },
         write   : () => {
             let config = "", newOptions = {}, subtopics = [], acceptRejects = [];
-            $( ".input-subtopic" )     .each( (index, item) => { let filter = $(item).val(); if( filter ) subtopics    .push( [filter] ); });
-            $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) acceptRejects.push( [$(item).data('ar'),filter] ); });
+            //$( ".input-subtopic" )     .each( (index, items) => { let filters = $(items).val().split(FILTER.CHAR_DELIMITER); for( let i=0; i<filters.length; i++) { let filter = filters[i].trim(); if( filter ) subtopics.push( [filter] ); } });
+            subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
+            for( let i=0; i<subtopics.length; i++ ) {
+                subtopics[i] = subtopics[i].trim();
+            }
+            $( ".input-accept_reject" ).each( (index, item)  => { let filter  = $(item).val(); if( filter ) acceptRejects.push( [$(item).data('ar'),filter] ); });
             newOptions.topic         = $(".label-topic").data('label');
             newOptions.subtopic      = subtopics;
             newOptions.acceptReject  = acceptRejects;
@@ -104,32 +114,52 @@ const
     L    = '\n',
     LANG = $.cookie("LANG"),                                            // Select user's prefered language
     PANE = {
+        BUILDER  : "builder",
         CATALOGUE: "folders",
         SUBTOPIC : "topics",
         FILES    : "files"
     },
     TAG = { 
         H1: ['<h1>','</h1>'],                                       // Predefined tag wrapers
-        cG: ['<span class="c-gris">','</span>'],
-        cJ: ['<span class="c-jaune">','</span>'],
-        cR: ['<span class="c-rouge">','</span>'],
-        cV: ['<span class="c-vert">','</span>'],
-        CN: ['<strong class="c-noir">','</strong>'],
-        CR: ['<strong class="c-rouge">','</strong>'],
-        CV: ['<strong class="c-vert">','</strong>']
+        cG: ['<span class="c-gris">'    , '</span>'],
+        cJ: ['<span class="c-jaune">'   , '</span>'],
+        cR: ['<span class="c-rouge">'   , '</span>'],
+        cV: ['<span class="c-vert">'    , '</span>'],
+        
+        Vxs:['<span class="visible-xs-inline">', '</span>'],
+        Hxs:['<span class="hidden-xs">'        , '</span>'],
+        
+        CN: ['<strong class="c-noir">'  , '</strong>'],
+        CR: ['<strong class="c-rouge">' , '</strong>'],
+        CV: ['<strong class="c-vert">'  , '</strong>']
     };
     
-
 var
     t       = {},                                                       // GUI's text container
     selectedFilesCatalogue,                                             // ### NOTE ### Catalogue is splitted in two data files: .json (contains folder paths) and .toc (contains file names)
     bigData_Folders = [],                                               // Array of objects - folders data (catalogue.json)
     bigData_Files   = [],                                               // Array of objects - files   data (catalogue.toc - byterange)
     GUIstate        = 0,
-    statistics      = { catalog:{}, search: {}, results: {} },
+    statistics      = {
+        catalog : {},
+        search  : {},
+        results : {},
+        reset   : ( { catalog, search, results } = {} ) => {
+            
+            if( !catalog && !search && !results ) {
+                statistics.catalog={};
+                statistics.search ={};
+                statistics.results={};
+            }
+            if( catalog ) statistics.catalog = catalog;
+            if( search  ) statistics.search  = search;
+            if( results ) statistics.results = results;
+        }
+    },
     searchToken     = new CancellationTokenSource,
     
     cluster         = {},
+    $selectize      = {},
     progressBar     = {
         $progress     : $('.progress'),
         $progress_bar : $('.progress-bar'),
@@ -166,6 +196,82 @@ var
 
 
 // ---------------------------------------------------------------------
+//  TEST ZONE BEGIN
+// ---------------------------------------------------------------------
+
+function setSubtopicFilters( filterOptions=[], groupOptions=[] ) {
+    
+    var eventHandler = function get (name) {
+        return function give() {
+            if( name === "onChange" ) {
+                setFilterSubtopic( isValidAMQP( $(FILTER.INPUT_AMQP_SRC).val() ) ? 'enable':'disable' );
+            }
+//             if( $selectize[0] )
+//                 if( $selectize[0].selectize )
+//                     if( $selectize[0].selectize.$activeItems ) {
+//                         console.log( me(), name, $selectize[0].selectize.$activeItems);
+//                         $selectize[0].selectize.$activeItems;
+//                     }
+//                     else
+//                         console.log( me(), name, $selectize[0].selectize);
+//                 else
+//                     console.log( me(), name, $selectize[0]);
+//             else
+//                 console.log( me(), name );
+        };
+    };
+    
+    if( $selectize.length ) {
+        $selectize[0].selectize.setValue( '' );
+        $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.destroy();
+        $selectize = {}
+    }
+    
+    $selectize =
+    $(FILTER.INPUT_AMQP_SRC).selectize({
+         persist       : true
+        ,diacritics    : true
+        ,plugins       : ['remove_button','restore_on_backspace','drag_drop']
+        ,maxItems      : FILTER.MAX_SUBTOPICS
+        ,delimiter     : FILTER.CHAR_DELIMITER
+        ,placeholder   : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
+        ,options       : filterOptions
+        ,optgroups     : groupOptions
+        ,optgroupField : 'path'
+        ,valueField    : 'filter'
+        ,labelField    : 'filter'
+        ,searchField   : ['filter']
+        ,create        : (input) => { return { path: 'X', filter: input }; }
+        ,render        : {
+             optgroup_add   : (input) => { return { id:'X', data: input }; }
+            ,optgroup_header: (data, escape) => { return '<div class="optgroup-header">' + escape(data.label) + '</div>'; }
+            ,item   : (item, escape) => {
+                if( item.filter ) {
+                    let classAMQP = !isValidAMQP( item.filter, false ) ? ' c-ERR':'';
+//                     return `<div class="editable-click item${classAMQP}">${escape(item.filter)} <a href="javascript:void(0)" class="c-cyan x-editable" tabindex="-1" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a></div>`;
+                    return `<div class="editable-click item${classAMQP}">${escape(item.filter)}</div>`;
+                }
+            }
+        }
+        ,onChange        : eventHandler('onChange')
+//         ,onItemAdd       : eventHandler('onItemAdd')
+//         ,onItemRemove    : eventHandler('onItemRemove')
+//         ,onOptionAdd     : eventHandler('onOptionAdd')
+//         ,onOptionRemove  : eventHandler('onOptionRemove')
+//         ,onDropdownOpen  : eventHandler('onDropdownOpen')
+//         ,onDropdownClose : eventHandler('onDropdownClose')
+//         ,onFocus         : eventHandler('onFocus')
+//         ,onBlur          : eventHandler('onBlur')
+//         ,onInitialize    : eventHandler('onInitialize')
+    });
+
+}
+
+// ---------------------------------------------------------------------
+//  TEST ZONE END
+// ---------------------------------------------------------------------
+
+// ---------------------------------------------------------------------
 //  Initialize Engine
 // ---------------------------------------------------------------------
 
@@ -179,8 +285,7 @@ _initialize_();
 
 // ---------------------------------------------------------------------
 //
-//  _initialize_
-// Startup the engines!
+// Start engines!
 
 function _initialize_() {
 // let DEBUG = true;
@@ -271,10 +376,11 @@ function _initialize_() {
         $("#btnSearch")            .html(t.g_search + t.search).addClass("disabled");
         $("#btnSearchReset")       .html(t.g_remove).addClass("disabled");
 
-        $("#stats-tab")            .html(t.f_gear + t.configuration);
-
+        $("#builder-tab")          .html(t.f_builder_tab +wrap(t.editor,TAG.Hxs) +wrap(t.edit,TAG.Vxs))       .attr('title',t.editor);
+        $("#stats-tab")            .html(t.f_stats_tab   +wrap(t.configuration,TAG.Hxs) +wrap(t.conf,TAG.Vxs)).attr('title',t.configuration);
+        
         if( !catalogs ) {
-            
+
             $catalogues.html(msg.err.noCatalogues[LANG]);
         }
         else {
@@ -291,7 +397,7 @@ function _initialize_() {
                 let selectedCatalogue = $(this).find("option:selected").val();
                 selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG.FILETYPE;
 
-                loadFoldersCatalogueData( selectedCatalogue );
+                loadCatalogueData( selectedCatalogue );
             });
         }
         
@@ -411,25 +517,55 @@ function _initialize_() {
 
 // ---------------------------------------------------------------------
 //
-// Reset statistics
+// Load selected catalogue 
 
-function resetStatistics( part = "" ) {
+function loadCatalogueData( selectedCatalogue ) {
+// let DEBUG = true;
+/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(selectedCatalogue);};/*#*/
+
+    $('#msg').html(`<h2 class="clusterize-no-data">${t.wait.loadingData}</h2>`).show();
+    $('#logs').show();
+
+    $.ajax({
+        url    : selectedCatalogue,
+        cache  : false,             // Get latest file version
+        xhr    : function() { return new window.XMLHttpRequest(); },
+        statusCode: { 404: function() { BSDialog( t.fileNotFound, t.error, "type-danger" ); } },
+        success: function(foldersData){
+            
+            bigData_Folders = foldersData;
+            
+            let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[CATALOG.id_NB_FILES]; s.bytes += folder.inf[CATALOG.id_TOTAL_SIZE]; }); return s; };
+            let total       = getSums( foldersData );
+            let fmtTotal    = { folders : plural(t.folder, total.folders, '0,0', TAG.CV),
+                                files   : plural(t.file,   total.files,   '0,0', TAG.CR),
+                                bytes   : ("("+ numeral(total.bytes).format('0.00 b') +")").replace(' ','&nbsp;')
+                              };
+            let cataloguePaths = selectedCatalogue.split("/");
+            let catalogueName  = cataloguePaths[cataloguePaths.length -2];
+            let catalogInfo    = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma}<br>${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}`;
+            
+            setSubtopicDirs();
+            cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, catalogInfo );
+            statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
+            _init_data_tabs ( total.folders, total.files );
+            setGUIstate     ( GUI.STATE_LOADING );
+            
+            setFilterSubtopic ( "reset" );
+        },
+        error: function( XMLHttpRequest, textStatus, errorThrown ) {
+            $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small>>> ${errorThrown} <<<</small></h2>`).show();
+            console.log( t.error + " - loadCatalogueData("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
+        }
+    });
     
-    switch( part ) {
-    
-        case "catalogue": statistics.catalog = {}; break;
-        case "search":    statistics.search  = {}; break;
-        case "results":   statistics.results = {}; break;
-        default:
-            statistics = { catalog:{}, search: {}, results: {} };
-    }
+/*#*/if( DEBUG ){ console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
 }
 
 
 // ---------------------------------------------------------------------
 //
-// fetchFileRange returns an httpGet object.
-// that contains texts of the url file within byte range
+// fetchFileRange returns text from a XMLHttpRequest within byte range
 
 async function fetchFileRange(url, byteRanges=[""]) {
 // let DEBUG = true;
@@ -439,7 +575,7 @@ async function fetchFileRange(url, byteRanges=[""]) {
         let fileInfo, rangeText = "";
         for( let i=0, n=byteRanges.length; i < n; i++ ) {
             fileInfo  = await getFileSize( url, byteRanges[i] );
-            rangeText+= await httpGet( url, fileInfo, byteRanges[i] );
+            rangeText+= await getHttpByteRange( url, fileInfo, byteRanges[i] );
         }
 /*#* /if( DEBUG ){ 'rangeText',L,rangeText,L,logMe('-','-');};/*#*/
         return rangeText;
@@ -578,7 +714,7 @@ function getRangeSize( byteRange, filesize ) {
 // Get part file within byte range
 // If no byteRange, returns the whole url file in rText
 
-function httpGet( url, fileinfo, byteRange="", responseType="" ) {
+function getHttpByteRange( url, fileinfo, byteRange="", responseType="" ) {
     
     return new Promise(
         function (resolve, reject) {
@@ -618,9 +754,9 @@ function httpGet( url, fileinfo, byteRange="", responseType="" ) {
 
 // ---------------------------------------------------------------------
 //
-// Set data into clusterized scroll div
+// Returns a clusterized scroll object
 
-function getDataCluster( pane = PANE.CATALOGUE, data, paneTitle ) {
+function getScrollClusterData( pane = PANE.CATALOGUE, data, paneTitle ) {
     
     var n,qtyFound, noDataText, bigData, tabLabel, $pane, $probar;
     
@@ -629,34 +765,42 @@ function getDataCluster( pane = PANE.CATALOGUE, data, paneTitle ) {
     paneTitle = paneTitle ? `<span id="${pane}-label" class="pane-title">${paneTitle}</span>`:"";
     
     switch( pane ) {
+        
         case PANE.CATALOGUE:
+            
             n        = bigData_Folders.length;
             tabLabel = t.Folder + "s";
-//          span    += `<div id="${pane}-search"><input id="${pane}-input" class="text form-control" type="text" data-ar="recherche" placeholder="Recherche..." aria-label="Recherche..."></div>`;
             for( var i=0; i<n; i++ ) {
                 bigData.push( `<li><span class="content">${bigData_Folders[i].dir}</span></li>` );
             }
-        break;
+            break;
         
         case PANE.SUBTOPIC:
+            
             n        = data.length || 0;
-            tabLabel = ( n < 1 ? t.noSubtopics : t.subtopic ) + ( n > 1 ? "s":"" );
+            tabLabel = ( n < 1 ? t.noFolders : t.Folder ) + ( n > 1 ? "s":"" );
+            tabLabel = wrap(tabLabel,TAG.Hxs) + wrap(t.f_topics_tab,TAG.Vxs);
             for( var i=0; i<n; i++ ) {
                 bigData.push( `<li><span class="content">${data[i].dir}</span></li>` );
             }
-        break;
+            break;
         
         case PANE.FILES:
+            
             n        = data.length || 0;
             tabLabel = ( n < 1 ? t.noFiles : t.file ) + ( n > 1 ? "s":"" );
+            tabLabel = wrap(tabLabel,TAG.Hxs) + wrap(t.f_files_tab,TAG.Vxs);
             for( var i=0; i<n; i++ ) {
-                bigData.push( `<li><span class="content">${data[i].size} - ${data[i].path}</span></li>` );
+                bigData.push( `<li><span class="content"><span class="size">${data[i].size}</span> - ${data[i].path}</span></li>` );
             }
-        break;
-        
+            break;
     }
-    qtyFound = n > 0 ? numeral(n).format('0,0') +" " : "";
-    $(`#${pane}-tab`).html( qtyFound + tabLabel ); // Update pane's tab
+    
+    if( pane !== PANE.CATALOGUE ) {
+        qtyFound = n > 0 ? numeral(n).format('0,0') +" " : "";
+        $(`#${pane}-tab`).html( qtyFound + tabLabel ); // Update pane's tab
+    }
+    
     $pane.html(`
                     ${paneTitle}
                     <div id="scroll-${pane}" class="clusterize-scroll emulate-progress">
@@ -664,7 +808,9 @@ function getDataCluster( pane = PANE.CATALOGUE, data, paneTitle ) {
                         </ol>
                     </div>
                     <span id="${pane}-progress-bar" class="progress-scroll"></span>`);
+    
     $probar = $(`#${pane}-progress-bar`);
+    
     return new Clusterize({
         rows          : bigData,
         scrollId      : `scroll-${pane}`,
@@ -676,14 +822,18 @@ function getDataCluster( pane = PANE.CATALOGUE, data, paneTitle ) {
     });
 }
 
-function getSubtopicDirs() {
+
+// ---------------------------------------------------------------------
+//
+// 
+// for products only = only second level dirs -> subtopics are: *.*.dir2.#                   
+// otherwise, show source and products only   -> subtopics are: *.dir1.dir2.#
+
+function setSubtopicDirs() {
     
-    let shortlist = "", path = "", paths_P = [], paths_SP = [];
+    let path="", paths=[], groups=[], paths_P=[], paths_SP=[];
     
-    // for products only = only second level dirs -> subtopics are: *.*.dir2.#                   
-    // otherwise, show source and products only   -> subtopics are: *.dir1.dir2.#
-    
-    bigData_Folders.forEach( (item,index)=>{
+    bigData_Folders.forEach( (item,index) => {
         
         // Do list Products only
         path = item.dir.replace(/^\/\d{8}\/[a-z-0-9_]*\/([a-z-0-9_]*)\/.*/i,"*.*.$1.#").
@@ -691,7 +841,7 @@ function getSubtopicDirs() {
                         replace(/^\/\d{8}\/[a-z-0-9_]*\/([a-z-0-9_]*)/i,"*.*.$1");
         if( !paths_P.includes(path) ){ paths_P.push(path); }
 
-        // Do Sources & Products only
+        // Do list Sources & Products only
         path = item.dir.replace(/^\/\d{8}\/([a-z-0-9_]*)\/([a-z-0-9_]*)\/.*/i,"*.$1.$2.#").
                         replace(/^\/\d{8}\/([a-z-0-9_]*)\/\d{2}$/i,"*.$1").
                         replace(/^\/\d{8}\/([a-z-0-9_]*)\/([a-z-0-9_]*)/i,"*.$1.$2");
@@ -701,76 +851,13 @@ function getSubtopicDirs() {
     paths_P .sort( (a,b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); });
     paths_SP.sort( (a,b) => { return a.toLowerCase().localeCompare(b.toLowerCase()); });
     
-    // Add Products & Sources/Products to the short list
-    shortlist += `<li class="dropdown-filter header" role="presentation"><h3>${t.products}</h3></li>`;
-    paths_P .forEach( (path,index)=>{ shortlist += `<li><a class="dropdown-filter" href="">${path}</a></li>` } );
-    shortlist += `<li class="dropdown-filter header" role="presentation"><h3>${t.sources_products}</h3></li>`;
-    paths_SP.forEach( (path,index)=>{ shortlist += `<li><a class="dropdown-filter" href="">${path}</a></li>` } );
+    paths_P .forEach( (path,index)=>{ paths.push({path:'P', filter:path}); });
+    paths_SP.forEach( (path,index)=>{ paths.push({path:'SP', filter:path}); });
+    groups=[{value: 'P', label:t.products},{value:'SP', label:t.sources_products}, {value: 'X', label:'AUTRES'}];
     
-    $("#products-list .dropdown-menu").html( shortlist );
-    $('[data-filter], .dropdown-filter').bsDropDownFilter({ label: t.filter.by });
+    setSubtopicFilters( paths, groups );
 }
 
-
-// ---------------------------------------------------------------------
-//
-// Load selected catalogue 
-
-function loadFoldersCatalogueData( selectedCatalogue ) {
-// let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(selectedCatalogue);};/*#*/
-
-//     var catalogCluster;
-
-    $('#msg').html(`<h2 class="clusterize-no-data">${t.wait.loadingData}</h2>`).show();
-    $('#logs').show();
-
-    $.ajax({
-        url    : selectedCatalogue,
-        cache  : false,             // Get latest file version
-        xhr    : function() {
-            return new window.XMLHttpRequest();
-//             let xhr = new window.XMLHttpRequest();
-//             return xhr;
-        },
-        statusCode: {
-            404: function() { 
-                    BSDialog( t.fileNotFound, t.error, "type-danger" );
-                }
-        },
-        success: function(foldersData){
-            
-            let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[CATALOG.id_NB_FILES]; s.bytes += folder.inf[CATALOG.id_TOTAL_SIZE]; }); return s; };
-            
-            bigData_Folders = foldersData;
-
-            let total       = getSums( foldersData );
-            let fmtTotal    = { folders : plural(t.folder, total.folders, '0,0', TAG.CV),
-                                files   : plural(t.file,   total.files,   '0,0', TAG.CR),
-                                bytes   : ("("+ numeral(total.bytes).format('0.00 b') +")").replace(' ','&nbsp;')
-                                };
-            let cataloguePaths = selectedCatalogue.split("/");
-            let catalogueName  = cataloguePaths[cataloguePaths.length -2];
-            let catalogInfo    = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma}<br>${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}`;
-            
-            resetStatistics();
-            getSubtopicDirs();
-            statistics.catalog = { name: catalogueName, folders: total.folders, files: total.files, bytes: total.bytes };
-            cluster.catalog = getDataCluster( PANE.CATALOGUE, bigData_Folders, catalogInfo );
-            
-            
-            _init_data_tabs(total.folders,total.files);
-            setGUIstate( GUI.STATE_LOADING );
-            setFilterSubtopic( "reset" );
-        },
-        error: function(XMLHttpRequest, textStatus, errorThrown){
-            $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small>>> ${errorThrown} <<<</small></h2>`).show();
-            console.log( t.error + " - loadFoldersCatalogueData("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
-        }
-    });
-
-/*#*/if( DEBUG ){ console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
-}
 
 // ==========================================================================================================================================
 //  Sarra Stuff
@@ -873,6 +960,7 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
     return dataFiles;
 }
 
+
 // ---------------------------------------------------------------------
 // 
 // getSubtopicMatch
@@ -880,30 +968,24 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
 // Receives a data array, regex string and accept/reject (true/false)
 // Returns an object containing stats, matched and unmatched data
 
-function getSubtopicMatch( foldersData, subtopicFilter ) {
+function getSubtopicMatch( foldersData, subtopicFilters ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilter+'] foldersData :',L,foldersData);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilters+'] foldersData :',L,foldersData);};/*#*/
 
-    let regex = new RegExp( subtopicFilter );
+    let regex = $.map( subtopicFilters, ( subtopicFilter ) => { return new RegExp( subtopicFilter ) } );
     let stats = { matched: { nbFiles: 0, totSize: 0, ranges: [] }, unmatch: { nbFiles: 0, totSize: 0, ranges: [] } };
     let matched = [];
     let unmatch = [];
     
     for( let i=0, n=foldersData.length; i < n; i++ ) {
-        if( regex.test( foldersData[i].dir ) ) {
-            matched.push(foldersData[i]);
-            if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
-                stats.matched.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
-                stats.matched.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
-                stats.matched.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
-            }
-        }
-        else {
-            unmatch.push(foldersData[i]);
-            if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
-                stats.unmatch.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
-                stats.unmatch.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
-                stats.unmatch.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
+        for( let ii=0, nn=regex.length; ii<nn; ii++) {
+            if( regex[ii].test( foldersData[i].dir ) && !matched.includes(foldersData[i]) ) {
+                matched.push(foldersData[i]);
+                if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
+                    stats.matched.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
+                    stats.matched.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
+                    stats.matched.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
+                }
             }
         }
     }
@@ -911,6 +993,7 @@ function getSubtopicMatch( foldersData, subtopicFilter ) {
 /*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
     return { matched, unmatch, stats }
 }
+
 
 // ---------------------------------------------------------------------
 // 
@@ -1022,9 +1105,10 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
 // ---------------------------------------------------------------------
 //
 // isValidAMQP
-// Test if received filter is a valid AMQP filter
+// Test if received filters are valid AMQP filters
+// Filters, if more than on, are separated by semi-columns (;)
 
-function isValidAMQP(filter) {
+function isValidAMQP(filters, updatePanes=true) {
     // --------------
     //
     // AMQP filter rules 
@@ -1038,45 +1122,66 @@ function isValidAMQP(filter) {
     //  3- Wildcard hash, IF ANY, must be the last filter's character, preceded immediately by a dot (.#)
     //
     // --------------
-    let vr1 = !/^\./.test(filter);  // test rule #1
-    let vr2 = (filter ==                                    // test rule #2 -> valid if filter does not change after replacements
-                        filter.replace(/\*[^\.]/g,"")           // - remove * followed by any char except dot 
-                                .replace(/[^\.]\*/g,"")         // - remove * preceded by any char except dot 
-                                .replace(/\*$/,""));            // - remove traling *
-    let vr3 = !(/#/.test(filter)                            // test rule #3
+    let vr1 = true, vr2 = true, vr3 = true;
+    filters.split(FILTER.CHAR_DELIMITER).forEach( filter => { 
+        vr1 = vr1 && !/^\./.test(filter);                   // test rule #1
+        vr2 = vr2 && (filter ==                             // test rule #2 -> valid if filter does not change after replacements
+                        filter.replace(/\*[^\.]/g,"")         // - remove * followed by any char except dot 
+                              .replace(/[^\.]\*/g,"")         // - remove * preceded by any char except dot 
+                              .replace(/\*$/,""));            // - remove traling *
+        vr3 = vr3 && !(/#/.test(filter)                     // test rule #3
                     && !( /.+\.#$/.test(filter) 
-                            || /#.+/.test(filter)
-                            || /^#$/.test(filter)
+                          || /#.+/.test(filter)
+                          || /^#$/.test(filter)
                         ));
-
-    let isValidFilter = vr1 && vr2 && vr3;                  // AMQP is a valid filter when all valid rules are passed
+    });
     
-    if ( !(isValidFilter) ) {
-        let eTitle   = '<p><strong>'+ t.error + t.comma + t.err_amqp.rules +'</strong></p>';
-        let eMessage = '<p>'+ ( !vr1 ? t.err_amqp.nodot : '' ) +
+    let isValidFilter = vr1 && vr2 && vr3; // AMQP is a valid filter when all valid rules are passed
+    
+    if( updatePanes ) {
+        if ( !(isValidFilter) ) {
+            let eTitle   = '<p><strong>'+ t.error + t.comma + t.err_amqp.rules +'</strong></p>';
+            let eMessage = '<p>'+ ( !vr1 ? t.err_amqp.nodot : '' ) +
                                 ( !vr2 ? (!vr1 ? '<br>':'') + t.err_amqp.stars : '' ) +
                                 ( !vr3 ? (!vr1 || !vr2 ? '<br>':'') + t.err_amqp.hasht : '' ) +'</p>';
-        $("#err-subtopic .err").html( eTitle + wrap(eMessage, TAG.cJ) );
-        $("#err-subtopic").show();
+            $("#err-subtopic .err").html( eTitle + wrap(eMessage, TAG.cJ) );
+            $("#err-subtopic").show();
+        }
+        
+        if ( isValidFilter ) {
+            $("#err-subtopic").hide();
+        }
     }
     
-    if ( isValidFilter ) {
-        $("#err-subtopic").hide();
-    }
-    
-    return isValidFilter;
+    return isValidFilter && filters !== '';
 }
 
 
 // ---------------------------------------------------------------------
 //
-// path2AMQP
+// Convert AMQP subtopicFilter to a RegExp filter
+// (This way, JavaScript will be able to search properly!)
+
+function AMQP_2_RegExp( AMQPfilter ) {
+
+    return AMQPfilter
+                    .trim()                                 // remove leading and trailing white spaces
+                    .replace(/(.*)/, "^/$1")                // add ^/ before and $ after the string
+                    .replace(/[.]/g, "/")                   // all . becomes /
+                    .replace(/\*/g,  /((?:\\.|[^\/\\])*)/ ) // magic finder - find any chars between 2 consecutive slashes 
+                    .replace(/\/{2,}/g, "/")                // reduce any consecutive slashes //, /// become /
+                    .replace(/(#.*)/,".*")
+                    .replace(/(.*)/, "$1$");
+}
+
+
+// ---------------------------------------------------------------------
+//
+// path_2_AMQP
 // Convert normal path to AMQP path
 // By default, use a star in place of the root folder
 
-function path2AMQP(path) {
-    return path.replace(/^\/\d{8}/,"*").replace(/\//g,".");
-}
+function path_2_AMQP( path ) { return path.replace(/^\/\d{8}/,"*").replace(/\//g,"."); }
 
 
 // ---------------------------------------------------------------------
@@ -1085,9 +1190,7 @@ function path2AMQP(path) {
 // 
 // Reset UI display and stuff
 
-function cleanUpCancelledSearch() {
-        window.location.reload();
-}
+function cleanUpCancelledSearch() { window.location.reload(); }
 
 
 // ---------------------------------------------------------------------
@@ -1115,14 +1218,10 @@ async function performSearch ( allFilters ) {
     setGUIstate( GUI.STATE_SEARCHING );
     
     let AMQPfilter          = allFilters[0][0],     // AMQP filter    is the first item of allFilters list;
+        AMQPfilters         = AMQPfilter.split(FILTER.CHAR_DELIMITER),
         acceptRejectFilters = allFilters,           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
-        subtopicFilter      = AMQPfilter            // Convert AMQP subtopicFilter to a RegExp filter;      -> JavaScript will be able to search!
-                                .replace(/(.*)/, "^/$1")                // add ^/ before and $ after the string
-                                .replace(/[.]/g, "/")                   // all . becomes /
-                                .replace(/\*/g,  /((?:\\.|[^\/\\])*)/ ) // magic finder - find any chars between 2 consecutive slashes 
-                                .replace(/\/{2,}/g, "/")                // reduce any consecutive slashes //, /// become /
-                                .replace(/(#.*)/,".*")
-                                .replace(/(.*)/, "$1$"),
+        subtopicFilter      = AMQP_2_RegExp( AMQPfilter ),
+        subtopicFilters     = $.map( AMQPfilters, (filter) => { return AMQP_2_RegExp( filter ); }),
         config              = '',                   // Sarra config to be displayed on screen according to user's choices
         STm                 = {},                   // STm (SubTopic match)     stores selectedCatalogue's data filtered with subtopicFilter
         ARm                 = {},                   // ARm (AcceptReject match) stores STm's (SubTopic match)'s data filtered with acceptRejectFilters
@@ -1137,13 +1236,8 @@ async function performSearch ( allFilters ) {
     // Apply Subtopic filter if different 
     // from a previous search...
     // --------------------------------------------------
-    STm = getSubtopicMatch( bigData_Folders, subtopicFilter );              // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
-    resetStatistics("search");
-    statistics.search.subtopic = [{
-        filter:AMQPfilter,
-        matched: {folders: STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize },
-        unmatch: {folders: STm.unmatch.length, files:STm.stats.unmatch.nbFiles, totalSize:STm.stats.unmatch.totSize }
-    }];
+    STm = getSubtopicMatch( bigData_Folders, subtopicFilters );              // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
+    statistics.reset({ search: { subtopic:{ filters:AMQPfilters, matched:{folders:STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize} } } });
     
     matches.push( STm );                                                    // Add it to the matches array
     matches.forEach( (match) => {                                           // Merge all match in filesInFolders
@@ -1160,10 +1254,18 @@ async function performSearch ( allFilters ) {
     nbFoldersHtml = plural(t.folder, nbFolders, '0,0', TAG.CV);
     nbFilesHtml   = plural(t.file,   nbFiles,   '0,0', TAG.CR);
     
+    let paneFolderHeader = "";
+        paneFolderHeader = wrap( numeral( nbFolders ).format('0,0') +" " +(nbFolders > 1 ? t.foldersFound : t.folderFound), TAG.CV ) +' ';
+        paneFolderHeader+= ( AMQPfilters.length > 1 ) ? t.withAMQPfilters : t.withAMQPfilter;
+    
     progressBar.updateDisplay( nbFiles );
 
     // And update display...
-    cluster.subtopic = getDataCluster( PANE.SUBTOPIC, STm.matched, `${t.filter.AMQP} [ ${AMQPfilter} ]` );
+    if( AMQPfilters.length > 1 )
+        cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilters.join('<br>')}</span>` );
+    else
+        cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilter}</span>` );
+    
     if( folders.length < 1 ) subtopicCluster.clear();
     
     // All files found with SubTopic filter are
@@ -1260,25 +1362,31 @@ function updateResultsTab() {
     let tbody_config = `
         <tbody id="user-conf">
             <tr><th colspan="4" class="title">${t.data.table.config}</th></tr>
-            <tr><td colspan="4"><div class="flex"><pre id="config">${CONFIG.write()}</pre><button id="btnCopy" class="btn btn-secondary" type="button" data-original-title title="${t.copyConfig}" data-toggle="tooltip" data-placement="left"><i class="fa fa-copy" aria-hidden="true"></i><br><span>${t.copy}</span></button></td></div></tr>
+            <tr><td colspan="4"><div class="flex"><button id="btnCopy" class="btn btn-secondary" type="button" data-original-title title="${t.copyConfig}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clipboard" aria-hidden="true"></i><br><span>${t.copy}</span></button><pre id="config">${CONFIG.write()}</pre></td></div></tr>
         </tbody>`;
+    
+    // --------------------------------------
+    // Catalogue info
+    // --------------------------------------
+    let tr_catalogue = `
+            <tr class="tr"><th class="th1" colspan="4">${t.searchResults} ${t.forThisConfig}</th></tr>
+            <tr class="c-bleu"><td class="title" colspan="4">Catalogue${t.comma} [ <strong>${statistics.catalog.name}</strong> ]</td></tr>
+            <tr class="c-bleu"><td></td><td>${numFolders}<br>${numFiles}</td><td colspan="2"> ${strFolders} <br> ${strFiles}</td></tr>
+            <tr><td></td><td colspan="2"></td><td><strong>${t.data.table.filter}</strong></td></tr>`;
     
     // --------------------------------------
     // Search filters
     // --------------------------------------
     // Subtopics
     let tr_findings = "";
-    for( let i=0, n=statistics.search.subtopic.length; i < n; i++ ) {
-        let numFolders = statistics.search.subtopic[i].matched.folders,
-            numFiles   = statistics.search.subtopic[i].matched.files;
-            
-        strFolders = numFolders == 0 ? t.noFolders : plural( t.folder, -numFolders ),
-        strFiles   = numFiles   == 0 ? t.noFiles   : plural( t.file,   -numFiles   );
-        numFolders = numFolders == 0 ? "" : numeral(numFolders).format('0,0');
-        numFiles   = numFiles   == 0 ? "" : numeral(numFiles).format('0,0');
-        tr_findings   += `
-            <tr class="sub"><td>${t.data.table.subtopic}</td><td>${numFolders}<br>${numFiles}</td><td>${ strFolders } <br>${ strFiles } &nbsp;</td><td>&nbsp; ${statistics.search.subtopic[i].filter}</td></tr>`;
-    }
+    numFolders = statistics.search.subtopic.matched.folders;
+    numFiles   = statistics.search.subtopic.matched.files;
+    strFolders = numFolders == 0 ? t.noFolders : plural( t.folder, -numFolders ),
+    strFiles   = numFiles   == 0 ? t.noFiles   : plural( t.file,   -numFiles   );
+    numFolders = numFolders == 0 ? "" : numeral(numFolders).format('0,0');
+    numFiles   = numFiles   == 0 ? "" : numeral(numFiles).format('0,0');
+    tr_findings   += `
+            <tr class="sub"><td>${t.data.table.subtopic}</td><td>${numFolders}<br>${numFiles}</td><td>${ strFolders } <br>${ strFiles } &nbsp;</td><td>&nbsp; ${statistics.search.subtopic.filters.filter(Boolean).join( "<br>&nbsp; ")}</td></tr>`;
     
     // Accepts - Rejects
     if( statistics.search.accept_reject ) {
@@ -1309,10 +1417,7 @@ function updateResultsTab() {
 
     let tbody_search = `
         <tbody id="search">
-            <tr class="tr"><th class="th1" colspan="4">${t.searchResults} ${t.forThisConfig}</th></tr>
-            <tr class="c-bleu"><td class="title" colspan="4">Catalogue${t.comma} [ <strong>${statistics.catalog.name}</strong> ]</td></tr>
-            <tr class="c-bleu"><td></td><td>${numFolders}<br>${numFiles}</td><td colspan="2"> ${strFolders} <br> ${strFiles}</td></tr>
-            <tr><td></td><td colspan="2"></td><td><strong>${t.data.table.filter}</strong></td></tr>
+            ${tr_catalogue}
             ${tr_findings}
         </tbody>`;
     
@@ -1320,8 +1425,8 @@ function updateResultsTab() {
     // Results
     // --------------------------------------
     if( !statistics.search.accept_reject ) {
-        statistics.results.files = statistics.search.subtopic[0].matched.files     == 0 ? "" :     numeral(statistics.search.subtopic[0].matched.files).format('0,0');
-        statistics.results.size  = statistics.search.subtopic[0].matched.totalSize == 0 ? "" : "("+numeral(statistics.search.subtopic[0].matched.totalSize).format('0.00 b')+")";
+        statistics.results.files = statistics.search.subtopic.matched.files     == 0 ? "" :     numeral(statistics.search.subtopic.matched.files).format('0,0');
+        statistics.results.size  = statistics.search.subtopic.matched.totalSize == 0 ? "" : "("+numeral(statistics.search.subtopic.matched.totalSize).format('0.00 b')+")";
         statistics.results.str   = statistics.results.files < 2  ? t.searchHits[ statistics.results.files ] : t.searchHits[2] ;
     }
     let tbody_results = `
@@ -1345,7 +1450,7 @@ function updateResultsTab() {
     let $config = $("#config"),
         colors = { 
             click:  { color:"#a00","background-color":"#fee","border-color":"#a00" },
-            hover:  { "background-color":"#fee" },
+            hover:  { color:"#e55", "background-color":"#fee" },
             origin: { color: $config.css('color'), "border-color": $config.css( 'border-color' ), "background-color": $config.css( 'background-color' ) }
         },
         resetColors = ()=>{ $config.animate( colors.origin, 250 ) };
@@ -1354,7 +1459,6 @@ function updateResultsTab() {
         .tooltip()
         .hover( ()=>{ $config.animate( colors.hover, 0 ) }, () => { $config.css( colors.origin ) })
         .click( ()=>{ $config.animate( colors.click, 10, resetColors ) });
-
 
 /*#*/if( DEBUG ){ logMe('-','-'); console.groupEnd();};/*#*/
 }
@@ -1434,9 +1538,7 @@ function optimizeMultipartRanges( multipartRanges ) {
 // Promise wrapper
 // Ref.: http://thecodebarbarian.com/basic-functional-programming-with-async-await
 
-Array.prototype.forEachAsync = function(fn) {
-    return this.reduce((promise, n) => promise.then(() => fn(n)), Promise.resolve());
-};
+Array.prototype.forEachAsync = function (fn) { return this.reduce((promise, n) => promise.then(() => fn(n)), Promise.resolve()); };
 
 
 // ---------------------------------------------------------------------
@@ -1452,7 +1554,6 @@ $(document).
         }
         else {
             let isValidFilter = isValidAMQP(AMQPfilter);
-//             $("#logger").html("&nbsp;");
             if( e && (e.which === $.ui.keyCode.ESCAPE || AMQPfilter === "") ) { setFilterSubtopic( "reset" ); }
             else {
                 let allFilters = getFilters();
@@ -1474,15 +1575,18 @@ $(document).
     }).focus().
 
     on('click', '#scroll-folders li', function(e) {
-        let me = $(this).find('.content');
-        $(".input-subtopic").val( path2AMQP( $(me).text() ) ).focus();
+        let filterText      = path_2_AMQP( $(this).find('.content').text() );
+        $selectize[0].selectize.addOption({ path:'SP',filter:filterText });
+        $selectize[0].selectize.addItem( filterText );                          // ( e.ctrlKey ) ? $selectize[0].selectize.addItem( filterText ) : $selectize[0].selectize.setValue( filterText );
         setFilterSubtopic( "enable" );
     }).
     
     on('click', 'a.dropdown-filter', function(e) {
+        
+        let $subtopic_input = $('.input-subtopic');
         $(this).parents('.dropdown-menu').find('.form-control').val( "" );
         $(this).parents('.catalogue-short-list .dropdown.open').removeClass( "open" );
-        $(this).parents('.subtopic').find('.input-subtopic').val( $(this).text() ).focus();
+        $subtopic_input.val( (e.ctrlKey ? $subtopic_input.val()+FILTER.CHAR_DELIMITER:'') + $(this).text() ).focus();
         setFilterSubtopic( "enable" );
         
         return false;
@@ -1490,7 +1594,6 @@ $(document).
     
     on('click', '.btn-topic', function(e) {
         $(".label-topic").data('label',$(this).data('label'));
-        $("#btnSearch").click();
     }).
 
     on('click', '.help', function(e) {
@@ -1529,24 +1632,20 @@ $(document).
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.accept, TAG.cV) +t.comma);
         dude.find('.input-accept_reject').data("ar","accept");
-        $("#btnSearch").click();
     }).
     on('click', '.btn-reject-regex', function(e) {
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.reject, TAG.cR) +t.comma);
         dude.find('.input-accept_reject').data("ar","reject");
-        $("#btnSearch").click();
     }).
     
     on('click', '.btn-accept-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','True');
         $(".label-accept_unmatch").html(wrap(t.accept, TAG.cV) +t.comma);
-        $("#btnSearch").click();
     }).
     on('click', '.btn-reject-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','False');
         $(".label-accept_unmatch").html(wrap(t.reject, TAG.cR) +t.comma);
-        $("#btnSearch").click();
     }).
     
     on('click', '#btnCopy', function() {
@@ -1586,6 +1685,7 @@ $(document).
         $(".notif-cookies").hide();
 });
 
+    
 $(window).
 
     scroll(() => {
@@ -1714,7 +1814,7 @@ function plural( str, qty, format="", wrapper="" ) {
 function getFilters() {
     
     // The first item on the filter's list is the AMQP filter
-    let filters = [ [$(".input-subtopic").val(), true] ];
+    let filters = [ [$(FILTER.INPUT_AMQP_SRC).val(), true] ];
     
     // Add to the list all other Regex filters provided by the user
     $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) filters.push( [filter,$(item).data('ar')==='accept'] ); });
@@ -1768,35 +1868,37 @@ function resetDataDisplay( obj, total=0, shown=0, lines=1000 ) {
 function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group('in -> '+me()); console.time( "   " ); console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); };/*#*/
-    
+
+    function getHeader( nbFiles=0, totSize=0 ) {
+        let files_found=t.noFilesFoundFor, total_size="", size_file="";
+        if( nbFiles > 0 ) {
+            files_found = wrap( numeral( nbFiles ).format('0,0') +" " +(nbFiles > 1 ? t.filesFound : t.fileFound), TAG.CR ) +'<br>';
+            total_size  = t.totalSize +t.comma +numeral( totSize ).format('0,0')+" " +t.bytes +(totSize > 1024 ? ' ('+ numeral(totSize).format('0.00 b') +')' : '' ) +'<br>';
+            size_file   = t.FileSize;
+        }
+
+        return files_found + total_size + size_file;
+    }
+
     if( filesInFolders.matched ) {
 
-        let header  = L+L+ t.FileSize +L,
-            files   = "",
-            totSize = 0,
-            nbFiles = 0;
+        let header="", files="", totSize=0, nbFiles=0;
             
         if( withAcceptRejectFilters ) {
-            filesInFolders.matched.forEach( file => { 
-                files   += file.size.toString().padStart(11) +" "+ file.path +L;
-                totSize += file.size;
-                nbFiles ++;
-            });
-            
-            header        = t.totalSize +t.comma+ totSize +" "+ t.bytes + (totSize > 1024 ? ' ('+ numeral(totSize).format('0.00 b') +')' : '' ) + header;
-            bigData_Files = buildBigDataFiles(filesInFolders, withAcceptRejectFilters);
+            filesInFolders.matched.forEach( file => { nbFiles++; totSize+=file.size; files+=file.size.toString().padStart(11) +" "+ file.path +L; });
+            header = getHeader( nbFiles, totSize );
+            bigData_Files = buildBigDataFiles( filesInFolders, withAcceptRejectFilters );
         }
         else {
-
-            header = t.totalSize +t.comma+ filesInFolders.stats.matched.totSize +" "+ t.bytes + (filesInFolders.stats.matched.totSize > 1024 ? ' ('+ numeral(filesInFolders.stats.matched.totSize).format('0.00 b') +')' : '' ) + header;
+            header = getHeader( bigData_Files.length, filesInFolders.stats.matched.totSize );
         }
-        
+      
         statistics.results.files = nbFiles == 0 ? "" :     numeral(nbFiles).format('0,0');
         statistics.results.size  = totSize == 0 ? "" : "("+numeral(totSize).format('0.00 b')+")";
         statistics.results.str   = nbFiles < 2  ? t.searchHits[ nbFiles ] : t.searchHits[2] ;
         updateResultsTab();
-
-        cluster.files = getDataCluster( PANE.FILES, bigData_Files, header );
+        
+        cluster.files = getScrollClusterData( PANE.FILES, bigData_Files, header );
         if( bigData_Files.length < 1 ) cluster.files.clear();
         
 /*#*/if( DEBUG ){ console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); console.groupEnd(); };/*#*/
@@ -1840,7 +1942,7 @@ function  setFilterSubtopic( state ) {
             setFilterSubtopic( "disable" );
             setGUIstate(GUI.STATE_RESET);
             if( folders.length < 1 ) cluster.subtopic.clear();
-            if( $('#input-subtopic').val() == "" ) {
+            if( $(FILTER.INPUT_AMQP_SRC).val() == "" ) {
                 $("#topics-tab").addClass('hidden');
                 $("#files-tab").addClass('hidden');
                 $("#stats-tab").addClass('hidden');
@@ -1875,9 +1977,8 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#topics-tab").removeClass('hidden');
                 $("#files-tab").removeClass('hidden');
                 $("#stats-tab").removeClass('hidden');
-                $("#files-tab").trigger('click');
+                $("#stats-tab").trigger('click');
                 adjustTabsHeight(true);
-//                 console.log('GUI.STATE_FOUND');
                 break;
                 
             case GUI.STATE_LOADING: 
@@ -1889,9 +1990,9 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#tabs .nav-tabs").show();
                 $("#sarra-formula").removeClass('hidden');
                 $(".input-subtopic").val("");
-                $("#folders-tab").trigger('click');
+//                 $("#folders-tab").trigger('click');
+                $("#builder-tab").trigger('click');
                 adjustTabsHeight(true);
-//                 console.log('GUI.STATE_LOADING');
                 break;
                 
             case GUI.STATE_RESET: 
@@ -1901,9 +2002,9 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files-tab").html(wrap( t.noFiles, TAG.cG ));
                 $("#files pre").html( "" );
                 $(".input-subtopic").val("");
-                $("#folders-tab").trigger('click');
+//                 $("#folders-tab").trigger('click');
+                $("#builder-tab").trigger('click');
                 adjustTabsHeight(true);
-//                 console.log('GUI.STATE_RESET');
                 break;
                 
             case GUI.STATE_SEARCHING: 
@@ -1913,9 +2014,9 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files-tab").addClass('hidden');
                 $("#stats-tab").addClass('hidden');
                 $("#btnSearch").html(t.f_superp + t.cancel);
-                $("#folders-tab").trigger('click');
+//                 $("#folders-tab").trigger('click');
+                $("#builder-tab").trigger('click');
                 adjustTabsHeight(true);
-//                 console.log('GUI.STATE_SEARCHING');
                 break;
                 
             case GUI.STATE_READY: 
@@ -1923,7 +2024,6 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 document.body.style.cursor = 'default';
                 $("#logs").hide();
                 adjustTabsHeight(true);
-//                 console.log('GUI.STATE_READY');
         }
     }
 }

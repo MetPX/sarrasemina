@@ -4,6 +4,39 @@
 
 lists all changes between versions.
 
+Date:   2018-04-30 10:30:01
+   DL - Added support for multiple Subtopics within the input field with Selectize plugin
+      - By default: Add to Subtopics list the Folder on which user clicked in Catalog's list
+      - Modified layout to display more on screen
+      - Removed bootstrap-dropdown-filter (replaced by Selectize plugin)
+
+Date:   2018-04-10 10:26:01
+   DL - Added Subtopic filter/selector
+
+Date:   2018-04-05 14:19:32
+   DL - Added brokers default file, updated config, Completed Help Dialogs (FR/EN), Docs Web page in preparation
+
+Date:   2018-03-23 09:52:37
+   DL - Implemented Clusterize on Folders, Subtopics & Files
+      - Replaced regex match by test for improved performance
+      - Merged CancellationToken into main.js
+      - Added noscript tag message
+      - Worked on GUI presentation, cleaned some js scripts
+
+Date:   2018-03-08 09:11:11
+   DL - Add: sample catalogue files with new data structure (deleted old /data/test/)
+      - Fix: multibyte range now fetch files properly
+      - Fix: apply parseInt to the size part of a catalogue's line that have been splitted
+
+Date:   2018-03-06 13:22:12
+   DL - Modified CSS and UI texts
+
+Date:   2018-03-06 13:02:49
+   DL - Catalogr now works with help arguments [-h] [-s SOURCE_FOLDER] [-o OUTPUT_FOLDER] [-l] [-v]
+
+Date:   2018-03-05 15:37:01
+   DL - Optimization: now catalogue.toc contains only file name w/o full path.
+
 
 **0.0.1**
 * development began August 2017.

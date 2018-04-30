@@ -10,9 +10,11 @@
 .clusterize-content.customize-counter li.clusterize-no-data { left: -30px; font-size: 18px; color: #900; margin-top: 30px; } /* Centering message that appears when no data provided */
 .clusterize-content.customize-counter li.clusterize-no-data:before { content: none; }       /* Centering message that appears when no data provided */
 .clusterize-content.customize-counter li .content{ text-decoration: none; position: relative; z-index: 1; }
+.clusterize-content.customize-counter li .content .size,
+#files #files-label .content .size { display: inline-block; min-width: 40px; text-align: right; }
 
 /* Clusterize ordered list */
-.cluster-ol{ width: 100%; position: relative; border: 1px solid #ddd; border-top: none; }
+.cluster-ol{ width: 100%; position: relative; border: 1px solid #ddd; margin-top: 5px; border-radius: 3px; }
 .cluster-ol ol{ margin-bottom: 0; margin-left: 20px; padding-left: 60px; white-space: nowrap; }
 .cluster-ol .progress-scroll { margin-top: 5px; max-width: 100%; border-radius: 5px; height: 7px; float: left; background-color: #09f; }
 .cluster-ol .clusterize-no-data{ margin: 0; padding: 10px 20px; font-size: 18px; text-align: center; }     /* Centering message that appears when no data provided */
