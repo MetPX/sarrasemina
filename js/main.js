@@ -52,6 +52,7 @@ class CancellationTokenSource {
 // ---------------------------------------------------------------------
 
 const
+    L    = '\n',
     FILTER = {
         CHAR_DELIMITER : '|',
         MAX_SUBTOPICS  : null,                  // User may enter an unlimited number of subtopics...
@@ -59,36 +60,54 @@ const
     },
     CONFIG = {
         options : {
-            broker       : "amqps://anonymous@dd.weather.gc.ca",
-            xchange      : "xpublic",
-            topic        : "v02.post",
-            subtopic     : [],
-            acceptReject : [],
-            acceptUnmatch: "False"
+            broker        : "amqps://anonymous@dd.weather.gc.ca",
+            xchange       : "xpublic",
+            expire        : "5m",                                        // default: 5m   - s[econds], m[inutes], h[our], d[ay], w[eek]
+            instance      : "1",                                         // default: 1    - add more instances if there is lagging
+            mirror        : "True",                                      // default: True - will build a mirror directory structure; False: will put all files in same directory
+            topic_prefix  : "v02.post",
+            subtopic      : [],
+            accept_reject : [],
+            accept_unmatch: "False"
         },
         setup   : ( newOptions = {} ) => {
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
         },
         write   : () => {
-            let config = "", newOptions = {}, subtopics = [], acceptRejects = [];
-            //$( ".input-subtopic" )     .each( (index, items) => { let filters = $(items).val().split(FILTER.CHAR_DELIMITER); for( let i=0; i<filters.length; i++) { let filter = filters[i].trim(); if( filter ) subtopics.push( [filter] ); } });
+            let pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[],
+                config='#'+L+'# commnent on expire...   TBD'+L+'# commnent on instance... TBD'+L+'# commnent on mirror...   TBD'+L+'#';
+
             subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
             for( let i=0; i<subtopics.length; i++ ) {
                 subtopics[i] = subtopics[i].trim();
             }
-            $( ".input-accept_reject" ).each( (index, item)  => { let filter  = $(item).val(); if( filter ) acceptRejects.push( [$(item).data('ar'),filter] ); });
-            newOptions.topic         = $(".label-topic").data('label');
-            newOptions.subtopic      = subtopics;
-            newOptions.acceptReject  = acceptRejects;
-            newOptions.acceptUnmatch = $("#btn-accept_unmatch").data('accept_unmatch');
+            
+            $( ".input-accept_reject" ).each( (index, item)  => { let filter = $(item).val(); if( filter ) accept_rejects.push( [$(item).data('ar'),filter] ); });
+            newOptions.topic_prefix   = $(".label-topic").data('label');
+            newOptions.subtopic       = subtopics;
+            newOptions.accept_reject  = accept_rejects;
+            newOptions.accept_unmatch = $("#btn-accept_unmatch").data('accept_unmatch');
+            
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
-
-            config  = "broker          "+ CONFIG.options.broker  +L;
-            config += "exchange        "+ CONFIG.options.xchange +L;
-            config += "topic_prefix    "+ CONFIG.options.topic   +L;
-            config += CONFIG.options.subtopic    .reduce( ( str, val, ind, arr ) => { return str +   "subtopic        "+ val    +L }, "" );
-            config += CONFIG.options.acceptReject.reduce( ( str, val, ind, arr ) => { return str + val[0] +"          "+ val[1] +L }, "" );
-            config += "accept_unmatch  "+ CONFIG.options.acceptUnmatch;
+            
+            Object.keys(CONFIG.options).forEach( (opt) => {
+                switch( opt ) {
+                    case 'subtopic':
+                        if( CONFIG.options[opt].length > 0 )
+                            for( let i=0; i<CONFIG.options[opt].length; i++ )
+                                config += L+ opt.padEnd(pad) + CONFIG.options[opt][i];
+                        break;
+                    case 'accept_reject':
+                        if( CONFIG.options[opt].length > 0 )
+                            for( let i=0; i<CONFIG.options[opt].length; i++ )
+                                config += L+ CONFIG.options[opt][i][0].padEnd(pad) + CONFIG.options[opt][i][1];
+                        break;
+                        
+                    default: 
+                    config += L+ opt.padEnd(pad) + CONFIG.options[opt];
+                }
+            });
+            
             return config;
         }
     },
@@ -111,7 +130,6 @@ const
         BLACK :'black',
         BLUE  :'blue'
     },
-    L    = '\n',
     LANG = $.cookie("LANG"),                                            // Select user's prefered language
     PANE = {
         BUILDER  : "builder",
@@ -193,7 +211,6 @@ var
                         },
         updateDisplay : function( count ) { this.isWorthDisplay = count > this.minCount2Show; }
     };
-
 
 // ---------------------------------------------------------------------
 //  TEST ZONE BEGIN
@@ -366,12 +383,13 @@ function _initialize_() {
         $(".input-accept_reject")  .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
         $(".label-accept_unmatch") .html(wrap(t.reject,    TAG.cR) +t.comma);
 
-        $("#switchLang")                                                                         .data("title", switchLangue[LANG].title)   .data("infos", switchLangue[LANG].title).tooltip();
-        $("#help")                 .attr("title", t.help.tip +" - "+ t.help.title.page)          .data("title", t.help.title.page)          .data("infos", t.help.infos.page).tooltip().show();
-        $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)         .data("title", t.help.title.topic)         .data("infos", t.help.infos.topic).tooltip();
-        $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)      .data("title", t.help.title.subtopic)      .data("infos", t.help.infos.subtopic).tooltip();
-        $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.acceptReject)  .data("title", t.help.title.acceptReject)  .data("infos", t.help.infos.acceptReject).tooltip();
-        $(".help.accept_unmatch")  .attr("title", t.help.tip +" - "+ t.help.title.acceptUnmatch) .data("title", t.help.title.acceptUnmatch) .data("infos", t.help.infos.acceptUnmatch).tooltip();
+        $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
+        
+        $("#help")                 .attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip().show();
+        $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
+        $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)       .data("title", t.help.title.subtopic)       .tooltip();
+        $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.accept_reject)  .data("title", t.help.title.accept_reject)  .tooltip();
+        $(".help.accept_unmatch")  .attr("title", t.help.tip +" - "+ t.help.title.accept_unmatch) .data("title", t.help.title.accept_unmatch) .tooltip();
         
         $("#btnSearch")            .html(t.g_search + t.search).addClass("disabled");
         $("#btnSearchReset")       .html(t.g_remove).addClass("disabled");
@@ -482,7 +500,6 @@ function _initialize_() {
                 pType      = "type-danger",
                 pBtnOK     = { cssClass:'btn-default btn-sm', label:'&nbsp; &nbsp; OK &nbsp; &nbsp;' },
                 pBtnGetRid = { cssClass:'btn-default btn-sm', label:((LANG == 'fr') ? "Ne plus afficher ce message":"Don't show this message again"), action:( function(){ $.cookie( "showWarningDialog", "NO", { expires: 365 }) }) };
-                // BSDialogPrompt(pMessage,pBtnAccept,pBtnCancel);
                 
                 BootstrapDialog.show({
                 type:    pType,
@@ -567,7 +584,7 @@ function loadCatalogueData( selectedCatalogue ) {
 //
 // fetchFileRange returns text from a XMLHttpRequest within byte range
 
-async function fetchFileRange(url, byteRanges=[""]) {
+async function fetchFileRange( url, byteRanges=[""] ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ logMe(url +L+"   - ["+ byteRanges +"]", '-');};/*#*/
 
@@ -1219,14 +1236,14 @@ async function performSearch ( allFilters ) {
     
     let AMQPfilter          = allFilters[0][0],     // AMQP filter    is the first item of allFilters list;
         AMQPfilters         = AMQPfilter.split(FILTER.CHAR_DELIMITER),
-        acceptRejectFilters = allFilters,           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
+        accept_rejectFilters = allFilters,           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
         subtopicFilter      = AMQP_2_RegExp( AMQPfilter ),
         subtopicFilters     = $.map( AMQPfilters, (filter) => { return AMQP_2_RegExp( filter ); }),
         config              = '',                   // Sarra config to be displayed on screen according to user's choices
         STm                 = {},                   // STm (SubTopic match)     stores selectedCatalogue's data filtered with subtopicFilter
-        ARm                 = {},                   // ARm (AcceptReject match) stores STm's (SubTopic match)'s data filtered with acceptRejectFilters
+        ARm                 = {},                   // ARm (AcceptReject match) stores STm's (SubTopic match)'s data filtered with accept_rejectFilters
         nbFolders, nbFoldersHtml,                   // Number of folders found with subtopicFilter
-        nbFiles,   nbFilesHtml,                     // Number of files   found with subtopicFilter and acceptRejectFilter (if any)
+        nbFiles,   nbFilesHtml,                     // Number of files   found with subtopicFilter and accept_rejectFilter (if any)
         matches    = [],                            // Store a list matching filters criteria
         filesInFolders = { matched: [], stats: { matched: { nbFiles:0,totSize:0 } } };
     
@@ -1290,13 +1307,13 @@ async function performSearch ( allFilters ) {
         $("#files pre").html( totSize + t.FileSize +L );
     }
     
-    // Apply acceptRejectFilters if any...
+    // Apply accept_rejectFilters if any...
     // --------------------------------------------------
     
-    let nbFilters     = acceptRejectFilters.length,
+    let nbFilters     = accept_rejectFilters.length,
         withARFilters = nbFilters > 2;
 
-    if( withARFilters ) {                                                                               // If no acceptRejectFilters, update files tab as well with found files...
+    if( withARFilters ) {                                                                               // If no accept_rejectFilters, update files tab as well with found files...
 
         let matchfiles = [],
             total      = bigData_Files.length,
@@ -1306,9 +1323,9 @@ async function performSearch ( allFilters ) {
             
         if( progressBar.isWorthDisplay ) { progressBar.init( total, initArrStr );  await wait(1); }
         
-        acceptRejectFilters[0][0] = subtopicFilter;
+        accept_rejectFilters[0][0] = subtopicFilter;
         searchToken.reset();
-        ARm = await getAcceptRejectMatch( bigData_Files, acceptRejectFilters, searchToken )   // Get Accept/Reject filtered filess
+        ARm = await getAcceptRejectMatch( bigData_Files, accept_rejectFilters, searchToken )   // Get Accept/Reject filtered filess
                         .then( (data) => { return data } )
                         .catch( (err) => {
                             if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ",L, err ); }
@@ -1597,23 +1614,24 @@ $(document).
     }).
 
     on('click', '.help', function(e) {
-        BSDialog( $(this).data('infos'), $(this).data('title'), );
+        let url = `/docs/help.html #${LANG}-${$(this).data('help')}`;
+        BSDialogUrl( url, $(this).data('title') );
     }).
     
     on('click', '.btn-add', function(e) {
         e.preventDefault();
-        let acceptReject = $('.input-accept_reject'),
+        let accept_reject = $('.input-accept_reject'),
             controlForm  = $('.accepts-rejects .filters:last'),
             currentEntry = $(this).parents('.entry:last'),
             currentState = currentEntry.find('.btn-accept-regex').hasClass('active') ? 'accept':'reject',
             newEntry     = $(currentEntry.clone()).appendTo(controlForm),
             nextEntryID  = function (){
                                 let ids = [];
-                                for( let i=0, n=acceptReject.length; i < n; i++ ) ids.push( acceptReject[i].id );
+                                for( let i=0, n=accept_reject.length; i < n; i++ ) ids.push( accept_reject[i].id );
                                 return ("input-accept_reject__" + parseInt(ids.sort().pop().split("__").pop()) + 1);
                             };
         newEntry.find('label:first').attr('for',nextEntryID);
-        newEntry.find('.help.accept_reject').attr("title", t.help.tip).data("title", t.help.title.acceptReject).data("infos", t.help.infos.acceptReject).tooltip();
+        newEntry.find('.help.accept_reject').attr("title", t.help.tip).data("title", t.help.title.accept_reject).tooltip();
         newEntry.find('.input-accept_reject').val('').data('ar',currentState).attr('id',nextEntryID);
         controlForm.find('.entry:not(:first) .btn-add')
             .removeClass('btn-add').addClass('btn-remove')
@@ -1672,6 +1690,7 @@ $(document).
     
     on('click', '#btnSearchReset', function() {                     // Do reset search
         if( ! $(this).hasClass('disabled') ) {
+            $selectize[0].selectize.setValue( '' );
             setFilterSubtopic( "reset" );
         }
     }).
@@ -1711,11 +1730,15 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
     adjustTabsHeight( true );
 });
 
+$('.collapse').on('show.bs.collapse', () => {
+    $('.collapse.in').each(()=>{ $(this).collapse('hide'); });
+});
+
 // ---------------------------------------------------------------------
 //
 // BSDialog
 // Display a message in a modal dialog
-    
+
 function BSDialog( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_INFO ) {
     
     if( dMessage )
@@ -1736,9 +1759,31 @@ function BSDialog( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_
 
 // ---------------------------------------------------------------------
 //
-// BSDialogPrompt
+// BSDialogUrl
 // Prompt a message to request an action
 
+function BSDialogUrl( url, dTitle = "Information", dType=BootstrapDialog.TYPE_INFO ) {
+    
+    if( url )
+        BootstrapDialog.show({
+            title:    dTitle,
+            message:  $('<div></div>').load(url),
+            type:     dType,
+            size:     BootstrapDialog.SIZE_SMALL,
+            buttons: [{
+                    label: t.dialog.btn.ok,
+                    hotkey: $.ui.keyCode.ENTER,
+                    action: function(dialogRef){ dialogRef.close(); }
+                }]
+        });
+    
+}
+
+
+// ---------------------------------------------------------------------
+//
+// BSDialogPrompt
+// Prompt a message to request an action
 
 function BSDialogPrompt( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_DEFAULT ) {
     

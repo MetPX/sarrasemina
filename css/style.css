@@ -11,7 +11,7 @@
 
 /* -[ GENERAL ]------------------------------------------- */
 
-html   { margin:0; padding:0; font-size:62.5%; background: #26a; }
+html   { margin:0; padding:0; font-size:62.5%; background-color: #09d; }
 body   { background: transparent; font-family: 'Open Sans', sans-serif; font-size:1.2em; line-height: 1.6em; margin:0 auto; min-width:420px; padding: 10px !important; }
 pre    { font-size: 0.85em; }
 hr     { margin: 3px 0; }
@@ -43,8 +43,8 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .notif-cookies a { color: #fff; }
 .notif-cookies a:hover { cursor: pointer; }
 
-.modal-dialog.modal-sm { width: 500px; }
-.modal-dialog.modal-sm .modal-header { padding: 10px 15px; }
+.modal-dialog.modal-sm { width: 770px; }
+.modal-dialog.modal-sm .modal-header { padding: 10px 15px; background-color: #09d; }
 .modal-dialog.modal-sm .modal-body { padding: 15px 15px 20px; }
 .modal-dialog.modal-sm .modal-body .margetop-5px li { margin-top: 5px; }
 .modal-dialog.modal-sm .modal-footer { border-top: none; padding-top: 0; }
@@ -57,8 +57,10 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .modal.bootstrap-dialog.type-primary.fade.in.size-small { padding-right: 0 !important; }
 .modal.bootstrap-dialog.type-danger .modal-header { background-color: #d00; }
 
-.progress { display: none; height: auto; overflow: hidden; font-size: .75rem; background-color: #fff; border-radius: .25rem; margin-bottom: 0; box-shadow: none; margin: 2px; }
+.collapsable { margin: 0 1em; padding: .2em; }
+.collapse-btns { text-align: center; }
 
+.progress { display: none; height: auto; overflow: hidden; font-size: .75rem; background-color: #fff; border-radius: .25rem; margin-bottom: 0; box-shadow: none; margin: 2px; }
 .progress-bar { display: flex; flex-direction: column; height: .5rem; justify-content: center; color: #fff; text-align: center; transition: width .6s ease; border-radius: 2px; }
 .progress-bar-striped { background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem; }
 .progress-bar-animated { animation: progress-bar-stripes 1s linear infinite; }

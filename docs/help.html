@@ -1,0 +1,216 @@
+====================================================================================================
+
+<div id="fr-about">
+    <h5>Sarra Semina : le compagnon Web de Sarracenia</h5>
+    
+    <p><strong>Que fait Sarra Semina ?</strong></p>
+    <p>
+        Sarra Semina a été conçu pour aider les abonnés de <strong><a href="https://github.com/MetPX/sarracenia" target="_blank">Sarracenia <i class="fa fa-external-link" aria-hidden="true"></i></a></strong> 
+        à créer leurs règles de configurations.</p>
+    <p>
+        Sarra Semina facilite l'expérimentation et la mise au point de configurations Sarracenia afin de recevoir les messages désirés.
+        Il permet entre autres de visualiser la liste des messages qu'émettra <strong>Sarracenia</strong> selon une configuration donnée.</p>
+    <br>
+    <p><strong>Catalogues de données</strong></p>
+    <p>
+        La liste des catalogues de données est mise à jour quotidiennement.</p>
+    <p>
+        Chaque catalogue contient la liste de <strong>plusieurs millions de fichiers</strong> répartis dans <strong>plus de 100,000 répertoires</strong>.
+        Considérant ce volume de données, il est avantageux de préciser le plus possible le ou les sous-thèmes recherchés.
+        Une recherche effectuée avec un sous-thème restrinct donnera des résultats rapidement (voir instantannément), alors qu'un sous-thème générique pourra prendre plusieurs minutes, sans compter le risque de saturer la mémoire.</p>
+    <br>
+    <p><strong>Règles de configuration</strong></p>
+    <p>
+        Deux types de filtres (règles) sont appliqués sur un catalogue de données :</p>
+    <p>
+        - Les règles AMQP sont appliqués aux sous-thèmes<br>
+        - Les filtres Regex sont appliqués en cascade sur les résultats du filtre précédent</p>
+    <br>
+    <p><strong>Références</strong></p>
+    <p>
+        <small>Projet GitHub : <a href="https://github.com/MetPX/sarrasemina" target="_blank">https://github.com/MetPX/sarrasemina <i class="fa fa-external-link" aria-hidden="true"></i></a></small><br>
+        <small>Documentation : <a href="/docs/sarrasemina-fr.html" target="_blank">Sarra Semina <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-about">
+    <h5>Sarra Semina is Sarracenia's Web Companion</h5>
+
+    <p><strong>What does Sarra Semina do?</strong></p>
+    <p>
+        Sarra Semina was developed to help <strong><a href="https://github.com/MetPX/sarracenia" target="_blank">Sarracenia's <i class="fa fa-external-link" aria-hidden="true"></i></a></strong> subscribers create their configuration rules.</p>
+    <p>
+        Sarra Semina facilitates experimentation and development of Sarracenia's configurations in order to receive the desired messages.
+        Among other things, it allows to view a list of messages that <strong>Sarracenia</strong> will send according to a given configuration.</p>
+    <br>
+    <p><strong>Data Catalogs</strong></p>
+    <p>
+        The list of data catalogs is updated daily.</p>
+    <p>
+        Each catalog contains a list of <strong>several million files</strong> spread across <strong>more than 100,000 directories</strong>.
+        Considering this volume of data, it is advantageous to pinpoint as much as possible the subtopic sought.
+        Searches performed with a narrower subtopic will yield results quickly (even instantaneously), while generic ones may take several minutes, not to mention the risk of memory overload.</p>
+    <br>
+    <p><strong>Configuration rules</strong></p>
+    <p>
+        Two types of filters (rules) are applied to a data catalog:</p>
+    <p>
+        - AMQP filters are applied to subtopics<br>
+        - Regex filters are applied in cascade order on previous filter's results</p>
+    <br>
+    <p><strong>References</strong></p>
+    <p>
+        <small>Projet GitHub : <a href="https://github.com/MetPX/sarrasemina" target="_blank">https://github.com/MetPX/sarrasemina <i class="fa fa-external-link" aria-hidden="true"></i></a></small><br>
+        <small>Documentation : <a href="/docs/sarrasemina-fr.html" target="_blank">Sarra Semina <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
+</div>
+
+====================================================================================================
+
+<div id="fr-topic">
+    <h5>Les protocoles AMQP</h5>
+    <p>
+        Il existe deux protocoles AMQP : &nbsp; <strong>Post</strong> et <strong>Report</strong>.</p>
+    <br>
+    <p>
+        <strong>v02</strong> est la version/format du protocole de messages Sarracenia.<br>
+        Le protocole <strong>v02.post</strong> est celui sélectionné par défaut.</p>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-topic">
+    <h5>AMQP Protocols</h5>
+    <p>
+        There are two AMQP protocols: &nbsp; <strong>Post</strong> and <strong>Report</strong>.</p>
+    <br>
+    <p>
+        <strong>v02</strong> is the version / format of the Sarracenia message protocol.<br>
+        The <strong>v02.post</strong> protocol is the one selected by default.</p>
+</div>
+
+====================================================================================================
+
+<div id="fr-subtopic">
+    <h5>Les règles AMQP</h5>
+    <p>
+        Les Sous-thèmes utilisent les règles AMQP comme filtre.</p>
+    <p>
+        <strong>Les métacaractères permis de AMQP</strong><br>
+        - Le point (<strong style="color: #f00;"> . </strong>) correspond toujours à un séparateur de répertoire (<strong style="color: #03f;"> / </strong>)<br>
+        - L'étoile &nbsp;(<strong style="color: #2c8e2c;"> * </strong>) correspond à tout nom de répertoire<br>
+        - Le dièse (<strong style="color: #de9226;"> # </strong>) correspond à tout caractère du chemin d'un fichier</p>
+    <p>
+        <strong>Règles AMQP</strong><br>
+        - Ces règles sont <strong>sensibles à la casse</strong> et sont appliquées au catalogue sélectionné.<br>
+        - Le filtre AMQP ne peut jamais commencer par un point (<strong style="color: #f00;"> . </strong>)<br>
+        - L'étoile est utilisée uniquement entre deux points ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> ) sauf si c'est le premier caractère (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> ) du filtre<br>
+        - Le dièse est toujours précédé d'un point ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> ) sauf si c'est le premier caractère (<strong style="color: #de9226;"> # </strong>) du filtre</p>
+    <p>
+        Il y a plusieurs manières de personnaliser les règles AMQP de ce champ.</p>
+    <p style="padding-left:20px">
+        <strong style="color: #2c8e2c;">Ajouter</strong> :<br>
+        - Saisir du texte directement dans le champ en respectant les règles AMQP<br>
+        - Sélectionner un ou plusieurs répertoires dans le menu déroulant du champ Sous-thème<br>
+        - Cliquer sur un ou plusieurs répertoires dans la liste située plus bas dans la page</p>
+    <p style="padding-left:20px">
+        <strong style="color: #de9226;">Modifier</strong> :<br>
+        - Placer le curseur à la fin d'une règle à l'aide les flèches gauche-droite<br>
+        - Appuyez sur la touche [Retour en arrière]<br>
+        - Modifier le texte selon vos besoins</p>
+    <p style="padding-left:20px">
+        <strong style="color: #c42f2a;">Effacer</strong> :<br>
+        - Effacer tous les filtres avec le grand [<strong class="c-rouge">X</strong>] rouge à la droite du champ<br>
+        - Cliquer sur le [x] à la droite d'une règle<br>
+        - Cliquer sur un ou plusieurs filtres et utiliser la touche effacement</p>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-subtopic">
+    <h5>The AMQP Rules</h5>
+    <p>
+        Subtopics use AMQP rules as filter.</p>
+    <p>
+        <strong>Wildcards allowed by AMQP</strong><br>
+        - The dot (<strong style="color: #f00;"> . </strong>) always match a directory separator (<strong style="color: #03f;"> / </strong>)<br>
+        - The star &nbsp;(<strong style="color: #2c8e2c;"> * </strong>) matches any directory name<br>
+        - The sharp (<strong style="color: #de9226;"> # </strong>) matches any file's path character</p>
+    <p>
+        <strong>AMQP rules</strong><br>
+        - These rules are <strong>case sensitive</strong> and are appliyed to the selected catalogue.<br>
+        - The AMQP filter can never start with a dot (<strong style="color: #f00;"> . </strong>)<br>
+        - The star wildcard can only be used between two dots ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> ) unless it's the begining character of the filter (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> )<br>
+        - The sharp wildcard is always preceded by a period ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> ) unless it's the begining character of the filter (<strong style="color: #de9226;"> # </strong>)</p>
+    <p>
+        There are several ways to customize the AMQP rules for this field.</p>
+    <p style="padding-left:20px">
+        <strong style="color: #2c8e2c;">Add</strong> :<br>
+        - Enter text directly in the field in accordance with the rules AMQP<br>
+        - Select one or more directories from the drop down menu Sub-topic field<br>
+        - Click on one or more directories in the list further down the page</p>
+    <p style="padding-left:20px">
+        <strong style="color: #de9226;">Modify</strong> :<br>
+        - Position the caret at the end of a rule using left and right arrows to navigate<br>
+        - Hit Backspace key<br>
+        - Modify text to meet your needs</p>
+    <p style="padding-left:20px">
+        <strong style="color: #c42f2a;">Delete</strong> :<br>
+        - Clear all filters with large red [<strong class="c-rouge">X</strong>] at the end of the field<br>
+        - Click the [x] on the right of a rule<br>
+        - Click on one or more filters and use the delete key</p>
+</div>
+
+====================================================================================================
+
+<div id="fr-accept_reject">
+    <h5>Les filtres Regex</h5>
+    <p>
+        Tout comme les règles AMQP, les filtres Regex sont <strong>sensibles à la casse</strong>.</p>
+    <p>
+        La recherche est effectuée d'un filtre à l'autre en cascade de haut en bas.<br>
+        Ce filtre détecte et applique des expressions régulières (Regex) sur la liste des éléments reçus du filtre précédent au-dessus de lui.</p>
+    <br>
+    <p>
+        Il y a deux modes d'opération pour ce filtre : <strong class="c-vert">Accepter</strong> ou <strong class="c-rouge">Rejeter</strong>.</p>
+    <ul style="margin: 5px 15px; line-height: 1.3em;">
+        <li style="margin-top: .5em;">En mode <strong class="c-vert">Accepter</strong>, les éléments trouvés sont retirés de la liste et seront affichés dans les résultats.<br>La liste restante est passée au filtre suivant.</li>
+        <li style="margin-top: .5em;">En mode <strong class="c-rouge">Rejeter</strong>, les éléments trouvés sont retirés de la liste.<br>La liste restante est passée au filtre suivant.</li>
+    </ul>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-accept_reject">
+    <h5>The Regex Filters</h5>
+    <p>
+        Like the AMQP rules, Regex filters are <strong>case sensitive</strong>.</p>
+    <p>
+        The search operation is performed from one filter to another cascading from top to bottom.<br>
+        This filter detects and applies regular expressions (Regex) on the received list of items. That list comes from the previous filter above it.</p>
+    <br>
+    <p>
+        There are two modes of operation for this filter : <strong class="c-vert">Accept</strong> or <strong class="c-rouge">Reject</strong>.</p>
+    <ul style="margin: 5px 15px; line-height: 1.3em;">
+        <li style="margin-top: .5em;">In <strong class="c-vert">Accept</strong> mode, found items are removed from the list and will be displayed in the results.<br>The remaining list is passed to the next filter.</li>
+        <li style="margin-top: .5em;">In <strong class="c-rouge">Reject</strong> mode, found items are removed from the list.<br>The remaining list is passed to the next filter.</li>
+    </ul>
+</div>
+
+====================================================================================================
+
+<div id="fr-accept_unmatch">
+    <h5>Le dernier filtre</h5>
+    <p>
+        Il n'y a que deux choix pour ce filtre :<br>
+        <strong class="c-vert">Accepter</strong> ou <strong class="c-rouge">Rejeter</strong> les éléments restant dans la liste.</p>
+    <ul style="margin: 5px 15px; line-height: 1.3em;">
+        <li style="margin-top: .5em;">En mode <strong class="c-vert">Accepter</strong>, tous les éléments restants dans la liste seront affichés dans les résultats.</li>
+        <li style="margin-top: .5em;">En mode <strong class="c-rouge">Rejeter</strong>, tous les éléments restants dans la liste seront éliminés.</li>
+    </ul>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-accept_unmatch">
+    <h5>The last filter</h5>
+    <p>
+        There are only two choices for this filter:<br>
+        <strong class="c-vert">Accept</strong> or <strong class="c-rouge">Reject</strong> the remaining items in the list.<br>
+    <ul class="margetop-5px">
+        <li>In <strong class="c-vert">Accept</strong> mode, all remaining items in the list will be displayed in the results.</li>
+        <li>In <strong class="c-rouge">Reject</strong> mode, all remaining items in the list will be eliminated .</li>
+    </ul>
+</div>
+
+====================================================================================================

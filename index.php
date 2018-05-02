@@ -78,7 +78,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                     <span style="white-space: nowrap">
                         <span id="catalogues"></span>
                         <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""></button>
-                        <button type="button" class="btn btn-default btn-sm help" id="help"  data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""><i class="fa fa-info" aria-hidden="true"></i></button>                    
+                        <button type="button" class="btn btn-default btn-sm help" id="help"  data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about"><i class="fa fa-info" aria-hidden="true"></i></button>                    
                     </span>
                 </div>
             </div>
@@ -101,7 +101,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         </div>
 <?php /*
 
-                <li><a id="folders-tab" href="#folders" data-toggle="tab"></a></li>
         BOT
         -------------------------------------------------------------------- */ ?>
         <div id="tabs" class="row page">
@@ -128,7 +127,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                         <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
                                             <div class="input-group input-group-sm disabled">
-                                                <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-help="topic" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
                                                     <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
                                                         <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
@@ -172,8 +171,9 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                         <td><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
                                         <td>
                                             <div class="subtopic filter input-group input-group-sm disabled">
-                                                <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
                                                 <input id="input-subtopics" class="subtopic" placeholder="..." value="" />
+                                                <span id="btnSearchReset" class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
                                             </div>
                                         </td>
                                     </tr>
@@ -188,7 +188,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                         <td width="90"><label class="label-accept_reject" for="input-accept_reject__1">Accept/Reject: </label></td>
                                         <td>
                                             <div class="input-group input-group-sm disabled">
-                                                <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-help="accept_reject" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="filter input-group input-group-sm">
                                                     <span class="input-group-btn btn-group-sm" data-toggle="buttons">
                                                         <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
@@ -217,7 +217,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                         </td>
                                         <td style="vertical-align: top;">
                                             <div class="input-group input-group-sm disabled" style="display:inline-table; width: 100px;">
-                                                <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
+                                                <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-help="accept_unmatch" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
                                                     <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
                                                         <input type="radio" name="options" id="option1" autocomplete="off">
