@@ -71,14 +71,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         -------------------------------------------------------------------- */ ?>
         <div id="docs" class="row page">
             <div class="row">
-                <div class="col-sm-5 logo">
+                <div class="col-sm-5 title-logo">
                     <img height="26" src="/img/sig-blk-fr.svg"/>
                 </div>
-                <div class="col-sm-7 text-right slogo">
+                <div class="col-sm-4 title-text"></div>
+                <div class="col-sm-3 title-btns text-right">
                     <span style="white-space: nowrap">
-                        <span id="catalogues"></span>
+                        <button type="button" class="btn btn-default btn-sm help" id="about" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about"></button>                    
                         <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""></button>
-                        <button type="button" class="btn btn-default btn-sm help" id="help"  data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about"><i class="fa fa-info" aria-hidden="true"></i></button>                    
                     </span>
                 </div>
             </div>
@@ -86,14 +86,8 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 <hr>
                 <div id="msg">
                     <noscript>
-                        <h2>
-                            Your browser does not support JavaScript!<br>
-                            <small>You need to enable JavaScript to use this website!</small>
-                        </h2>
-                        <h2>
-                            JavaScript n'est pas activé sur votre navigateur !<br>
-                            <small>Vous devez l'activer pour utiliser les fonctions de ce site web!</small>
-                        </h2>
+                        <h2>Your browser does not support JavaScript!<br><small>You need to enable JavaScript to use this website!</small></h2>
+                        <h2>JavaScript n'est pas activé sur votre navigateur !<br><small>Vous devez l'activer pour utiliser les fonctions de ce site web!</small></h2>
                     </noscript>
                 </div>
                 <p id="logger"></p>
@@ -105,13 +99,13 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         -------------------------------------------------------------------- */ ?>
         <div id="tabs" class="row page">
             <ul class="nav nav-tabs">
-                <li><a id="builder-tab" href="#builder" data-toggle="tab"></a></li>
-                <li><a id="stats-tab"   href="#stats"   data-toggle="tab"></a></li>
-                <li><a id="topics-tab"  href="#topics"  data-toggle="tab"></a></li>
-                <li><a id="files-tab"   href="#files"   data-toggle="tab"></a></li>
+                <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab"></a></li>
+                <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab"></a></li>
+                <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab"></a></li>
+                <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab"></a></li>
             </ul>
             <div class="tab-content clearfix">
-                <div id="builder" class="tab-pane">
+                <div id="editor" class="tab-pane">
 <?php /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
 <?php /*
 
@@ -124,45 +118,37 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                             <div class="sarra-configs col-xm-12 accepts-rejects">
                                 <table>
                                     <tr>
+                                        <td>
+                                            <label class="label-catalogue" for="selectCatalogue">Catalogue : </label>
+                                            <span id="catalogues"></span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <hr>
+                                <table>
+                                    <tr>
                                         <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
                                             <div class="input-group input-group-sm disabled">
                                                 <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-help="topic" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
                                                     <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
-                                                        <input type="radio" name="options" id="option1" autocomplete="off" checked><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> post
+                                                        <input type="radio" name="options" id="option1" autocomplete="off" checked>
+                                                        <i class="fa fa-circle-thin unchecked" aria-hidden="true"></i>
+                                                        <i class="fa fa-check-circle checked" aria-hidden="true"></i>
+                                                        post
                                                     </label>
                                                     <label class="btn btn-primary btn-topic" data-label="v02.report">
-                                                        <input type="radio" name="options" id="option2" autocomplete="off"><i class="fa fa-circle-thin unchecked" aria-hidden="true"></i><i class="fa fa-check-circle checked" aria-hidden="true"></i> report
+                                                        <input type="radio" name="options" id="option2" autocomplete="off">
+                                                        <i class="fa fa-circle-thin unchecked" aria-hidden="true"></i>
+                                                        <i class="fa fa-check-circle checked" aria-hidden="true"></i>
+                                                        report
                                                     </label>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
 <?php /** / ?>
-                                    Previous one
-                                    --------------------------------------------------------------------
-<?php /** / ?>
-                                    <tr>
-                                        <td><label class="label-subtopic" for="input-subtopic">Subtopic: </label></td>
-                                        <td>
-                                            <div class="subtopic filter input-group input-group-sm disabled">
-                                                <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="right"></span>
-                                                <span id="products-list" class="catalogue-short-list input-group-addon">
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-primary btn-sm dropdown-toggle" type="button" id="dropdown-products-list" data-toggle="dropdown" aria-expanded="true"><span class="caret"></span></button>
-                                                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdown-products-list" data-filter ></ul>
-                                                    </div>
-                                                </span>
-                                                <input id="input-subtopic" class="text form-control input-subtopic" autocomplete="off" type="text" class="form-control" placeholder="..." aria-label="..." aria-describedby="btnSearchReset" />
-                                                <span id="btnSearchReset" class="input-group-addon"></span>
-                                            </div>
-                                        </td>
-                                    </tr>
-<?php /** / ?>
-                                    --------------------------------------------------------------------
-                                    Previous one
-
                                     Selectize
                                     --------------------------------------------------------------------
 <?php /**/ ?>
@@ -172,12 +158,25 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                         <td>
                                             <div class="subtopic filter input-group input-group-sm disabled">
                                                 <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
-                                                <input id="input-subtopics" class="subtopic" placeholder="..." value="" />
-                                                <span id="btnSearchReset" class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                                <input id="input-subtopics" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
+                                                <span id="btnSearchReset" class="input-group-addon disabled"><span class="glyphicon glyphicon-remove"></span></span>
                                             </div>
                                         </td>
                                     </tr>
 <?php /** / ?>
+                        <div class="subtopic filter input-group input-group-sm disabled">
+                            <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right" title="" data-original-title="Aide - Sous-thème"></span>
+                            <input id="input-subtopics" class="subtopic selectized" placeholder="..." value="" tabindex="-1" style="display: none;">
+                            <div class="selectize-control subtopic multi plugin-remove_button plugin-restore_on_backspace plugin-drag_drop">
+                                <div class="selectize-input items not-full has-options ui-sortable">
+                                    <input type="text" autocomplete="off" tabindex="" id="input-subtopics-selectized" placeholder="Ajoutez des filtres AMQP..." style="width: 163.578px;">
+                                </div>
+                                <div class="selectize-dropdown multi subtopic plugin-remove_button plugin-restore_on_backspace plugin-drag_drop" style="display: none; width: 722px; top: 28px; left: 0px;">
+                                    <div class="selectize-dropdown-content"></div>
+                                </div>
+                            </div>
+                            <span id="btnSearchReset" class="input-group-addon disabled"><span class="glyphicon glyphicon-remove"></span></span>
+                        </div>
                                     --------------------------------------------------------------------
                                     Selectize
 <?php /**/ ?>
@@ -257,14 +256,12 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
 
         SCRIPTS
         
-        <link  href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet"/>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
-
-        <link  href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/css/jqueryui-editable.css" rel="stylesheet"/>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/jqueryui-editable/js/jqueryui-editable.min.js"></script>
-
-        <script src="/js/plugins/bootstrap-dropdown-filter/diacritics.js"></script>
-        <script src="/js/plugins/bootstrap-dropdown-filter/bootstrap-dropdown-filter.js"></script>
+        <script src="/js/plugins/boomerang/boomerang.js"></script>
+        <script src="/js/plugins/boomerang/plugins/auto-xhr.js"></script>
+        <script src="/js/plugins/boomerang/plugins/bw.js"></script>
+        <script src="/js/plugins/boomerang/plugins/rt.js"></script>
+        <script src="/js/plugins/boomerang/plugins/spa.js"></script>
+        <script src="/js/plugins/boomerang/plugins/zzz-last-plugin.js"></script>
         -------------------------------------------------------------------- */ ?>
         <script src="//code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
@@ -281,6 +278,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
 
         <script src="/js/plugins/selectize/js/selectize.js"></script>
+<?php /** / ?>
+        <script>
+            BOOMR.init({
+                beacon_url: window.location.href + 'data',
+                instrument_xhr: true
+            });
+        </script>
+<?php /**/ ?>
         <script>
             var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>', '/json/brokers.json<?= $v ?>'];
         </script>

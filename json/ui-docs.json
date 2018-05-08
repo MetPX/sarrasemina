@@ -10,7 +10,7 @@
             "searching": "Recherche en cours",
             "table"    : {
                 "catalogue": "Contenu du catalogue ",
-                "config"   : "Configuration AMQP",
+                "config"   : "Configuration Sarracenia ",
                 "folder"   : "répertoire",
                 "file"     : "fichier",
                 "search"   : "Recherche",
@@ -78,7 +78,7 @@
             "table"    :
             {
                 "catalogue": "Catalogue Content ",
-                "config"   : "AMQP Configuration ",
+                "config"   : "Sarracenia Configuration ",
                 "folder"   : "folder",
                 "file"     : "file",
                 "search"   : "Search",

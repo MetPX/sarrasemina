@@ -395,10 +395,11 @@
   font-size: 0.85em;
   
   /**/
+  font-size: 0.9em;
   padding-top: 3px;
   padding-bottom: 3px;
-  color: #05e;
-  background-color: #eee;
+  color: #fc0;
+  background-color: #333;
   border-bottom: 1px solid #f0f0ff;
 }
 .selectize-dropdown .optgroup {

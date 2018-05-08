@@ -61,9 +61,9 @@ const
     CONFIG = {
         options : {
             broker        : "amqps://anonymous@dd.weather.gc.ca",
-            xchange       : "xpublic",
+            exchange      : "xpublic",
             expire        : "5m",                                        // default: 5m   - s[econds], m[inutes], h[our], d[ay], w[eek]
-            instance      : "1",                                         // default: 1    - add more instances if there is lagging
+            instances     : "1",                                         // default: 1    - add more instances if there is lagging
             mirror        : "True",                                      // default: True - will build a mirror directory structure; False: will put all files in same directory
             topic_prefix  : "v02.post",
             subtopic      : [],
@@ -73,9 +73,8 @@ const
         setup   : ( newOptions = {} ) => {
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
         },
-        write   : () => {
-            let pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[],
-                config='#'+L+'# commnent on expire...   TBD'+L+'# commnent on instance... TBD'+L+'# commnent on mirror...   TBD'+L+'#';
+        write   : ( includeHints = true, includeMan = false ) => {
+            let config=getConfigHeader(includeMan), pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[];
 
             subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
             for( let i=0; i<subtopics.length; i++ ) {
@@ -93,18 +92,27 @@ const
             Object.keys(CONFIG.options).forEach( (opt) => {
                 switch( opt ) {
                     case 'subtopic':
-                        if( CONFIG.options[opt].length > 0 )
+                        if( CONFIG.options[opt].length > 0 ) {
                             for( let i=0; i<CONFIG.options[opt].length; i++ )
                                 config += L+ opt.padEnd(pad) + CONFIG.options[opt][i];
+                            if( includeMan )   config += getConfigManual(opt) + (includeHints && t.confComment[opt].length ? '':'\n');
+                            if( includeHints ) config += t.confComment[opt];
+                        }
                         break;
                     case 'accept_reject':
-                        if( CONFIG.options[opt].length > 0 )
-                            for( let i=0; i<CONFIG.options[opt].length; i++ )
+                        if( CONFIG.options[opt].length > 0 ) {
+                            for( let i=0; i<CONFIG.options[opt].length; i++ ) {
                                 config += L+ CONFIG.options[opt][i][0].padEnd(pad) + CONFIG.options[opt][i][1];
+                            }
+                            if( includeMan )   config += getConfigManual(opt) + (includeHints && t.confComment[opt].length ? '':'\n');
+                            if( includeHints ) config += t.confComment[opt];
+                        }
                         break;
                         
                     default: 
-                    config += L+ opt.padEnd(pad) + CONFIG.options[opt];
+                        config += L+ opt.padEnd(pad) + CONFIG.options[opt];
+                        if( includeMan )   config += getConfigManual(opt) + (includeHints && t.confComment[opt].length ? '':'\n');
+                        if( includeHints ) config += t.confComment[opt];
                 }
             });
             
@@ -112,6 +120,8 @@ const
         }
     },
     CATALOG = {
+        NAME           : '',
+        LOADTIME       : 0,
         FILETYPE       : 'toc',
         DATA_SEPARATOR : '|',
         id_NB_FILES    : 0,
@@ -132,7 +142,7 @@ const
     },
     LANG = $.cookie("LANG"),                                            // Select user's prefered language
     PANE = {
-        BUILDER  : "builder",
+        EDITOR   : "editor",
         CATALOGUE: "folders",
         SUBTOPIC : "topics",
         FILES    : "files"
@@ -148,6 +158,7 @@ const
         Hxs:['<span class="hidden-xs">'        , '</span>'],
         
         CN: ['<strong class="c-noir">'  , '</strong>'],
+        CB: ['<strong class="c-bleu">'  , '</strong>'],
         CR: ['<strong class="c-rouge">' , '</strong>'],
         CV: ['<strong class="c-vert">'  , '</strong>']
     };
@@ -215,7 +226,26 @@ var
 // ---------------------------------------------------------------------
 //  TEST ZONE BEGIN
 // ---------------------------------------------------------------------
-
+function getConfigHeader( includeMan ) {
+    let configHeader = t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
+    if( includeMan ) {
+        let url = t.confManual.baseURL.split('|');
+        configHeader = configHeader.replace('(git)', `<a href="${url[0]}" target="_blank">${url[0]}</a>`);
+    }
+    return configHeader;
+}
+function getConfigManual(opt) {
+    let man = t.confManual[opt];
+    if( man ) {
+        let url = t.confManual.baseURL.split('|'),
+            lnk = man.split('|'),
+//             out = L+'# <a href="'+url[0]+lnk[0]+'" target="_blank">'+url[1]+lnk[1]+' <i class="fa fa-external-link" aria-hidden="true"></a>';
+            out = url[1] +' <a href="'+url[0]+lnk[0]+'" target="_blank">'+lnk[1]+'</a>';
+//     console.log('opt[',opt,']\nman[',man,']\nurl[',url,']\nlnk[',lnk,']\nout[',out,']\n');
+        return out;
+    }
+}
+    
 function setSubtopicFilters( filterOptions=[], groupOptions=[] ) {
     
     var eventHandler = function get (name) {
@@ -374,6 +404,7 @@ function _initialize_() {
         $.extend(t,GUItexts[LANG],DOCtexts[LANG],GUItexts.icons);
 
         $("#title")                .html(t.title);
+        $(".title-text")           .html(t.titleHeader);
         $("#msg")                  .html(wrap(t.bienvenue, TAG.H1));
         $("#logger")               .html(wrap(t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
         $(".label-topic")          .html(t.topic            +t.comma);
@@ -382,10 +413,11 @@ function _initialize_() {
         $(".label-accept_reject")  .html(wrap(t.accept,    TAG.cV) +t.comma);
         $(".input-accept_reject")  .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
         $(".label-accept_unmatch") .html(wrap(t.reject,    TAG.cR) +t.comma);
+        $(".label-catalogue")      .html(t.selectedCatalogue+t.comma);
 
         $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
+        $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip().show();
         
-        $("#help")                 .attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip().show();
         $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
         $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)       .data("title", t.help.title.subtopic)       .tooltip();
         $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.accept_reject)  .data("title", t.help.title.accept_reject)  .tooltip();
@@ -394,8 +426,8 @@ function _initialize_() {
         $("#btnSearch")            .html(t.g_search + t.search).addClass("disabled");
         $("#btnSearchReset")       .html(t.g_remove).addClass("disabled");
 
-        $("#builder-tab")          .html(t.f_builder_tab +wrap(t.editor,TAG.Hxs) +wrap(t.edit,TAG.Vxs))       .attr('title',t.editor);
-        $("#stats-tab")            .html(t.f_stats_tab   +wrap(t.configuration,TAG.Hxs) +wrap(t.conf,TAG.Vxs)).attr('title',t.configuration);
+        $("#editor-tab")           .html(t.f_editor_tab +wrap(t.editor,TAG.Hxs)        +wrap(t.edit,TAG.Vxs)).attr('title',t.editor);
+        $("#stats-tab")            .html(t.f_config_tab +wrap(t.configuration,TAG.Hxs) +wrap(t.conf,TAG.Vxs)).attr('title',t.configuration);
         
         if( !catalogs ) {
 
@@ -403,26 +435,31 @@ function _initialize_() {
         }
         else {
             
-            let options = catalogs.sort().reverse().map( dirName => `<option value="${dirBase}${dirName}/catalogue.json">${dirName}</option>` );
+            let options = catalogs.sort().reverse().map( dirName => `<option value="${dirBase}${dirName}/catalogue.json">${dirName}</option>` ).join('');
             let mySelector = `
             <select id="catalogueSelector" class="form-control input-sm">
-                <option value="" selected hidden>${t.selectCatalogue}...</option>
                 ${options}
             </select>`;
 
             $catalogues.html( mySelector );
             $('#catalogueSelector').on('change', function(){
-                let selectedCatalogue = $(this).find("option:selected").val();
+                let selectedCatalogue  = $(this).find("option:selected").val();
                 selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG.FILETYPE;
-
                 loadCatalogueData( selectedCatalogue );
             });
+            
+            // Auto select the latest catalog when loading page
+            $('#catalogueSelector').find('option:nth-child(1)').prop('selected',true).trigger('change');
         }
         
         if( brokers ) {
             let rx = new RegExp(/ /,'i'), thisSubdomain = window.location.hostname.split('.')[0];
             $.each( brokers, ( filter, thisBroker ) => { rx = new RegExp(filter,'i'); if( thisSubdomain.match(rx) ){ CONFIG.setup( { broker: thisBroker } ); } });
         }
+        
+        showTabPane( PANE.EDITOR );
+        activatePane( PANE.EDITOR );
+        $('#input-subtopics').attr('placeholder',t.wait.loadingData);
     }
     
     function testCookies() {
@@ -539,7 +576,9 @@ function _initialize_() {
 function loadCatalogueData( selectedCatalogue ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(selectedCatalogue);};/*#*/
-
+    
+    let loadtime = Date.now();
+    
     $('#msg').html(`<h2 class="clusterize-no-data">${t.wait.loadingData}</h2>`).show();
     $('#logs').show();
 
@@ -550,6 +589,7 @@ function loadCatalogueData( selectedCatalogue ) {
         statusCode: { 404: function() { BSDialog( t.fileNotFound, t.error, "type-danger" ); } },
         success: function(foldersData){
             
+            $('#input-subtopics').prop("disabled", false);
             bigData_Folders = foldersData;
             
             let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[CATALOG.id_NB_FILES]; s.bytes += folder.inf[CATALOG.id_TOTAL_SIZE]; }); return s; };
@@ -561,7 +601,8 @@ function loadCatalogueData( selectedCatalogue ) {
             let cataloguePaths = selectedCatalogue.split("/");
             let catalogueName  = cataloguePaths[cataloguePaths.length -2];
             let catalogInfo    = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma}<br>${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}`;
-            
+            CATALOG.NAME       = catalogueName;
+
             setSubtopicDirs();
             cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, catalogInfo );
             statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
@@ -569,9 +610,11 @@ function loadCatalogueData( selectedCatalogue ) {
             setGUIstate     ( GUI.STATE_LOADING );
             
             setFilterSubtopic ( "reset" );
+            
+            CATALOG.LOADTIME = Date.now() - loadtime;
         },
         error: function( XMLHttpRequest, textStatus, errorThrown ) {
-            $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small>>> ${errorThrown} <<<</small></h2>`).show();
+            $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small> >>> ${errorThrown} <<< </small></h2>`).show();
             console.log( t.error + " - loadCatalogueData("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
         }
     });
@@ -1349,6 +1392,10 @@ async function performSearch ( allFilters ) {
     }
     /*#*/if( DEBUG ){ console.log('filesInFolders',filesInFolders); };/*#*/
     
+//     showTabPane( PANE.CATALOGUE );
+//     showTabPane( PANE.SUBTOPIC );
+//     showTabPane( PANE.FILES );
+    activatePane( PANE.CATALOGUE );
     setGUIstate(GUI.STATE_FOUND);
     setGUIstate(GUI.STATE_READY);
 
@@ -1361,7 +1408,7 @@ async function performSearch ( allFilters ) {
 // updateResults
 // Update content of Results Tab
 
-function updateResultsTab() {
+function updateResultsTab( withHints=true, withMan=false ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); logMe('-','-'); console.log('>>> statistics[', statistics, ']'); };/*#*/
     
@@ -1378,8 +1425,11 @@ function updateResultsTab() {
     // --------------------------------------
     let tbody_config = `
         <tbody id="user-conf">
-            <tr><th colspan="4" class="title">${t.data.table.config}</th></tr>
-            <tr><td colspan="4"><div class="flex"><button id="btnCopy" class="btn btn-secondary" type="button" data-original-title title="${t.copyConfig}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clipboard" aria-hidden="true"></i><br><span>${t.copy}</span></button><pre id="config">${CONFIG.write()}</pre></td></div></tr>
+            <tr><th colspan="4" class="title">${t.data.table.config} &nbsp; - &nbsp;${t.include} &nbsp;
+               [ <label class="toggle"><input id="include-hints" type="checkbox" name="toggle" ${withHints?'checked=""':''}> <span class="label-text">${t.inc_hints}</span></label> ]  &nbsp;
+               [ <label class="toggle"><input id="include-man"   type="checkbox" name="toggle" ${withMan?'checked=""':''}> <span class="label-text">${t.inc_man}</span></label> ]
+            </th></tr>
+            <tr><td colspan="4"><div class="flex"><button id="btnCopy" class="btn btn-secondary" type="button" data-original-title title="${t.copyConfig}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clipboard" aria-hidden="true"></i><br><span>${t.copy}</span></button><pre id="config">${CONFIG.write( withHints, withMan )}</pre></td></div></tr>
         </tbody>`;
     
     // --------------------------------------
@@ -1476,7 +1526,7 @@ function updateResultsTab() {
         .tooltip()
         .hover( ()=>{ $config.animate( colors.hover, 0 ) }, () => { $config.css( colors.origin ) })
         .click( ()=>{ $config.animate( colors.click, 10, resetColors ) });
-
+        
 /*#*/if( DEBUG ){ logMe('-','-'); console.groupEnd();};/*#*/
 }
 
@@ -1699,6 +1749,13 @@ $(document).
         switchLangue(this);
     }).
     
+    on('click', '#include-hints', function() {                      // Show/Hide Config Hints
+        updateResultsTab( this.checked, $('#include-man').is(':checked') );
+    }).
+    on('click', '#include-man', function() {                        // Show/Hide Config Hints
+        updateResultsTab( $('#include-hints').is(':checked'), this.checked );
+    }).
+    
     on('click', '.notif-cookies .fa.fa-times-circle', function() { // Register cookies & close notification
         $.cookie( 'cookies', 'notified', {expires:365} );
         $(".notif-cookies").hide();
@@ -1889,6 +1946,24 @@ Array.prototype.forEachFromTo = function(a, inn=0, out=this.length) {
 
 // ---------------------------------------------------------------------
 //
+// Show Pane Tab
+// Unhide given tab through its ID
+
+function showTabPane( tabID ) {
+    if( tabID ) $(`#${tabID}-tab`).removeClass('hidden');      // Actually, it's the parent's tab that is hidden...
+}
+
+// ---------------------------------------------------------------------
+//
+// Activate Pane Tab
+// Simulate a click on a given tab through its ID
+
+function activatePane( tabID ) {
+    if( tabID ) $(`#${tabID}-tab`).trigger('click');
+}
+
+// ---------------------------------------------------------------------
+//
 // _init_data_tabs
 // Use data object to store information about folders/files to display
 
@@ -2035,8 +2110,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#tabs .nav-tabs").show();
                 $("#sarra-formula").removeClass('hidden');
                 $(".input-subtopic").val("");
-//                 $("#folders-tab").trigger('click');
-                $("#builder-tab").trigger('click');
+                $("#editor-tab").trigger('click');
                 adjustTabsHeight(true);
                 break;
                 
@@ -2047,8 +2121,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files-tab").html(wrap( t.noFiles, TAG.cG ));
                 $("#files pre").html( "" );
                 $(".input-subtopic").val("");
-//                 $("#folders-tab").trigger('click');
-                $("#builder-tab").trigger('click');
+                $("#editor-tab").trigger('click');
                 adjustTabsHeight(true);
                 break;
                 
@@ -2059,8 +2132,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files-tab").addClass('hidden');
                 $("#stats-tab").addClass('hidden');
                 $("#btnSearch").html(t.f_superp + t.cancel);
-//                 $("#folders-tab").trigger('click');
-                $("#builder-tab").trigger('click');
+                $("#editor-tab").trigger('click');
                 adjustTabsHeight(true);
                 break;
                 

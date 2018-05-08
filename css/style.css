@@ -82,28 +82,22 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 /* -[ TOP ]---------------------------------------------- */
 
 .row.page { background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.7); display: block; margin: 0; margin-bottom: 10px; padding: 10px; }
-#tabs { margin-bottom: 0; min-height: 360px; display: none; }
+#tabs { margin-bottom: 0; min-height: 360px; }
 
-.logo { max-height: 20px; padding: 5px 20px; }
+.title-logo { /* max-height: 20px; */ padding: 5px 20px; }
+.title-text { /* max-height: 20px; */ line-height: 1.1em; padding: 5px 20px; font-size: 1.2em; font-weight: bold; text-align: center; color: #777 }
+.title-btns { font-size: 1.2em; color: #777; padding-left: 5px; min-height: 37px; line-height: 37px; }
+.title-btns button { margin-bottom: 2px; }
+.title-btns span { display: inline-block; padding: 0 0 2px 4px; white-space: nowrap; margin-right: 5px; }
+.title-btns .btn { padding: 5px 8px; }
+.title-btns #help,
+.title-btns #switchLang { display: none; }
+.title-btns #switchLang.en { border-color: #78c; color: #00c; outline: none; }
+.title-btns #switchLang.fr { border-color: #f77; color: #f33; outline: none; }
+.title-btns #switchLang.en:hover { background-color: #8bf; }
+.title-btns #switchLang.fr:hover { background-color: #fcc; }
+
 .entry:not(:first-of-type) { margin-top: 5px; }
-.scaling-svg { position: absolute; height: 100%; width: 100%; left: 0; top: 0; }
-.scaling-svg-container { position: relative; height: 0; width: 100%; padding: 0; padding-bottom: 100%; /* override this inline for aspect ratio other than square */ }
-
-.slogo { font-size: 1.2em; color: #777; padding-left: 5px; min-height: 37px; }
-.slogo button { margin-bottom: 2px; }
-.slogo span { display: inline-block; padding: 0 0 2px 4px; white-space: nowrap; }
-.slogo span img { height: 30px; }
-.slogo #catalogues { max-width: 200px; }
-.slogo #catalogueSelector { display: inline-block; width: auto; max-width: 195px; margin-bottom: 0; padding: 2px 5px; height: 27px; }
-.slogo .btn { padding: 5px 8px; }
-.slogo #help,
-.slogo #switchLang { display: none; }
-.slogo #switchLang.en { border-color: #78c; color: #00c; outline: none; }
-.slogo #switchLang.fr { border-color: #f77; color: #f33; outline: none; }
-.slogo #switchLang.en:hover { background-color: #8bf; }
-.slogo #switchLang.fr:hover { background-color: #fcc; }
-.slogo #help { color: brown; background-color: white; border-color: brown; padding:5px 20px; }
-.slogo #help:hover { color: white; background-color: brown; }
 
 .tooltip { white-space: nowrap; }
 .input-group-btn .btn.btn-accept-regex,
@@ -142,6 +136,7 @@ select.input-sm { line-height: 1.3; height: 28px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li.header h3 { font-size: .9em; color: #35d; border-bottom: 1px solid #bcd; background-color: #def; padding: 5px; margin: 3px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu .form-control { width: 100%; border-radius: 4px; padding: 0px 6px; font-size: 12px;  margin:0 auto; margin-bottom: 5px; height: 30px; }
 
+#catalogueSelector { display: inline-block; width: auto; max-width: 195px; margin-bottom: 0; padding: 2px 5px; height: 27px; }
 #catalogues { margin: 3px; }
 #info-catalogue span { background-color: #fe9; padding: 1px 3px; }
 #info-catalogue span span { font-weight: bold; }
@@ -167,12 +162,25 @@ select.input-sm { line-height: 1.3; height: 28px; }
 
 @media (max-width: 768px) {
   .modal-dialog.modal-sm { width: auto; min-width: 340px; }
-  .logo { margin-bottom: 15px; }
-  .slogo { text-align: center !important; }
+  .title-logo { margin-bottom: 5px; }
+  .title-btns { text-align: center !important; min-height:25px; line-height:25px; }
+  .title-btns .btn { padding: 2px 8px; }
 }
 
 @media (max-width: 500px) {
   .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: 'BenchNine', sans-serif; font-weight: 500; line-height: 2; }
+}
+
+@media (max-width: 490px) {
+  #input-subtopics { font-size: 11px; }
+}
+
+@media (max-width: 470px) {
+  #input-subtopics { font-size: 10px; }
+}
+
+@media (max-width: 450px) {
+  #input-subtopics { font-size: 9px; }
 }
 
 
@@ -194,6 +202,7 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 /* PANES [ Folders | Subtopics | Files | Results ] */
 #folders #folders-search { padding: 5px; }
 #folders #folders-input { font-size: 11px; line-height: 1em; height: 2.5em; }
+#input-subtopics { width: 100%; height: 27px; background-color: #fff; padding: 0px 5px; border: 1px solid #ccc; box-shadow: inset 0 1px 1px rgba(0,0,0,.075); }
 
 #files p { font: 13px 'Ubuntu Mono', monospace; color: #960; }
 #files pre { margin: 2px; }
@@ -205,6 +214,7 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #stats table tr:nth-child(2) td { padding-top: 10px; }
 #stats table tr:last-child td { padding-bottom: 10px; }
 #stats table th { border-top: 1px solid #e6e6e6; padding: 5px; line-height: 1.2em; }
+#stats table th.title  { padding-top: 10px; }
 #stats table td { padding: 3px 1px; line-height: 1.2em; }
 #stats table td:last-child { width: 80%; }
 #stats table td:nth-child(2) { text-align: right; padding-left: 10px; padding-right: 2px; }
@@ -228,3 +238,43 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #topics .amqp-filters { margin-left: 10px; display: inline-block; }
 
 /* ------------------------------------------------------ */
+
+pre#config { line-height: 1.15em; }
+pre#config a[target="_blank"]:before { content:"\f08e   "; font-family:"FontAwesome"; }
+
+input[type="checkbox"], input[type="radio"]{ position: absolute; right: 9000px; }
+
+/*Check box*/
+input[type="checkbox"] + .label-text:before{ 
+    content: "\f096"; font-family: "FontAwesome";
+    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
+    width: 1em; display: inline-block; margin-right: 5px; speak: none;
+}
+input[type="checkbox"]:checked  + .label-text:before{ content: "\f14a"; color: #2980b9; }
+input[type="checkbox"]:disabled + .label-text{ color: #aaa; }
+input[type="checkbox"]:disabled + .label-text:before{ content: "\f0c8"; color: #ccc; }
+
+/*Radio box*/
+input[type="radio"] + .label-text:before{
+    content: "\f10c"; font-family: "FontAwesome";
+    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
+    width: 1em; display: inline-block; margin-right: 5px; speak: none;
+}
+input[type="radio"]:checked  + .label-text:before{ content: "\f192"; color: #8e44ad; }
+input[type="radio"]:disabled + .label-text{ color: #aaa; }
+input[type="radio"]:disabled + .label-text:before{ content: "\f111"; color: #ccc; }
+
+/*Radio Toggle*/
+.toggle input[type="radio"] + .label-text:before{
+    content: "\f204"; font-family: "FontAwesome";
+    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
+    width: 1em; display: inline-block; margin-right: 10px; speak: none;
+}
+.toggle input[type="radio"]:checked + .label-text:before{ content: "\f205"; color: #16a085; }
+.toggle input[type="radio"]:disabled + .label-text{ color: #aaa; }
+.toggle input[type="radio"]:disabled + .label-text:before{ content: "\f204"; color: #ccc; }
+
+
+@keyframes effect{
+    0%{transform: scale(0);} 25%{transform: scale(1.3);} 75%{transform: scale(1.4);} 100%{transform: scale(1);} 
+}
