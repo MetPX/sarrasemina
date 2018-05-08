@@ -62,9 +62,10 @@ const
         options : {
             broker        : "amqps://anonymous@dd.weather.gc.ca",
             exchange      : "xpublic",
-            expire        : "5m",                                        // default: 5m   - s[econds], m[inutes], h[our], d[ay], w[eek]
-            instances     : "1",                                         // default: 1    - add more instances if there is lagging
-            mirror        : "True",                                      // default: True - will build a mirror directory structure; False: will put all files in same directory
+            expire        : "5m",                                        // default:  5m   - s[econds], m[inutes], h[our], d[ay], w[eek]
+            inflight      : ".tmp",                                      // default: .tmp  - or NONE if post_broker is set
+            instances     : "1",                                         // default:  1    - add more instances if there is lagging
+            mirror        : "True",                                      // default:  True - will build a mirror directory structure; False: will put all files in same directory
             topic_prefix  : "v02.post",
             subtopic      : [],
             accept_reject : [],
