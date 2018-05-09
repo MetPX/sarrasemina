@@ -121,6 +121,7 @@ const
         }
     },
     CATALOG = {
+        MAX            : 5,                                             // Display only the latest MAX (5) Catalogues available; i.e.: ignore the rest (older ones)
         NAME           : '',
         LOADTIME       : 0,
         FILETYPE       : 'toc',
@@ -227,6 +228,18 @@ var
 // ---------------------------------------------------------------------
 //  TEST ZONE BEGIN
 // ---------------------------------------------------------------------
+    
+// ---------------------------------------------------------------------
+// 
+// Returns server origin
+// Since development domains do not host product files,
+// a default server is provided.
+    
+function getOrigin() {
+    let domain = window.location.origin.split('//')[1].split('.')[0];
+    return ['lab','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin;
+}
+
 function getConfigHeader( includeMan ) {
     let configHeader = t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
     if( includeMan ) {
@@ -436,7 +449,10 @@ function _initialize_() {
         }
         else {
             
-            let options = catalogs.sort().reverse().map( dirName => `<option value="${dirBase}${dirName}/catalogue.json">${dirName}</option>` ).join('');
+            catalogs.sort().reverse();
+            if( catalogs.length > CATALOG.MAX ) catalogs.length = CATALOG.MAX;
+            
+            let options = catalogs.map( dirName => `<option value="${dirBase}${dirName}/catalogue.json">${dirName}</option>` ).join('');
             let mySelector = `
             <select id="catalogueSelector" class="form-control input-sm">
                 ${options}
@@ -601,11 +617,11 @@ function loadCatalogueData( selectedCatalogue ) {
                               };
             let cataloguePaths = selectedCatalogue.split("/");
             let catalogueName  = cataloguePaths[cataloguePaths.length -2];
-            let catalogInfo    = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma}<br>${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}`;
+            let paneHeader     = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma} ${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}<br>${t.click2AddSubtopic}`;
             CATALOG.NAME       = catalogueName;
 
             setSubtopicDirs();
-            cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, catalogInfo );
+            cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, paneHeader );
             statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
             _init_data_tabs ( total.folders, total.files );
             setGUIstate     ( GUI.STATE_LOADING );
@@ -1649,6 +1665,12 @@ $(document).
         setFilterSubtopic( "enable" );
     }).
     
+    on('click', '#scroll-files .content', function() {
+        let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
+        let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
+        getIt.trigger('click');
+    }).
+    
     on('click', 'a.dropdown-filter', function(e) {
         
         let $subtopic_input = $('.input-subtopic');
@@ -1951,7 +1973,7 @@ Array.prototype.forEachFromTo = function(a, inn=0, out=this.length) {
 // Unhide given tab through its ID
 
 function showTabPane( tabID ) {
-    if( tabID ) $(`#${tabID}-tab`).removeClass('hidden');      // Actually, it's the parent's tab that is hidden...
+    if( tabID ) $(`#${tabID}-tab`).removeClass('hidden');
 }
 
 // ---------------------------------------------------------------------
@@ -1993,7 +2015,7 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
     function getHeader( nbFiles=0, totSize=0 ) {
         let files_found=t.noFilesFoundFor, total_size="", size_file="";
         if( nbFiles > 0 ) {
-            files_found = wrap( numeral( nbFiles ).format('0,0') +" " +(nbFiles > 1 ? t.filesFound : t.fileFound), TAG.CR ) +'<br>';
+            files_found = wrap( numeral( nbFiles ).format('0,0') +" " +(nbFiles > 1 ? t.filesFound : t.fileFound), TAG.CR ) +' - ';
             total_size  = t.totalSize +t.comma +numeral( totSize ).format('0,0')+" " +t.bytes +(totSize > 1024 ? ' ('+ numeral(totSize).format('0.00 b') +')' : '' ) +'<br>';
             size_file   = t.FileSize;
         }

@@ -1,4 +1,7 @@
 {
+    "acronym": {
+        "AMQP": "Advanced Message Queuing Protocol"
+    },
     "fr": {
         "about":            "À propos",
         "accept":           "Accepter",
@@ -9,6 +12,7 @@
         "cancel":           "Annuler",
         "catalogue":        "Le catalogue",
         "catalogList":      "Liste des catalogues",
+        "click2AddSubtopic":"<span style='padding-left:70px;'>( <small style='font-weight: bold;'>sélectionnez un répertoire pour l'ajouter aux sous-thèmes</small> )</span>",
         "comma":            "&nbsp;:&nbsp;",
         "conf":             "Conf.",
         "confComment":    { "SarraS"        :"\n# Configuration Sarracenia générée avec Sarra Semina\n# URL       [ (url) ]\n# Catalogue [ (catalogue) ]\n# Date UTC  [ (date) ]\n#---\n",
@@ -61,7 +65,7 @@
         "FilesFound":       "Fichiers trouvés",
         "fileNotFound":     "Fichier introuvable ou n'est plus disponible.",
         "FileSize1":         "    Taille | Fichier",
-        "FileSize":         "<ol><li><span class='content'><span class='size'>Taille</span> - Fichier</span></li></ol>",
+        "FileSize":         "<ol><li><span class='content'><span class='size'>Taille</span> - Fichier ( <span class='c-vert'>cliquez sur le nom d'un fichier pour le télécharger</span> )</span></li></ol>",
         "filter":          {"_":"Filtre",
                             "by"      :"Filtrer par :",
                             "AMQP"    :"Filtre AMQP",
@@ -128,6 +132,7 @@
         "cancel":           "Cancel",
         "catalogue":        "Catalogue",
         "catalogList":      "Catalogues List",
+        "click2AddSubtopic":"<span style='padding-left:70px;'>( <span class='c-bleu'>select a directory to add it to subtopic list</span>   )</span>",
         "comma":            ":&nbsp;",
         "conf":             "Conf.",
         "confComment":    { "SarraS"        :"# Sarracenia configuration generated with Sarra Semina\n# URL       [ (url) ]\n# Catalogue [ (catalogue) ]\n# UTC Date  [ (date) ]\n#---\n",
@@ -180,7 +185,7 @@
         "FilesFound":       "Files found",
         "fileNotFound":     "File not found or no more available.",
         "FileSize2":         "      Size | File",
-        "FileSize":         "<ol><li><span class='content'><span class='size'>Size</span> - File</span></li></ol>",
+        "FileSize":         "<ol><li><span class='content'><span class='size'>Size</span> - File ( <span class='c-vert'>click on a file name to download it</span> )</span></li></ol>",
         "filter":          {"_"       :"Filter",
                             "by"      :"Filter by:",
                             "AMQP"    :"AMQP Filter",
@@ -252,8 +257,5 @@
        "f_spiner":           "<i class='fa fa-spinner fa-spin fa-fw'></i><span class='sr-only'>Loading...</span> ",
        "g_search":           "<span class='glyphicon glyphicon-search'></span> ",
        "g_remove":           "<span class='glyphicon glyphicon-remove'></span> "
-    },
-    "acronym": {
-        "AMQP"   : "Advanced Message Queuing Protocol"
     }
 }
