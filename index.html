@@ -10,9 +10,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180509102513">
-        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20180509102513">
-        <link rel="stylesheet" href="/css/style.css?v20180509102513">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180510134844">
+        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20180510134844">
+        <link rel="stylesheet" href="/css/style.css?v20180510134844">
     </head>
     <body>
         <div class="modal fade">
@@ -48,8 +48,9 @@
                     </span>
                 </div>
             </div>
+        </div>
+        <div id="tabs" class="row page">
             <div id="logs" class="col-sm-12">
-                <hr>
                 <div id="msg">
                     <noscript>
                         <h2>Your browser does not support JavaScript!<br><small>You need to enable JavaScript to use this website!</small></h2>
@@ -58,8 +59,6 @@
                 </div>
                 <p id="logger"></p>
             </div>
-        </div>
-        <div id="tabs" class="row page">
             <ul class="nav nav-tabs">
                 <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab"></a></li>
                 <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab"></a></li>
@@ -110,7 +109,7 @@
                                             <div class="subtopic filter input-group input-group-sm disabled">
                                                 <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
                                                 <input id="input-subtopics" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
-                                                <span id="btnSearchReset" class="input-group-addon disabled"><span class="glyphicon glyphicon-remove"></span></span>
+                                                <span class="input-group-addon"><button id="btnSearchReset" class="input-group-addon" disabled><span class="glyphicon glyphicon-remove"></span></button></span>
                                             </div>
                                         </td>
                                     </tr>
@@ -164,7 +163,7 @@
                                                     </label>
                                                 </div>
                                             </div>
-                                            <span class="btn btn-default btn-sm pull-right" id="btnSearch"><span class="glyphicon glyphicon-search"></span> Search</span>
+                                            <button class="btn btn-default btn-sm pull-right" id="btnSearch" disabled><span class="glyphicon glyphicon-search"></span> Chercher</button>
                                         </td>
                                     </tr>
                                 </table>
@@ -201,8 +200,8 @@
 
         <script src="/js/plugins/selectize/js/selectize.js"></script>
         <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180509102513', '/json/ui-docs.json?v20180509102513', '/json/brokers.json?v20180509102513'];
+            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180510134844', '/json/ui-docs.json?v20180510134844', '/json/brokers.json?v20180510134844'];
         </script>
-        <script src="/js/main.js?v20180509102513"></script>
+        <script src="/js/main.js?v20180510134844"></script>
     </body>
 </html> 

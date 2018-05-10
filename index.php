@@ -82,8 +82,13 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                     </span>
                 </div>
             </div>
+        </div>
+<?php /*
+
+        BOT
+        -------------------------------------------------------------------- */ ?>
+        <div id="tabs" class="row page">
             <div id="logs" class="col-sm-12">
-                <hr>
                 <div id="msg">
                     <noscript>
                         <h2>Your browser does not support JavaScript!<br><small>You need to enable JavaScript to use this website!</small></h2>
@@ -92,12 +97,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 </div>
                 <p id="logger"></p>
             </div>
-        </div>
-<?php /*
-
-        BOT
-        -------------------------------------------------------------------- */ ?>
-        <div id="tabs" class="row page">
             <ul class="nav nav-tabs">
                 <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab"></a></li>
                 <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab"></a></li>
@@ -159,24 +158,11 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                             <div class="subtopic filter input-group input-group-sm disabled">
                                                 <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
                                                 <input id="input-subtopics" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
-                                                <span id="btnSearchReset" class="input-group-addon disabled"><span class="glyphicon glyphicon-remove"></span></span>
+                                                <span class="input-group-addon"><button id="btnSearchReset" class="input-group-addon" disabled><span class="glyphicon glyphicon-remove"></span></button></span>
                                             </div>
                                         </td>
                                     </tr>
 <?php /** / ?>
-                        <div class="subtopic filter input-group input-group-sm disabled">
-                            <span id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right" title="" data-original-title="Aide - Sous-thème"></span>
-                            <input id="input-subtopics" class="subtopic selectized" placeholder="..." value="" tabindex="-1" style="display: none;">
-                            <div class="selectize-control subtopic multi plugin-remove_button plugin-restore_on_backspace plugin-drag_drop">
-                                <div class="selectize-input items not-full has-options ui-sortable">
-                                    <input type="text" autocomplete="off" tabindex="" id="input-subtopics-selectized" placeholder="Ajoutez des filtres AMQP..." style="width: 163.578px;">
-                                </div>
-                                <div class="selectize-dropdown multi subtopic plugin-remove_button plugin-restore_on_backspace plugin-drag_drop" style="display: none; width: 722px; top: 28px; left: 0px;">
-                                    <div class="selectize-dropdown-content"></div>
-                                </div>
-                            </div>
-                            <span id="btnSearchReset" class="input-group-addon disabled"><span class="glyphicon glyphicon-remove"></span></span>
-                        </div>
                                     --------------------------------------------------------------------
                                     Selectize
 <?php /**/ ?>
@@ -230,7 +216,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                                     </label>
                                                 </div>
                                             </div>
-                                            <span class="btn btn-default btn-sm pull-right" id="btnSearch"><span class="glyphicon glyphicon-search"></span> Search</span>
+                                            <button class="btn btn-default btn-sm pull-right" id="btnSearch" disabled><span class="glyphicon glyphicon-search"></span> Chercher</button>
                                         </td>
                                     </tr>
                                 </table>

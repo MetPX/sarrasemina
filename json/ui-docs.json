@@ -43,8 +43,8 @@
                 "cancel"        : "Annuler",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
                 "stop"          : "Arrêter",
-                "stopSearch"    : "Arrêter la recherche maintenant",
-                "continueSearch": "Continuer la recherche..."
+                "stopSearch"    : "Arrêter maintenant",
+                "continueSearch": "Continuer la recherche"
             },
             "icon"    : "glyphicon glyphicon-cloud-download",
             "spinicon": "glyphicon glyphicon-refresh"
@@ -113,8 +113,8 @@
                 "cancel"        : "Cancel",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
                 "stop"          : "Stop",
-                "stopSearch"    : "Stop Search Now",
-                "continueSearch": "Continue Searching..."
+                "stopSearch"    : "Stop Now",
+                "continueSearch": "Continue Searching"
             },
             "icon"    : "glyphicon glyphicon-cloud-download",
             "spinicon": "glyphicon glyphicon-refresh"

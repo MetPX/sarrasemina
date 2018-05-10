@@ -116,7 +116,6 @@ const
                         if( includeHints ) config += t.confComment[opt];
                 }
             });
-            
             return config;
         }
     },
@@ -138,7 +137,6 @@ const
         STATE_LOADING   : 2,
         STATE_SEARCHING : 3,
         STATE_FOUND     : 4,
-        
         BLACK :'black',
         BLUE  :'blue'
     },
@@ -265,20 +263,23 @@ function setSubtopicFilters( filterOptions=[], groupOptions=[] ) {
     var eventHandler = function get (name) {
         return function give() {
             if( name === "onChange" ) {
+                $('#btnSearchReset').prop('disabled', ($(FILTER.INPUT_AMQP_SRC).val() === "") );
                 setFilterSubtopic( isValidAMQP( $(FILTER.INPUT_AMQP_SRC).val() ) ? 'enable':'disable' );
             }
-//             if( $selectize[0] )
-//                 if( $selectize[0].selectize )
-//                     if( $selectize[0].selectize.$activeItems ) {
-//                         console.log( me(), name, $selectize[0].selectize.$activeItems);
-//                         $selectize[0].selectize.$activeItems;
-//                     }
-//                     else
-//                         console.log( me(), name, $selectize[0].selectize);
-//                 else
-//                     console.log( me(), name, $selectize[0]);
-//             else
-//                 console.log( me(), name );
+            /** /
+            if( $selectize[0] )
+                if( $selectize[0].selectize )
+                    if( $selectize[0].selectize.$activeItems ) {
+                        console.log( me(), name, $selectize[0].selectize.$activeItems);
+                        $selectize[0].selectize.$activeItems;
+                    }
+                    else
+                        console.log( me(), name, $selectize[0].selectize);
+                else
+                    console.log( me(), name, $selectize[0]);
+            else
+                console.log( me(), name );
+            /**/
         };
     };
     
@@ -290,40 +291,40 @@ function setSubtopicFilters( filterOptions=[], groupOptions=[] ) {
     
     $selectize =
     $(FILTER.INPUT_AMQP_SRC).selectize({
-         persist       : true
-        ,diacritics    : true
-        ,plugins       : ['remove_button','restore_on_backspace','drag_drop']
-        ,maxItems      : FILTER.MAX_SUBTOPICS
-        ,delimiter     : FILTER.CHAR_DELIMITER
-        ,placeholder   : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
-        ,options       : filterOptions
-        ,optgroups     : groupOptions
-        ,optgroupField : 'path'
-        ,valueField    : 'filter'
-        ,labelField    : 'filter'
-        ,searchField   : ['filter']
-        ,create        : (input) => { return { path: 'X', filter: input }; }
-        ,render        : {
+         persist          : true
+        ,diacritics       : true
+        ,closeAfterSelect : true
+        ,plugins          : ['remove_button','restore_on_backspace','drag_drop']
+        ,maxItems         : FILTER.MAX_SUBTOPICS
+        ,delimiter        : FILTER.CHAR_DELIMITER
+        ,placeholder      : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
+        ,options          : filterOptions
+        ,optgroups        : groupOptions
+        ,optgroupField    : 'path'
+        ,valueField       : 'filter'
+        ,labelField       : 'filter'
+        ,searchField      : ['filter']
+        ,create           : (input) => { return { path: 'X', filter: input }; }
+        ,render           : {
              optgroup_add   : (input) => { return { id:'X', data: input }; }
             ,optgroup_header: (data, escape) => { return '<div class="optgroup-header">' + escape(data.label) + '</div>'; }
             ,item   : (item, escape) => {
                 if( item.filter ) {
                     let classAMQP = !isValidAMQP( item.filter, false ) ? ' c-ERR':'';
-//                     return `<div class="editable-click item${classAMQP}">${escape(item.filter)} <a href="javascript:void(0)" class="c-cyan x-editable" tabindex="-1" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a></div>`;
                     return `<div class="editable-click item${classAMQP}">${escape(item.filter)}</div>`;
                 }
             }
         }
         ,onChange        : eventHandler('onChange')
-//         ,onItemAdd       : eventHandler('onItemAdd')
-//         ,onItemRemove    : eventHandler('onItemRemove')
-//         ,onOptionAdd     : eventHandler('onOptionAdd')
-//         ,onOptionRemove  : eventHandler('onOptionRemove')
-//         ,onDropdownOpen  : eventHandler('onDropdownOpen')
-//         ,onDropdownClose : eventHandler('onDropdownClose')
-//         ,onFocus         : eventHandler('onFocus')
-//         ,onBlur          : eventHandler('onBlur')
-//         ,onInitialize    : eventHandler('onInitialize')
+        ,onItemAdd       : eventHandler('onItemAdd')
+        ,onItemRemove    : eventHandler('onItemRemove')
+        ,onOptionAdd     : eventHandler('onOptionAdd')
+        ,onOptionRemove  : eventHandler('onOptionRemove')
+        ,onDropdownOpen  : eventHandler('onDropdownOpen')
+        ,onDropdownClose : eventHandler('onDropdownClose')
+        ,onFocus         : eventHandler('onFocus')
+        ,onBlur          : eventHandler('onBlur')
+        ,onInitialize    : eventHandler('onInitialize')
     });
 
 }
@@ -419,8 +420,6 @@ function _initialize_() {
 
         $("#title")                .html(t.title);
         $(".title-text")           .html(t.titleHeader);
-        $("#msg")                  .html(wrap(t.bienvenue, TAG.H1));
-        $("#logger")               .html(wrap(t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
         $(".label-topic")          .html(t.topic            +t.comma);
         $(".label-subtopic")       .html(t.subtopic         +t.comma);
         $(".input-subtopic")       .attr("placeholder", t.placeholder.AMQP_filter ).attr("aria-label",t.enterYourFilter);
@@ -437,8 +436,7 @@ function _initialize_() {
         $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.accept_reject)  .data("title", t.help.title.accept_reject)  .tooltip();
         $(".help.accept_unmatch")  .attr("title", t.help.tip +" - "+ t.help.title.accept_unmatch) .data("title", t.help.title.accept_unmatch) .tooltip();
         
-        $("#btnSearch")            .html(t.g_search + t.search).addClass("disabled");
-        $("#btnSearchReset")       .html(t.g_remove).addClass("disabled");
+        $("#btnSearch")            .html(t.g_search + t.search);
 
         $("#editor-tab")           .html(t.f_editor_tab +wrap(t.editor,TAG.Hxs)        +wrap(t.edit,TAG.Vxs)).attr('title',t.editor);
         $("#stats-tab")            .html(t.f_config_tab +wrap(t.configuration,TAG.Hxs) +wrap(t.conf,TAG.Vxs)).attr('title',t.configuration);
@@ -596,7 +594,7 @@ function loadCatalogueData( selectedCatalogue ) {
     
     let loadtime = Date.now();
     
-    $('#msg').html(`<h2 class="clusterize-no-data">${t.wait.loadingData}</h2>`).show();
+    $('#msg').html(`<p class="title-text">${t.wait.loadingData}</p>`).show();
     $('#logs').show();
 
     $.ajax({
@@ -972,6 +970,7 @@ async function getBigDataFiles( folders, selectedCatalogue = selectedFilesCatalo
             if( progressBar.isWorthDisplay ) { progressBar.set(count, dataFiles.length ); await wait( 10 ); }
             if( cancel.token.isSearchCancelled() ) {
                 cleanUpCancelledSearch();
+                return;
             }
             else {
                 
@@ -1106,6 +1105,7 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
         if( progressBar.isWorthDisplay && (line % chunk) == 0 ) { progressBar.set(line, stats.matched.nbFiles ); await wait(10); }
         if( cancel.token.isSearchCancelled() ) {
             cleanUpCancelledSearch();
+            return;
         }
         
         loopRegex: for( let r = 0, n=regex.length; r < n; r++ ) {
@@ -1307,13 +1307,10 @@ async function performSearch ( allFilters ) {
         matches    = [],                            // Store a list matching filters criteria
         filesInFolders = { matched: [], stats: { matched: { nbFiles:0,totSize:0 } } };
     
-    if( AMQPfilter === "#" )
-        console.log( "WARNING" );
-    
     // Apply Subtopic filter if different 
     // from a previous search...
     // --------------------------------------------------
-    STm = getSubtopicMatch( bigData_Folders, subtopicFilters );              // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
+    STm = getSubtopicMatch( bigData_Folders, subtopicFilters );             // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
     statistics.reset({ search: { subtopic:{ filters:AMQPfilters, matched:{folders:STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize} } } });
     
     matches.push( STm );                                                    // Add it to the matches array
@@ -1360,6 +1357,7 @@ async function performSearch ( allFilters ) {
                                 .catch( (err) => {
                                     console.log(me()," err: ",err);
                                     if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ",L, err ); }
+                                    else { console.log( "### ",t.searchCancelled, L, err ); return; }
                                 });
 
         let totSize   = t.totalSize +t.comma+ totalSize +" "+ t.bytes + (totalSize > 1024 ? ' ('+ numeral(totalSize).format('0.00 b') +')' : '' ) +L +L;
@@ -1389,6 +1387,7 @@ async function performSearch ( allFilters ) {
                         .then( (data) => { return data } )
                         .catch( (err) => {
                             if( !searchToken.token.cancelledSearch ) { console.log( "### Err : ",L, err ); }
+                            else { console.log( "### ",t.searchCancelled, L, err ); return; }
                         });
         
         // Reset matched filesInFolders to merge
@@ -1409,9 +1408,6 @@ async function performSearch ( allFilters ) {
     }
     /*#*/if( DEBUG ){ console.log('filesInFolders',filesInFolders); };/*#*/
     
-//     showTabPane( PANE.CATALOGUE );
-//     showTabPane( PANE.SUBTOPIC );
-//     showTabPane( PANE.FILES );
     activatePane( PANE.CATALOGUE );
     setGUIstate(GUI.STATE_FOUND);
     setGUIstate(GUI.STATE_READY);
@@ -1629,9 +1625,13 @@ Array.prototype.forEachAsync = function (fn) { return this.reduce((promise, n) =
 // 
 // Document events handlers
 
-$(document).
+$(document)
+    .on('keyup', '#input-subtopics-selectized', function(e){
+        if( e.originalEvent.code === "NumpadEnter" )
+            $('#btnSearch').trigger('click');
+    })
 
-    on('keyup', '.input-subtopic', function(e){
+    .on('keyup', '.input-subtopic', function(e){
         let AMQPfilter = $.trim( $(this).val() );
         if( AMQPfilter !== "" && e.type === "mouseout" ) {
             setFilterSubtopic( "enable" );
@@ -1648,30 +1648,31 @@ $(document).
             }
         }
         return;
-    }).focus().
+    })
+    .focus()
     
-    on('keyup mouseout', '.input-accept_reject', function(e){
-        if (e.which === $.ui.keyCode.ENTER) { 
-            let allFilters = getFilters();
-            performSearch( allFilters );
+    .on('keyup mouseout', '.input-accept_reject', function(e){
+        if( e.which === $.ui.keyCode.ENTER ) { 
+            $('#btnSearch').trigger('click');
         }
         return;
-    }).focus().
+    })
+    .focus()
 
-    on('click', '#scroll-folders li', function(e) {
+    .on('click', '#scroll-folders li', function(e) {
         let filterText      = path_2_AMQP( $(this).find('.content').text() );
         $selectize[0].selectize.addOption({ path:'SP',filter:filterText });
         $selectize[0].selectize.addItem( filterText );                          // ( e.ctrlKey ) ? $selectize[0].selectize.addItem( filterText ) : $selectize[0].selectize.setValue( filterText );
         setFilterSubtopic( "enable" );
-    }).
+    })
     
-    on('click', '#scroll-files .content', function() {
+    .on('click', '#scroll-files .content', function() {
         let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
         let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
         getIt.trigger('click');
-    }).
+    })
     
-    on('click', 'a.dropdown-filter', function(e) {
+    .on('click', 'a.dropdown-filter', function(e) {
         
         let $subtopic_input = $('.input-subtopic');
         $(this).parents('.dropdown-menu').find('.form-control').val( "" );
@@ -1680,18 +1681,18 @@ $(document).
         setFilterSubtopic( "enable" );
         
         return false;
-    }).
+    })
     
-    on('click', '.btn-topic', function(e) {
+    .on('click', '.btn-topic', function(e) {
         $(".label-topic").data('label',$(this).data('label'));
-    }).
+    })
 
-    on('click', '.help', function(e) {
+    .on('click', '.help', function(e) {
         let url = `/docs/help.html #${LANG}-${$(this).data('help')}`;
         BSDialogUrl( url, $(this).data('title') );
-    }).
+    })
     
-    on('click', '.btn-add', function(e) {
+    .on('click', '.btn-add', function(e) {
         e.preventDefault();
         let accept_reject = $('.input-accept_reject'),
             controlForm  = $('.accepts-rejects .filters:last'),
@@ -1711,108 +1712,88 @@ $(document).
             .removeClass('btn-success').addClass('btn-danger')
             .html('<span class="glyphicon glyphicon-minus"></span>');
         adjustTabsHeight(true);
-    }).
-    on('click', '.btn-remove', function(e) {
+    })
+    .on('click', '.btn-remove', function(e) {
         $(this).parents('.entry:last').remove();
         e.preventDefault();
         adjustTabsHeight(true);
         return false;
-    }).
+    })
     
-    on('click', '.btn-accept-regex', function(e) {
+    .on('click', '.btn-accept-regex', function(e) {
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.accept, TAG.cV) +t.comma);
         dude.find('.input-accept_reject').data("ar","accept");
-    }).
-    on('click', '.btn-reject-regex', function(e) {
+    })
+    .on('click', '.btn-reject-regex', function(e) {
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.reject, TAG.cR) +t.comma);
         dude.find('.input-accept_reject').data("ar","reject");
-    }).
+    })
     
-    on('click', '.btn-accept-unmatch', function(e) {
+    .on('click', '.btn-accept-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','True');
         $(".label-accept_unmatch").html(wrap(t.accept, TAG.cV) +t.comma);
-    }).
-    on('click', '.btn-reject-unmatch', function(e) {
+    })
+    .on('click', '.btn-reject-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','False');
         $(".label-accept_unmatch").html(wrap(t.reject, TAG.cR) +t.comma);
-    }).
+    })
     
-    on('click', '#btnCopy', function() {
+    .on('click', '#btnCopy', function() {
         copyToClipboard( $("#config").text() );
-    }).
+    })
     
-    on('click', '#btnSearch', function() {                          // Do search products
+    .on('click', '#btnSearch', function() {                          // Do search products
         
-        if( GUIstate == GUI.STATE_SEARCHING ) {
-            
-            BSDialogPrompt( t.wait.cancelSearch, t.wait.searchInProgress, "type-danger" );
+        if( GUI.state == GUI.STATE_SEARCHING ) {
+            BSDialogPrompt( t.wait.cancelSearch, t.wait.searchInProgress, "type-danger stop-search" );
         }
         else {
-            
             let allFilters = getFilters();
-            if( isValidAMQP(allFilters[0][0]) && !$(this).hasClass('disabled') ) {
+            if( isValidAMQP(allFilters[0][0]) ) {
                 performSearch( allFilters );
             }
             else {
                 BSDialog( t.err_amqp.filtr, t.error, "type-warning" );
             }
         }
-    }).
+    })
     
-    on('click', '#btnSearchReset', function() {                     // Do reset search
-        if( ! $(this).hasClass('disabled') ) {
-            $selectize[0].selectize.setValue( '' );
-            setFilterSubtopic( "reset" );
-        }
-    }).
+    .on('click', '#btnSearchReset', function() {                     // Do reset search
+        $selectize[0].selectize.setValue( '' );
+    })
     
-    on('click', '#switchLang', function() {                         // Switch langue
+    .on('click', '#switchLang', function() {                         // Switch langue
         switchLangue(this);
-    }).
+    })
     
-    on('click', '#include-hints', function() {                      // Show/Hide Config Hints
+    .on('click', '#include-hints', function() {                      // Show/Hide Config Hints
         updateResultsTab( this.checked, $('#include-man').is(':checked') );
-    }).
-    on('click', '#include-man', function() {                        // Show/Hide Config Hints
+    })
+    .on('click', '#include-man', function() {                        // Show/Hide Config Hints
         updateResultsTab( $('#include-hints').is(':checked'), this.checked );
-    }).
+    })
     
-    on('click', '.notif-cookies .fa.fa-times-circle', function() { // Register cookies & close notification
+    .on('click', '.notif-cookies .fa.fa-times-circle', function() { // Register cookies & close notification
         $.cookie( 'cookies', 'notified', {expires:365} );
         $(".notif-cookies").hide();
-});
+    })
+    ;
 
     
-$(window).
-
-    scroll(() => {
-        if( $(this).scrollTop() > 100 ) {
-            $('#back-to-top').fadeIn();
-        } else {
-            $('#back-to-top').fadeOut();
-        }
-    }).
-    
-    resize(() => {
-        adjustTabsHeight( true );
-    });
+$(window)
+    .scroll(() => { ($(this).scrollTop() > 100) ? $('#back-to-top').fadeIn() : $('#back-to-top').fadeOut(); })
+    .resize(() => { adjustTabsHeight( true ); })
+    ;
 
 // On click, scroll body to top
-$('#back-to-top').click(() => {
-    $('body,html').animate( {scrollTop: 0}, 500 );
-    return false;
-});
+$('#back-to-top')         .click(() => { $('body,html').animate( {scrollTop: 0}, 500 ); return false; });
 
 // Track tabs' activation and adjust clusterized scroll's height
-$('a[data-toggle="tab"]').on('shown.bs.tab', (e) => {
-    adjustTabsHeight( true );
-});
+$('a[data-toggle="tab"]') .on('shown.bs.tab', (e) => { adjustTabsHeight( true ); });
 
-$('.collapse').on('show.bs.collapse', () => {
-    $('.collapse.in').each(()=>{ $(this).collapse('hide'); });
-});
+$('.collapse')            .on('show.bs.collapse', () => { $('.collapse.in').each(()=>{ $(this).collapse('hide'); }); });
 
 // ---------------------------------------------------------------------
 //
@@ -1828,12 +1809,11 @@ function BSDialog( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_
             type:     dType,
             size:     BootstrapDialog.SIZE_SMALL,
             buttons: [{
-                    label: t.dialog.btn.ok,
-                    hotkey: $.ui.keyCode.ENTER,
-                    action: function(dialogRef){ dialogRef.close(); }
-                }]
+                label : t.dialog.btn.ok,
+                hotkey: $.ui.keyCode.ENTER,
+                action: function(dialogRef){ dialogRef.close(); }
+            }]
         });
-    
 }
 
 
@@ -1851,10 +1831,10 @@ function BSDialogUrl( url, dTitle = "Information", dType=BootstrapDialog.TYPE_IN
             type:     dType,
             size:     BootstrapDialog.SIZE_SMALL,
             buttons: [{
-                    label: t.dialog.btn.ok,
-                    hotkey: $.ui.keyCode.ENTER,
-                    action: function(dialogRef){ dialogRef.close(); }
-                }]
+                label : t.dialog.btn.ok,
+                hotkey: $.ui.keyCode.ENTER,
+                action: function(dialogRef){ dialogRef.close(); }
+            }]
         });
     
 }
@@ -1868,16 +1848,15 @@ function BSDialogUrl( url, dTitle = "Information", dType=BootstrapDialog.TYPE_IN
 function BSDialogPrompt( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_DEFAULT ) {
     
     if( dMessage )
-        // BSDialogPrompt();
         BootstrapDialog.show({
             title:    dTitle,
             message:  wrap( dMessage ),
             type:     dType,
-            size: BootstrapDialog.SIZE_SMALL,
+            size:     BootstrapDialog.SIZE_SMALL,
             closable: false,
             buttons: [{
                 label: t.dialog.btn.stopSearch,
-                cssClass: 'btn-danger btn-sm',
+                cssClass: 'btn-danger btn-sm stop-search',
                 action: function(dialog){
                     searchToken.cancelSearch();
                     dialog.close();
@@ -1890,7 +1869,6 @@ function BSDialogPrompt( dMessage, dTitle = "Information", dType=BootstrapDialog
                 }
             }]
         });
-    
 }
 
 
@@ -1906,7 +1884,6 @@ function copyToClipboard( text ) {
     $temp.val(text).select();
     document.execCommand("copy");
     $temp.remove();
-    
 }
 
 
@@ -1926,7 +1903,6 @@ function plural( str, qty, format="", wrapper="" ) {
 
     let string = (qty < 0 ? "" : (format ? numeral(qty).format(format) : qty) +"&nbsp;")+ str + (Math.abs(qty) > 1 ? "s":"");
     return wrapper ? wrap(string, wrapper) : string;
-    
 }
 
 
@@ -1948,7 +1924,6 @@ function getFilters() {
     filters.push( ['.*', $("#btn-accept_unmatch").data('accept_unmatch')==='True'] );
     
     return filters;
-    
 }
 
 
@@ -2066,34 +2041,27 @@ function  setFilterSubtopic( state ) {
     switch ( state ) {
         
         case "enable" :
-            
-            $("#btnSearch").removeClass('disabled');
-            $("#btnSearchReset").removeClass('disabled');
-        break;
+            $("#btnSearch").prop('disabled',false);
+            break;
 
         case "disable" :
-            
-            $("#btnSearch").html(t.g_search + t.search).addClass('disabled');
-            $("#btnSearchReset").addClass('disabled');
-        break;
+            $("#btnSearch").prop('disabled',true).html(t.g_search + t.search);
+            break;
 
         case "reset" :
             resetDataDisplay( "#topics-tab", bigData_Folders.length );
             $("#err-subtopic").hide();
-            $("#topics-tab").data("display").shown = 0;
-            $("#files-tab").data("display").shown = 0;
+            $("#topics-tab, #files-tab").data("display").shown = 0;
             setFilterSubtopic( "disable" );
             setGUIstate(GUI.STATE_RESET);
             if( folders.length < 1 ) cluster.subtopic.clear();
             if( $(FILTER.INPUT_AMQP_SRC).val() == "" ) {
-                $("#topics-tab").addClass('hidden');
-                $("#files-tab").addClass('hidden');
-                $("#stats-tab").addClass('hidden');
+                $("#topics-tab, #files-tab, #stats-tab").addClass('hidden');
             }
             setGUIstate(GUI.STATE_READY);
-        break;
+            break;
 
-        default : // what happened here ?
+        default : // if here, what did happen ???
             console.log(t.err_subtopicState +" ["+ state +"]")
     }
     
@@ -2115,24 +2083,18 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
             case GUI.STATE_FOUND: 
                 document.body.style.cursor = 'wait';                           
                 $("#logs").hide();
-                $("#btnCopy").removeClass("hidden");
                 $("#btnSearch").html(t.g_search + t.search);
-                $("#topics-tab").removeClass('hidden');
-                $("#files-tab").removeClass('hidden');
-                $("#stats-tab").removeClass('hidden');
+                $("#btnCopy, #topics-tab, #files-tab, #stats-tab").removeClass('hidden');
                 $("#stats-tab").trigger('click');
                 adjustTabsHeight(true);
                 break;
                 
             case GUI.STATE_LOADING: 
                 document.body.style.cursor = 'wait';
-                $("#logs").show();
-                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
-                $("#tabs").show();
-                $("#msg").hide();
-                $("#tabs .nav-tabs").show();
-                $("#sarra-formula").removeClass('hidden');
+                $("#msg").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
                 $(".input-subtopic").val("");
+                $("#logs, #tabs, #tabs .nav-tabs").show();
+                $("#sarra-formula").removeClass('hidden');
                 $("#editor-tab").trigger('click');
                 adjustTabsHeight(true);
                 break;
@@ -2140,7 +2102,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
             case GUI.STATE_RESET: 
                 document.body.style.cursor = 'wait';
                 $("#logs").show();
-                $("#logger").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
+                $("#msg").html( wrap( t.wait.searchInProgress +" - "+ t.wait.please, TAG.CN ) );
                 $("#files-tab").html(wrap( t.noFiles, TAG.cG ));
                 $("#files pre").html( "" );
                 $(".input-subtopic").val("");
@@ -2150,10 +2112,8 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 
             case GUI.STATE_SEARCHING: 
                 document.body.style.cursor = 'wait';
-                $("#logs").show();
-                $("#logger").show();
-                $("#files-tab").addClass('hidden');
-                $("#stats-tab").addClass('hidden');
+                $("#logs, #msg").show();
+                $("#files-tab, #stats-tab").addClass('hidden');
                 $("#btnSearch").html(t.f_superp + t.cancel);
                 $("#editor-tab").trigger('click');
                 adjustTabsHeight(true);
@@ -2231,10 +2191,9 @@ function adjustTabsHeight( adjust ) {
 // 
 
 function setCookie() {
-    
+
     LANG = ( LANG == "fr" ? "en":"fr" );
     $.cookie( "LANG",LANG );
-    
 }
 
 
@@ -2244,10 +2203,9 @@ function setCookie() {
 // 
 
 function switchLangue() {
-    
+
     $.cookie( "LANG", ( LANG == "fr" ? "en":"fr" ) );
     location.reload();
-    
 }
 
 
@@ -2257,6 +2215,7 @@ function switchLangue() {
 // 
 
 function wrap(str,wrapTag=['<p>','</p>']) {
+
     return wrapTag[0] + str + wrapTag[1];
 }
 
