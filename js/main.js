@@ -226,8 +226,9 @@ var
 // ---------------------------------------------------------------------
 //  TEST ZONE BEGIN
 // ---------------------------------------------------------------------
-    
+
 // ---------------------------------------------------------------------
+
 // 
 // Returns server origin
 // Since development domains do not host product files,
@@ -235,7 +236,7 @@ var
     
 function getOrigin() {
     let domain = window.location.origin.split('//')[1].split('.')[0];
-    return ['lab','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin;
+    return ['labs','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin +"/";
 }
 
 function getConfigHeader( includeMan ) {
@@ -359,7 +360,7 @@ function _initialize_() {
     searchToken.cancel();
     _init_data_tabs();
     
-    var msg = {                                                          // Set GUI's fallback texts
+    var msg = {                                                         // Set GUI's fallback texts
             "ini":{ "fr":"Chargement des fichiers JSON.",
                     "en":"Loading JSON files."
             },
@@ -384,7 +385,7 @@ function _initialize_() {
                         "en":'<strong>This site use cookies to: </strong> &nbsp; 1- Remember your prefered language. &nbsp; 2- Keep shut warning dialogs (on old browsers). &nbsp; <strong>That’s it!</strong>'
             }
         },
-        requests    = jsonURLs.map((url) => $.ajax(url)),                // Get JSON requests for GUI texts & catalogue lists from jsonURLs global var
+        requests    = jsonURLs.map((url) => $.ajax(url)),               // Get JSON requests for GUI texts & catalogue lists from jsonURLs global var
         $catalogues = $("#catalogues");
     
     $catalogues.html( wrap( msg.ini[LANG] ) );
@@ -1044,7 +1045,7 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
 // Receives a data array, regex string and accept/reject (true/false)
 // Returns an object containing stats, matched and unmatched data
 
-function getSubtopicMatch( foldersData, subtopicFilters ) {
+function getSubtopicMatch( foldersData, subtopicFilters, accept_rejectFilters ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilters+'] foldersData :',L,foldersData);};/*#*/
 
@@ -1052,19 +1053,37 @@ function getSubtopicMatch( foldersData, subtopicFilters ) {
     let stats = { matched: { nbFiles: 0, totSize: 0, ranges: [] }, unmatch: { nbFiles: 0, totSize: 0, ranges: [] } };
     let matched = [];
     let unmatch = [];
+    let withARFilters = accept_rejectFilters.length > 2
     
-    for( let i=0, n=foldersData.length; i < n; i++ ) {
-        for( let ii=0, nn=regex.length; ii<nn; ii++) {
-            if( regex[ii].test( foldersData[i].dir ) && !matched.includes(foldersData[i]) ) {
-                matched.push(foldersData[i]);
-                if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
-                    stats.matched.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
-                    stats.matched.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
-                    stats.matched.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
+    if( withARFilters || (!withARFilters && accept_rejectFilters[1][1] ) ) {
+        for( let i=0, n=foldersData.length; i < n; i++ ) {
+            for( let ii=0, nn=regex.length; ii<nn; ii++) {
+                if( regex[ii].test( foldersData[i].dir ) && !matched.includes(foldersData[i]) ) {
+                    matched.push(foldersData[i]);
+                    if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
+                        stats.matched.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
+                        stats.matched.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
+                        stats.matched.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
+                    }
                 }
             }
         }
     }
+    else {
+        for( let i=0, n=foldersData.length; i < n; i++ ) {
+            for( let ii=0, nn=regex.length; ii<nn; ii++) {
+                if( regex[ii].test( foldersData[i].dir ) && !unmatch.includes(foldersData[i]) ) {
+                    unmatch.push(foldersData[i]);
+                    if(foldersData[i].inf[CATALOG.id_NB_FILES] > 0) {
+                        stats.unmatch.nbFiles += foldersData[i].inf[CATALOG.id_NB_FILES];
+                        stats.unmatch.totSize += foldersData[i].inf[CATALOG.id_TOTAL_SIZE];
+                        stats.unmatch.ranges.push( foldersData[i].inf[CATALOG.id_RANGE_START]+'-'+foldersData[i].inf[CATALOG.id_RANGE_STOP] );
+                    }
+                }
+            }
+        }
+    }
+    
     
 /*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
     return { matched, unmatch, stats }
@@ -1305,25 +1324,42 @@ async function performSearch ( allFilters ) {
         nbFolders, nbFoldersHtml,                   // Number of folders found with subtopicFilter
         nbFiles,   nbFilesHtml,                     // Number of files   found with subtopicFilter and accept_rejectFilter (if any)
         matches    = [],                            // Store a list matching filters criteria
-        filesInFolders = { matched: [], stats: { matched: { nbFiles:0,totSize:0 } } };
-    
+        unmatchs   = [],                            // Store a list unmatching filters criteria
+        filesInFolders = { matched: [], unmatch: [], stats: { matched: { nbFiles:0,totSize:0 }, unmatch: { nbFiles:0,totSize:0 } } },
+        
+        nbFilters     = accept_rejectFilters.length,
+        withARFilters = nbFilters > 2,
+        acceptUnmatch = accept_rejectFilters[ nbFilters-1 ][1];
+
+
     // Apply Subtopic filter if different 
     // from a previous search...
     // --------------------------------------------------
-    STm = getSubtopicMatch( bigData_Folders, subtopicFilters );             // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
-    statistics.reset({ search: { subtopic:{ filters:AMQPfilters, matched:{folders:STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize} } } });
+    STm = getSubtopicMatch( bigData_Folders, subtopicFilters, accept_rejectFilters );             // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
+    statistics.reset({
+                        search: {
+                            subtopic:{
+                                filters: AMQPfilters,
+                                matched: {folders:STm.matched.length, files:STm.stats.matched.nbFiles, totalSize:STm.stats.matched.totSize},
+                                unmatch: {folders:STm.unmatch.length, files:STm.stats.unmatch.nbFiles, totalSize:STm.stats.unmatch.totSize}
+                            }
+                        }
+                     });
     
     matches.push( STm );                                                    // Add it to the matches array
     matches.forEach( (match) => {                                           // Merge all match in filesInFolders
         filesInFolders.stats.matched.nbFiles += match.stats.matched.nbFiles;
+        filesInFolders.stats.unmatch.nbFiles += match.stats.unmatch.nbFiles;
         filesInFolders.stats.matched.totSize += match.stats.matched.totSize;
+        filesInFolders.stats.unmatch.totSize += match.stats.unmatch.totSize;
         $.merge(filesInFolders.matched, match.matched);
+        $.merge(filesInFolders.unmatch, match.unmatch);
     });
     
 /*#*/if( DEBUG ){ console.log('STm',STm); };/*#*/
     
     // Extract some info for the logger...
-    nbFolders     = STm.matched.length;
+    nbFolders     = STm.matched.length + STm.unmatch.length;
     nbFiles       = filesInFolders.stats.matched.nbFiles;
     nbFoldersHtml = plural(t.folder, nbFolders, '0,0', TAG.CV);
     nbFilesHtml   = plural(t.file,   nbFiles,   '0,0', TAG.CR);
@@ -1335,10 +1371,18 @@ async function performSearch ( allFilters ) {
     progressBar.updateDisplay( nbFiles );
 
     // And update display...
-    if( AMQPfilters.length > 1 )
-        cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilters.join('<br>')}</span>` );
-    else
-        cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilter}</span>` );
+    if( withARFilters || acceptUnmatch ) {
+        if( AMQPfilters.length > 1 )
+            cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilters.join('<br>')}</span>` );
+        else
+            cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilter}</span>` );
+    }
+    else {
+        if( AMQPfilters.length > 1 )
+            cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.unmatch, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilters.join('<br>')}</span>` );
+        else
+            cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.unmatch, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilter}</span>` );
+    }
     
     if( folders.length < 1 ) subtopicCluster.clear();
     
@@ -1367,10 +1411,6 @@ async function performSearch ( allFilters ) {
     
     // Apply accept_rejectFilters if any...
     // --------------------------------------------------
-    
-    let nbFilters     = accept_rejectFilters.length,
-        withARFilters = nbFilters > 2;
-
     if( withARFilters ) {                                                                               // If no accept_rejectFilters, update files tab as well with found files...
 
         let matchfiles = [],
@@ -1458,8 +1498,13 @@ function updateResultsTab( withHints=true, withMan=false ) {
     // Search filters
     // --------------------------------------
     // Subtopics
-    let tr_findings = "";
-    numFolders = statistics.search.subtopic.matched.folders;
+    let tr_findings   = "",
+        allFilters    = getFilters(),
+        nbFilters     = allFilters.length,
+        withARFilters = nbFilters > 2,
+        acceptUnmatch = allFilters[ nbFilters-1 ][1];
+    
+    numFolders = ( withARFilters || acceptUnmatch ) ? statistics.search.subtopic.matched.folders : statistics.search.subtopic.unmatch.folders;
     numFiles   = statistics.search.subtopic.matched.files;
     strFolders = numFolders == 0 ? t.noFolders : plural( t.folder, -numFolders ),
     strFiles   = numFiles   == 0 ? t.noFiles   : plural( t.file,   -numFiles   );
@@ -1493,6 +1538,17 @@ function updateResultsTab( withHints=true, withMan=false ) {
             tr_findings  += `
             <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} (${ numeral(size).format("0.00 b") }) &nbsp;</td><td>&nbsp; ${filter}</td></tr>`;
         }
+    } else if( !withARFilters && !acceptUnmatch ) {
+        let color, choice, files, size, elem, plural;
+        color  = ' class="c-rouge"',
+        choice = t.data.table.rejected,
+        files  = statistics.search.subtopic.unmatch.files,
+        size   = statistics.search.subtopic.unmatch.totalSize;
+        plural = files > 1 ? "s":"";
+        files  = numeral(files).format('0,0');
+        elem   = t.file + plural; // i < lastAcceptReject ? t.file+plural : t.data.table['unmatch'+plural];
+        tr_findings  += `
+        <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} (${ numeral(size).format("0.00 b") }) &nbsp;</td><td>&nbsp; ${t.data.table.unmatchs}</td></tr>`;
     }
 
     let tbody_search = `
@@ -1507,12 +1563,16 @@ function updateResultsTab( withHints=true, withMan=false ) {
     if( !statistics.search.accept_reject ) {
         statistics.results.files = statistics.search.subtopic.matched.files     == 0 ? "" :     numeral(statistics.search.subtopic.matched.files).format('0,0');
         statistics.results.size  = statistics.search.subtopic.matched.totalSize == 0 ? "" : "("+numeral(statistics.search.subtopic.matched.totalSize).format('0.00 b')+")";
-        statistics.results.str   = statistics.results.files < 2  ? t.searchHits[ statistics.results.files ] : t.searchHits[2] ;
+        statistics.results.str   = statistics.results.files < 2  ? t.searchHits[ statistics.results.files ] : t.searchHits[2];
     }
+    if( !withARFilters && !acceptUnmatch ) {
+        statistics.results.str   = t.searchHits[0];
+    }
+    
     let tbody_results = `
         <tbody id="results">
             <tr><th colspan="4" class="title">${t.data.table.summary}</th></tr>
-            <tr><td></td><td>${statistics.results.files}</td><td colspan="2"> ${statistics.results.str} ${statistics.results.size}</td></tr>
+            <tr><td></td><td>${statistics.results.files}</td><td colspan="2">${statistics.results.str} ${statistics.results.size}</td></tr>
         </tbody>`;
         
     // --------------------------------------
@@ -1668,8 +1728,9 @@ $(document)
     
     .on('click', '#scroll-files .content', function() {
         let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
+        console.log(url);
         let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
-        getIt.trigger('click');
+//         getIt.trigger('click');
     })
     
     .on('click', 'a.dropdown-filter', function(e) {
