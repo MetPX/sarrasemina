@@ -1,5 +1,5 @@
-<div style="display:block; float:right">
-<img width="250" src="img/sig-blk-fr.svg">
+<div style="display:block;">
+<img align="right" width="250" src="img/sig-blk-fr.svg">
 </div>
 
 # MetPX-SarraSemina
