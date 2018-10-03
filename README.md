@@ -1,6 +1,7 @@
 <div style="display:block; float:right">
-<img width="250" src="/users/dor/aspy/dal/public_html/sarrasemina/img/sig-blk-fr.svg">
+<img width="250" src="img/sig-blk-fr.svg">
 </div>
+
 # MetPX-SarraSemina
 
 [**Français**](#francais)
