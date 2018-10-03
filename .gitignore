@@ -3,5 +3,6 @@
 .project
 .pydevproject
 .settings/*
+.vscode/*
 py/__pycache__/*
 
