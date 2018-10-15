@@ -51,13 +51,14 @@
         },
 
         "help": {
-            "tip"  : "Aide",
+            "tip"  : "Clic pour aide",
             "title": {
-                "page"         : "À propos de Sarra Semina",
+                "page"         : "Sarra Semina",
+                "filters"      : "Filtres",
                 "topic"        : "Thème",
                 "subtopic"     : "Sous-thème",
                 "accept_reject" : "Accepter/Rejeter",
-                "accept_unmatch": "Tous les éléments non filtrés"
+                "accept_unmatch": "Éléments non filtrés"
             },
             
             "filterReset"      : "Réinitialiser le filtre",
@@ -105,7 +106,8 @@
             {
                 "tocLoaded"  : "Selected catalogue is now loaded into memory.<br>It contains a listing of ",
                 "displayToc" : ".<br><br>Rendering its Table of Content on screen may take several seconds...",
-                "buildingToc": "<br><span class='bootstrap-dialog-button-icon glyphicon glyphicon-refresh icon-spin'></span> Building Table Of Content...<br>&nbsp;"}, 
+                "buildingToc": "<br><span class='bootstrap-dialog-button-icon glyphicon glyphicon-refresh icon-spin'></span> Building Table Of Content...<br>&nbsp;"
+            },
             "btn":
             {
                 "continue"      : "Continue",
@@ -121,14 +123,15 @@
         },
 
         "help": {
-            "tip"  : "Aide",
+            "tip"  : "Click for help",
             "title":
             {
-                "page"         : "About Sarra Semina",
-                "topic"        : "Topic (v02)",
-                "subtopic"     : "Subtopic",
+                "page"          : "Sarra Semina",
+                "filters"       : "Filters",
+                "topic"         : "Topic (v02)",
+                "subtopic"      : "Subtopic",
                 "accept_reject" : "Accept/Reject",
-                "accept_unmatch": "All unmatched elements"
+                "accept_unmatch": "Unmatched elements"
             },
             
             "filterReset"      : "Reset filter",

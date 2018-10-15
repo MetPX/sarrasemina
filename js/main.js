@@ -1,5 +1,10 @@
 // ---------------------------------------------------------------------
 //
+// Author        : Daniel Léveillé
+//                  SSC-SPC - Gouvernement du Canada
+// created       : 2017-08-24 08:00:00
+// last-modified : 2018-10-15 12:41:23
+//
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
 //      -> Do optimize mem usage
@@ -21,7 +26,7 @@ if( $.cookie( "LANG" ) === undefined )                                  // Detec
 
 const CANCEL        = Symbol(),
       CANCEL_SEARCH = Symbol();
-      
+
 class CancellationToken {
     constructor() {
         this.cancelled       = false;
@@ -74,7 +79,7 @@ const
         setup   : ( newOptions = {} ) => {
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
         },
-        write   : ( includeHints = true, includeMan = false ) => {
+        write   : ( includeHints = false, includeMan = false ) => {
             let config=getConfigHeader(includeMan), pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[];
 
             subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
@@ -229,6 +234,29 @@ var
 
 // ---------------------------------------------------------------------
 
+// Test if a config is available in cookie.
+/** /
+
+// Serialize user's config
+Person.prototype.toJson = function() {
+    return JSON.stringify({age: this.age});
+};
+
+// Similar for deserializing:
+Person.fromJson = function(json) {
+    var data = JSON.parse(json); // Parsing the json string.
+    return new Person(data.age);
+};
+
+// The usage would be:
+var serialize = p1.toJson();
+var _p1 = Person.fromJson(serialize);
+alert("Is old: " + _p1.isOld());
+/**/
+
+
+// ---------------------------------------------------------------------
+
 // 
 // Returns server origin
 // Since development domains do not host product files,
@@ -236,11 +264,12 @@ var
     
 function getOrigin() {
     let domain = window.location.origin.split('//')[1].split('.')[0];
-    return ['labs','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin +"/";
+    return ['lab','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin +"/";
 }
 
 function getConfigHeader( includeMan ) {
-    let configHeader = t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
+    let regxWarning  = $("#checkbox-regex_case").is(":checked") ? t.confComment.regex_case:"";
+    let configHeader = regxWarning + t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
     if( includeMan ) {
         let url = t.confManual.baseURL.split('|');
         configHeader = configHeader.replace('(git)', `<a href="${url[0]}" target="_blank">${url[0]}</a>`);
@@ -421,6 +450,8 @@ function _initialize_() {
 
         $("#title")                .html(t.title);
         $(".title-text")           .html(t.titleHeader);
+        $(".label-filters")        .html(t.filters._        +t.comma);
+        $("#caseInsensitive")      .html(t.filters.caseInsensitive);
         $(".label-topic")          .html(t.topic            +t.comma);
         $(".label-subtopic")       .html(t.subtopic         +t.comma);
         $(".input-subtopic")       .attr("placeholder", t.placeholder.AMQP_filter ).attr("aria-label",t.enterYourFilter);
@@ -432,6 +463,7 @@ function _initialize_() {
         $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
         $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip().show();
         
+        $(".help.filters")         .attr("title", t.help.tip +" - "+ t.help.title.filters)        .data("title", t.help.title.filters)        .tooltip();
         $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
         $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)       .data("title", t.help.title.subtopic)       .tooltip();
         $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.accept_reject)  .data("title", t.help.title.accept_reject)  .tooltip();
@@ -1053,8 +1085,8 @@ function getSubtopicMatch( foldersData, subtopicFilters, accept_rejectFilters ) 
     let stats = { matched: { nbFiles: 0, totSize: 0, ranges: [] }, unmatch: { nbFiles: 0, totSize: 0, ranges: [] } };
     let matched = [];
     let unmatch = [];
-    let withARFilters = accept_rejectFilters.length > 2
-    
+    let withARFilters = accept_rejectFilters.length > 2;
+
     if( withARFilters || (!withARFilters && accept_rejectFilters[1][1] ) ) {
         for( let i=0, n=foldersData.length; i < n; i++ ) {
             for( let ii=0, nn=regex.length; ii<nn; ii++) {
@@ -1102,8 +1134,9 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+reg+']',L,'filesData :',L,filesData);};/*#*/
     
     reg[0][0] = reg[0][0].replace('$','.*$');   // First filter is subtopic. When Accept-Reject filters kiks in, make sure subtopic will allow everything beyond its path.
-
-    let regex    = reg.map( (r) => { return new RegExp(r[0]); } );
+    let rxModifier = $("#checkbox-regex_case").is(":checked") ? "i":""
+    
+    let regex    = reg.map( (r) => { return new RegExp(r[0],rxModifier); } );
     let accept   = reg.map( (r) => { return r[1]; } );
     let matched  = reg.map( () => { return [] } );
     let unmatch  = reg.map( () => { return [] } );
@@ -1461,7 +1494,7 @@ async function performSearch ( allFilters ) {
 // updateResults
 // Update content of Results Tab
 
-function updateResultsTab( withHints=true, withMan=false ) {
+function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=false ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); logMe('-','-'); console.log('>>> statistics[', statistics, ']'); };/*#*/
     
@@ -1727,10 +1760,17 @@ $(document)
     })
     
     .on('click', '#scroll-files .content', function() {
-        let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
-        console.log(url);
-        let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
-//         getIt.trigger('click');
+        // let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
+        let url   = $(this).text().replace( /^\d+ - \//, '/' );
+        let file  = url.replace( /http.?:\/\//, '' ).replace( /\//g, '_' ).replace( /:/g, '-' );
+        // let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
+        // getIt.trigger('click');
+
+        $.ajax({
+            url       : url,
+            success   : download.bind(true, "blob", file),
+            statusCode: { 404: function() { BSDialog( t.fileNotFound, t.error, "type-danger" ); } }
+        });
     })
     
     .on('click', 'a.dropdown-filter', function(e) {
@@ -1881,7 +1921,8 @@ function BSDialog( dMessage, dTitle = "Information", dType=BootstrapDialog.TYPE_
 // ---------------------------------------------------------------------
 //
 // BSDialogUrl
-// Prompt a message to request an action
+// Prompt message extracted from an external URL at a given div ID
+// ex.: /docs/help.html #en-about
 
 function BSDialogUrl( url, dTitle = "Information", dType=BootstrapDialog.TYPE_INFO ) {
     
