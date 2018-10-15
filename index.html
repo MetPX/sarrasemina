@@ -10,9 +10,14 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20180525150633">
-        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20180525150633">
-        <link rel="stylesheet" href="/css/style.css?v20180525150633">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20181015151759">
+        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20181015151759">
+        <link rel="stylesheet" href="/css/style.css?v20181015151759">
+        <script>
+            // if we have less than IE Edge, redirect to incompatible page
+            var unSupported_IE = (/msie\ [0-9]{1}|Trident\/[7]{1}/i.test(navigator.userAgent));
+            if( unSupported_IE ) { window.location.href = 'incompatible-ie.html'; }
+        </script>
     </head>
     <body>
         <div class="modal fade">
@@ -72,9 +77,25 @@
                             <div class="sarra-configs col-xm-12 accepts-rejects">
                                 <table>
                                     <tr>
+                                        <td width="90" style="vertical-align: middle; padding-top: 10px;"><label class="label-filters" data-label="unchecked">Filters: </label></td>
                                         <td>
-                                            <label class="label-catalogue" for="selectCatalogue">Catalogue : </label>
+                                            <div style="display:inline-block; position: relative; top: 10px; ">
+                                                <div class="input-group input-group-sm disabled">
+                                                    <span id="help-filters" class="help filters input-group-addon glyphicon glyphicon-question-sign" data-help="filters" data-toggle="tooltip" data-placement="right"></span>
+                                                    <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
+                                                        <label class="btn btn-primary btn-regex_case" data-label="regex_case" style="border-radius: 0 3px 3px 0;">
+                                                            <input type="checkbox" name="checkbox-regex_case" id="checkbox-regex_case" autocomplete="off">
+                                                            <i class="fa fa-square unchecked" aria-hidden="true"></i>
+                                                            <i class="fa fa-check-square checked" aria-hidden="true"></i>
+                                                            <span id="caseInsensitive">Case insensitive</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: inline-block;">
+                                            <label style="padding-left: 5px" class="label-catalogue" for="selectCatalogue">Catalogue : </label>
                                             <span id="catalogues"></span>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
@@ -184,6 +205,15 @@
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
+        <script>
+            if( unSupported_IE ) {
+                document.getElementById( "unSupported_IE" ).style.display = "block";
+            } else {
+                document.getElementById( "docs" ).style.display = "block";
+                document.getElementById( "tabs" ).style.display = "block";
+            }
+        </script>
+
         <script src="//code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
         
@@ -195,13 +225,14 @@
 
         <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
+        <script src="/js/plugins/download.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
 
         <script src="/js/plugins/selectize/js/selectize.js"></script>
         <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json?v20180525150633', '/json/ui-docs.json?v20180525150633', '/json/brokers.json?v20180525150633'];
+            var jsonURLs = ['/data/', '/json/ui-texts.json?v20181015151759', '/json/ui-docs.json?v20181015151759', '/json/brokers.json?v20181015151759'];
         </script>
-        <script src="/js/main.js?v20180525150633"></script>
+        <script src="/js/main.js?v20181015151759"></script>
     </body>
 </html> 
