@@ -1,8 +1,11 @@
 /*
-  --------------------------------------------------------
-    Description: Sarra Semina Style based on Bootstrap 3
-    Author:      Daniel Léveillé
-  --------------------------------------------------------
+-----------------------------------------------------------
+  Description   : Sarra Semina Style based on Bootstrap 3
+  Author        : Daniel Léveillé
+                   SSC-SPC - Gouvernement du Canada
+  created       : 2017-08-24 08:00:00
+  last-modified : 2018-10-12 11:14:24
+-----------------------------------------------------------
 */
 .select2-container--default .select2-selection--multiple { border-radius: 3px; border-color: #ddd; }
 .select2-container--default.select2-container--focus .select2-selection--multiple { border-color: #aaa !important; }
@@ -12,7 +15,7 @@
 /* -[ GENERAL ]------------------------------------------- */
 
 html   { margin:0; padding:0; font-size:62.5%; background-color: #09d; }
-body   { background: transparent; font-family: 'Open Sans', sans-serif; font-size:1.2em; line-height: 1.6em; margin:0 auto; min-width:420px; padding: 10px !important; }
+body   { background: transparent; font-family: /*'Open Sans',*/ sans-serif; font-size:1.2em; line-height: 1.6em; margin:0 auto; min-width:420px; padding: 10px !important; }
 pre    { font-size: 0.85em; }
 hr     { margin: 3px 0; }
 h1     { font-size:1.8em; }
@@ -32,6 +35,8 @@ th, td { padding: 1px 0 0 0; }
 .c-rouge { color: red; }
 .c-vin   { color: #a00; }
 .c-ERR   { background: #a00 !important; color: #fc0 !important; border: 1px solid #bb0073 !important; background-image: linear-gradient(to bottom, #f61d57, #c9103e) !important; font-weight: bold; }
+.c-IErr  { line-height: 1.2em; border: 1px solid #ccc; margin: 0; padding: 2em; background-color: #eee; font-size: 1.1em; color: #c00; font-weight: bold; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; behavior:("/css/PIE.htc"); }
+.c-IErr span { color: #777; font-size: .9em; font-weight: normal; }
 noscript h2 { color: #f00; }
 noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font-weight: bold; }
 
@@ -84,6 +89,7 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 
 .row.page { background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.7); display: block; margin: 0; margin-bottom: 10px; padding: 10px; }
 #tabs { margin-bottom: 0; min-height: 360px; }
+#tabs.IErr { min-height: auto; padding-bottom: 20px; }
 
 .title-logo { /* max-height: 20px; */ padding: 5px 20px; }
 .title-text { /* max-height: 20px; */ line-height: 1.1em; padding: 5px 20px; font-size: 1.2em; font-weight: bold; text-align: center; color: #777 }
@@ -101,19 +107,20 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .entry:not(:first-of-type) { margin-top: 5px; }
 
 .tooltip { white-space: nowrap; }
+.tooltip-inner { max-width: 350px; }
 .input-group-btn .btn.btn-accept-regex,
 .btn-group .btn.btn-accept-unmatch { border-radius: 0; }
 .input-group-addon .fa { color: #07d; }
 .glyphicon { font-size: 12px; }
 .glyphicon.input-group-addon { top: 0; }
 .glyphicon.input-group-addon:hover { cursor: pointer; }
-table.accept_unmatch.filter td { position: relative; vertical-align: top; }
+table.accept_unmatch.filter td { position: relative; }
 #btnSearch { background-color: #e6e6e6; color: #444; position: absolute; top: 0; right: 0; }
 #btnSearch:hover { cursor: pointer; }
 #btnSearch:disabled { background-color: #f6f6f6; color: #bbb; cursor: default; }
 #btnSearch:disabled .glyphicon-search { color: #aaa; }
 #btnSearch .glyphicon-search { color: #090; }
-#btnSearchReset { background-color: #e6e6e6; color: #444; border: none; cursor: pointer; display: inline; height: 100%; width: 27px; }
+#btnSearchReset { background-color: #e6e6e6; color: #444; border: none; cursor: pointer; display: inline; /* height: 100%; width: 27px; */ }
 #btnSearchReset:disabled { background-color: #f6f6f6; color: #ddd; cursor: default; }
 #btnSearchReset:disabled .glyphicon-remove { color: #ddd; }
 #btnSearchReset .glyphicon-remove { color: #f00; }
@@ -170,7 +177,7 @@ select.input-sm { line-height: 1.3; height: 28px; }
 }
 
 @media (max-width: 500px) {
-  .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: 'BenchNine', sans-serif; font-weight: 500; line-height: 2; }
+  .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: /*'BenchNine',*/ sans-serif; font-weight: 500; line-height: 2; }
 }
 
 @media (max-width: 490px) {
@@ -253,7 +260,7 @@ input[type="checkbox"], input[type="radio"]{ position: absolute; right: 9000px; 
 input[type="checkbox"] + .label-text:before{ 
     content: "\f096"; font-family: "FontAwesome";
     font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 5px; speak: none;
+    width: 1em; display: inline-block; margin-right: 5px; /*speak: none;*/
 }
 input[type="checkbox"]:checked  + .label-text:before{ content: "\f14a"; color: #2980b9; }
 input[type="checkbox"]:disabled + .label-text{ color: #aaa; }
@@ -263,7 +270,7 @@ input[type="checkbox"]:disabled + .label-text:before{ content: "\f0c8"; color: #
 input[type="radio"] + .label-text:before{
     content: "\f10c"; font-family: "FontAwesome";
     font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 5px; speak: none;
+    width: 1em; display: inline-block; margin-right: 5px; /*speak: none;*/
 }
 input[type="radio"]:checked  + .label-text:before{ content: "\f192"; color: #8e44ad; }
 input[type="radio"]:disabled + .label-text{ color: #aaa; }
@@ -273,7 +280,7 @@ input[type="radio"]:disabled + .label-text:before{ content: "\f111"; color: #ccc
 .toggle input[type="radio"] + .label-text:before{
     content: "\f204"; font-family: "FontAwesome";
     font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 10px; speak: none;
+    width: 1em; display: inline-block; margin-right: 10px; /*speak: none;*/
 }
 .toggle input[type="radio"]:checked + .label-text:before{ content: "\f205"; color: #16a085; }
 .toggle input[type="radio"]:disabled + .label-text{ color: #aaa; }

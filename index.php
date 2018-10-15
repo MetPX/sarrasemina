@@ -3,6 +3,11 @@
 -[ sarrasemina.ca/index.php ]--------------------------------------------------
 ===============================================================================
 
+  Author        : Daniel Léveillé
+                   SSC-SPC - Gouvernement du Canada
+  created       : 2017-08-24 08:00:00
+  last-modified : 2018-10-15 11:50:46
+
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
     +------------------------------------------------------+
@@ -10,13 +15,7 @@
     | The goal is to deploy a completely static website.   |
     | Thus, in PROD, the final index file is index.html    |
     +------------------------------------------------------+
-
-Created  - 2017-08-24
-Modified - 2018-04-24
-
-Daniel Léveillé 
-
-*/ 
+*/
 
 $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
 
@@ -37,11 +36,14 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css<?= $v ?>">
         <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css<?= $v ?>">
         <link rel="stylesheet" href="/css/style.css<?= $v ?>">
+        <script>
+            // if we have less than IE Edge, redirect to incompatible page
+            var unSupported_IE = (/msie\ [0-9]{1}|Trident\/[7]{1}/i.test(navigator.userAgent));
+            if( unSupported_IE ) { window.location.href = 'incompatible-ie.html'; }
+        </script>
     </head>
     <body>
-<?php /*
-        
-        HELPERS
+<?php /*Modal Dialog HELPERS
         
         Modal Dialog - https://nakupanda.github.io/bootstrap3-dialog/#available-options
         -------------------------------------------------------------------- */ ?>
@@ -65,9 +67,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <div class="notif-cookies">
           <span class="msg"></span> &nbsp; <a><i class="fa fa-times-circle" aria-hidden="true"></i></a>
         </div>
-<?php /*
-
-        TOP
+<?php /*TOP TITLE
         -------------------------------------------------------------------- */ ?>
         <div id="docs" class="row page">
             <div class="row">
@@ -83,9 +83,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 </div>
             </div>
         </div>
-<?php /*
-
-        BOT
+<?php /*MAIN BODY
         -------------------------------------------------------------------- */ ?>
         <div id="tabs" class="row page">
             <div id="logs" class="col-sm-12">
@@ -103,23 +101,37 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab"></a></li>
                 <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab"></a></li>
             </ul>
+<?php /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
+<?php /*BUILDER PANE
+        
+        User creates its Sarra Config here
+        -------------------------------------------------------------------- */ ?>
             <div class="tab-content clearfix">
                 <div id="editor" class="tab-pane">
-<?php /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
-<?php /*
-
-        BUILDER
-        
-        User create its Sarra Config here
-        -------------------------------------------------------------------- */ ?>
                     <div id="sarra-formula">
                         <div class="row">
                             <div class="sarra-configs col-xm-12 accepts-rejects">
                                 <table>
                                     <tr>
+                                        <td width="90" style="vertical-align: middle; padding-top: 10px;"><label class="label-filters" data-label="unchecked">Filters: </label></td>
                                         <td>
-                                            <label class="label-catalogue" for="selectCatalogue">Catalogue : </label>
+                                            <div style="display:inline-block; position: relative; top: 10px; ">
+                                                <div class="input-group input-group-sm disabled">
+                                                    <span id="help-filters" class="help filters input-group-addon glyphicon glyphicon-question-sign" data-help="filters" data-toggle="tooltip" data-placement="right"></span>
+                                                    <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
+                                                        <label class="btn btn-primary btn-regex_case" data-label="regex_case" style="border-radius: 0 3px 3px 0;">
+                                                            <input type="checkbox" name="checkbox-regex_case" id="checkbox-regex_case" autocomplete="off">
+                                                            <i class="fa fa-square unchecked" aria-hidden="true"></i>
+                                                            <i class="fa fa-check-square checked" aria-hidden="true"></i>
+                                                            <span id="caseInsensitive">Case insensitive</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div style="display: inline-block;">
+                                            <label style="padding-left: 5px" class="label-catalogue" for="selectCatalogue">Catalogue : </label>
                                             <span id="catalogues"></span>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
@@ -230,17 +242,16 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                     </div>
                     
                     <div id="folders" class="tab-pane cluster-ol"></div>
-<?php /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
                 </div>
+<?php /*RESULTS PANES
+        -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
                 <div id="stats"   class="tab-pane"></div>
                 <div id="topics"  class="tab-pane cluster-ol"></div>
                 <div id="files"   class="tab-pane cluster-ol"></div>
             </div>
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
-<?php /*
-
-        SCRIPTS
+<?php /*SCRIPTS
         
         <script src="/js/plugins/boomerang/boomerang.js"></script>
         <script src="/js/plugins/boomerang/plugins/auto-xhr.js"></script>
@@ -249,6 +260,15 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="/js/plugins/boomerang/plugins/spa.js"></script>
         <script src="/js/plugins/boomerang/plugins/zzz-last-plugin.js"></script>
         -------------------------------------------------------------------- */ ?>
+        <script>
+            if( unSupported_IE ) {
+                document.getElementById( "unSupported_IE" ).style.display = "block";
+            } else {
+                document.getElementById( "docs" ).style.display = "block";
+                document.getElementById( "tabs" ).style.display = "block";
+            }
+        </script>
+
         <script src="//code.jquery.com/jquery-3.2.1.min.js"        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
         <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
         
@@ -260,18 +280,11 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
 
         <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
+        <script src="/js/plugins/download.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
 
         <script src="/js/plugins/selectize/js/selectize.js"></script>
-<?php /** / ?>
-        <script>
-            BOOMR.init({
-                beacon_url: window.location.href + 'data',
-                instrument_xhr: true
-            });
-        </script>
-<?php /**/ ?>
         <script>
             var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>', '/json/brokers.json<?= $v ?>'];
         </script>
