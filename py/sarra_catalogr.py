@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 
 # ------------------------------------------------------------------------------------
+#   Description   : sarra_catalogr.py
+#                   - Parse a dir recursively
+#                   - Build its paths and files representation in a json & toc file
+#
+#   created       : 2017-09-18 08:00:00
+#   last-modified : 2018-10-15 15:39:34
+#
+#   Author        : Daniel Léveillé
+#                    SPC- Gouvernement du Canada
+#                    SSC- Government of Canada
+# ------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------
 # IMPORTS
 # ------------------------------------------------------------------------------------
 
@@ -297,7 +310,7 @@ def writeDocumentsFilesFullpath( sortedPaths ):
     
     for path in sortedPaths :
         sortedFiles = sorted( documents[path]['files'] )
-        byte_start  = byte_stop
+        # byte_start  = byte_stop
             
         fL.write( '{:<{wp}} [{:>3}][{:>3}][{}'.format(path, documents[path]['D'], len(documents[path]['files']), byte_stop,wp=my['len']) )
         documents[path]['R'][0] = byte_stop
@@ -326,7 +339,7 @@ def writeDocumentsFilesFullpath( sortedPaths ):
                 fJ.write( ',\n{' )
             n += 1
             
-            fJ.write( '"title":"{0}", "info":[{2},{3},{4},{5},{6}]'.format(path, n, documents[path]['D'], documents[path]['F'], documents[path]['R'][0], documents[path]['R'][1], documents[path]['S']) )
+            fJ.write( '"title":"{0}", "info":[{1},{2},{3},{4},{5}]'.format(path, documents[path]['D'], documents[path]['F'], documents[path]['R'][0], documents[path]['R'][1], documents[path]['S']) )
             #fJ.write( '"title":"{0}", "folder": true, "info":[{2},{3},{4},{5},{6},{7},{8},{9}]'.format(path, n, documents[path]['D'], documents[path]['F'], byte_start, byte_stop, documents[path]['S'], documents[path]['TD'], documents[path]['TF'], documents[path]['TS']) )
             fJ.write( '}' )
     
