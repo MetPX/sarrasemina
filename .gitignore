@@ -5,4 +5,5 @@
 .settings/*
 .vscode/*
 py/__pycache__/*
-
+data/20*
+2018*/*
