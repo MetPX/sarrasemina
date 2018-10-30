@@ -6,11 +6,11 @@
 #                     from tar backup
 #
 #   created       : 2017-09-18 08:00:00
-#   last-modified : 2018-10-15 15:48:41
+#   last-modified : 2018-10-18 10:15:46
 #
-#   Author        : Daniel Léveillé
+#   Author        : Daniel Leveille
 #                    SPC- Gouvernement du Canada
-#                    SSC- Gouvernement of Canada
+#                    SSC- Government of Canada
 # ------------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------------

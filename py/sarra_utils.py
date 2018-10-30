@@ -1,8 +1,23 @@
 #!/usr/bin/env python3
-import argparse, locale, time
 
 # ------------------------------------------------------------------------------------
-# UTILS
+#   Description   : sarra_catalogr.py
+#                   - Parse a dir recursively
+#                   - Build its paths and files representation in a json & toc file
+#
+#   created       : 2017-09-18 08:00:00
+#   last-modified : 2018-10-18 10:47:00
+#
+#   Author        : Daniel Leveille
+#                    SPC- Gouvernement du Canada
+#                    SSC- Government of Canada
+# ------------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------------
+# IMPORTS
+# ------------------------------------------------------------------------------------
+
+import argparse, locale, time
 
 # ------------------------------------------------------------------------------------
 # colorize texts output
@@ -44,3 +59,4 @@ def file_size(fname):
 #print("File size in bytes of a plain file: ",file_size("test.txt"))
 
 # ------------------------------------------------------------------------------------
+

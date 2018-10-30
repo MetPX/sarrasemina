@@ -6,9 +6,9 @@
 #                   - Build its paths and files representation in a json & toc file
 #
 #   created       : 2017-09-18 08:00:00
-#   last-modified : 2018-10-15 15:39:34
+#   last-modified : 2018-10-18 09:48:34
 #
-#   Author        : Daniel Léveillé
+#   Author        : Daniel Leveille
 #                    SPC- Gouvernement du Canada
 #                    SSC- Government of Canada
 # ------------------------------------------------------------------------------------
