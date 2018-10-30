@@ -42,6 +42,7 @@
                 "display"       : "Afficher",
                 "cancel"        : "Annuler",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
+                "reset"         : "Réinitialiser Configurations",
                 "stop"          : "Arrêter",
                 "stopSearch"    : "Arrêter maintenant",
                 "continueSearch": "Continuer la recherche"
@@ -54,6 +55,8 @@
             "tip"  : "Clic pour aide",
             "title": {
                 "page"         : "Sarra Semina",
+                "catalogues"   : "Catalogues",
+                "configs"      : "Exemples de configuration",
                 "filters"      : "Filtres",
                 "topic"        : "Thème",
                 "subtopic"     : "Sous-thème",
@@ -114,6 +117,7 @@
                 "display"       : "Display",
                 "cancel"        : "Cancel",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
+                "reset"         : "Reset Configurations",
                 "stop"          : "Stop",
                 "stopSearch"    : "Stop Now",
                 "continueSearch": "Continue Searching"
@@ -127,8 +131,10 @@
             "title":
             {
                 "page"          : "Sarra Semina",
+                "catalogues"    : "Catalogues",
+                "configs"       : "Config Examples",
                 "filters"       : "Filters",
-                "topic"         : "Topic (v02)",
+                "topic"         : "Topic",
                 "subtopic"      : "Subtopic",
                 "accept_reject" : "Accept/Reject",
                 "accept_unmatch": "Unmatched elements"
