@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-10-29 15:56:00
+  last-modified : 2018-10-30 11:01:05
 -----------------------------------------------------------
 */
 .select2-container--default .select2-selection--multiple { border-radius: 3px; border-color: #ddd; }
@@ -145,8 +145,9 @@ table.accept_unmatch.filter td { position: relative; }
 select.custom {
   line-height: 2; vertical-align: middle; background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center;
   background-size: 8px 10px; -webkit-appearance: none; -moz-appearance: none; appearance: none;
-}}
+}
 select.input-sm { line-height: 1.3; height: 28px; }
+
 .btn-group-sm>.btn, .btn-sm { line-height: 1.3; padding: 5px 10px; }
 .input-group-sm>.form-control,
 .input-group-sm>.input-group-addon,
@@ -155,6 +156,7 @@ select.input-sm { line-height: 1.3; height: 28px; }
 .input-group-sm>.text.form-control { font-size: 11px; }
 .subtopic.filter .input-group-addon { padding: 0; width: 28px; }
 .subtopic.subtopic.filter .selectize-input { border-radius: 0; }
+#help-subtopic { width: 32px; }
 .btn .fa.checked { display:none; }
 .btn .fa.unchecked { display:inline-block; }
 .btn.active .fa.checked { display:inline-block; }
