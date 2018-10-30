@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-10-29 15:54:10
+// last-modified : 2018-10-30 10:10:20
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -291,7 +291,7 @@ function deserializeData( json ) {
 }
 
 function getConfigCookie() {
-let DEBUG = true;
+// let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); }/*#*/
     let jsonStr = $.cookie('config');
     let config  = (jsonStr) ? deserializeData( jsonStr ) : {};
@@ -300,7 +300,7 @@ let DEBUG = true;
 }
 
 function setConfigCookie( withSampleConfigIndex=-1 ) {
-let DEBUG = true;
+// let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); }/*#*/
 
     CATALOG.LOADED = ( withSampleConfigIndex > -1 ) || CATALOG.LOADED;
