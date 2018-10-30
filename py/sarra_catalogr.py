@@ -6,9 +6,9 @@
 #                   - Build its paths and files representation in a json & toc file
 #
 #   created       : 2017-09-18 08:00:00
-#   last-modified : 2018-10-15 15:39:34
+#   last-modified : 2018-10-30 08:11:09
 #
-#   Author        : Daniel Léveillé
+#   Author        : Daniel Leveille
 #                    SPC- Gouvernement du Canada
 #                    SSC- Government of Canada
 # ------------------------------------------------------------------------------------
@@ -72,6 +72,7 @@ t_log_paths  = t_dir + 'paths.log'
 t_log_files  = t_dir + 'files.log'
 
 if not os.path.exists(os.path.dirname(t_cat)):
+    import errno
     try:
         os.makedirs(os.path.dirname(t_cat))
     except OSError as exc: # Guard against rare condition

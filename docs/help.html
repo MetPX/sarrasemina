@@ -65,6 +65,66 @@
 
 ====================================================================================================
 
+<div id="fr-catalogues">
+    <h5>Le menu déroulant Catalogue</h5>
+    <p> Ce menu déroulant affiche les catalogues des 5 derniers jours précédents aujourd'hui.<br>
+        <br>
+        Il devrait y avoir peu de différences entre les types de produits disponibles d'un catalogue à l'autre.
+        Vous pouvez cependant comparer vos résultats de recherche entre des catalogues pour une configuration donnée.<br>
+        <br>
+        Cette option permet également d'être utilisée comme une machine à remontrer les 5 derniers jours 
+        et à télécharger un fichier qui ne serait plus disponible à partir de Sarracenia.</p>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-catalogues">
+    <h5>The Catalogue drop-down menu</h5>
+    <p> This drop-down menu displays the catalogs of the last 5 days preceding today.<br>
+        <br>
+        There should be little difference in the types of available products from one catalog to another.
+        However, if you need to, you can compare your search results between catalogs for a given configuration.<br>
+        <br>
+        This option can also be used as a wayback machine of the last 5 days 
+        and to download a file that would no longer be available from Sarracenia.</p>
+</div>
+
+====================================================================================================
+
+<div id="fr-configs">
+    <h5>Le bouton <img src="/img/btn-configurations.png" /></h5>
+    <p> Ce bouton donne accès à des exemples pré-établis de configuration Sarracenia.
+        Vous pouvez charger ceux-ci dans l'éditeur d'abonnements afin d'observer les résultats de recherche anticipés sur un catalogue de produits.<br>
+        <br>
+        Pour procéder, cliquez sur le bouton Configurations et sélectionnez dans la liste une configuration désirée, puis lancez la recherche en cliquant sur le bouton <strong>Chercher</strong>.<br>
+        <br>
+        <ul class="notes">
+        NOTES :
+        <li>Lorsqu'une configuration est chargée, vous pouvez sans crainte modifier les paramètres afin de vous familiariser avec les filtres de recherche Sous-thème (AMQP), Accepter/Rejeter (Regex) et les Éléments non-filtrés.</li>
+        <li>L'Explorateur et éditeur d'abonnements Sarra Semina ne contient pas la liste exhaustive des possibilités de configurations que possède Sarracenia.</li>
+        <li>Pour de plus amples détails, veuillez vous référer à la <em><strong>documentation de Sarracenia</strong></em> :<br>
+            <small><a href="https://github.com/MetPX/sarracenia/blob/master/doc/fr/sr_subscribe.1.rst#configurations" target="_blank">https://github.com/MetPX/sarracenia/blob/master/doc/fr/sr_subscribe.1.rst#syntaxe-des-options <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
+        </li>
+        </ul>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-configs">
+    <h5><img src="/img/btn-configurations.png" /> Button</h5>
+    <p> This button gives access to Sarracenia configuration examples.
+        You can upload a config to the Subscription editor to get its expected results from a product's catalog.<br>
+        <br>
+        To configure, click on the Configurations button and select a desired config from the list, then launch the search with <strong>Search</strong> button.<br>
+        <br>
+        <ul class="notes">
+        NOTES :
+        <li>Once a config is loaded, you can safely modify its settings to familiarize yourself with the Subtopic search filters (AMQP), Accept / Reject (Regex) and Unfiltered Items.</li>
+        <li>The Sarra Semina Browser and Subscription Editor does not contain Sarracenia's exhaustive list of configuration possibilities.</li>
+        <li>For further details, please refer to the <em><strong>Sarracenia documentation</strong></em>:<br>
+            <small><a href="https://github.com/MetPX/sarracenia/blob/master/doc/sr_subscribe.1.rst#configurations" target="_blank">https://github.com/MetPX/sarracenia/blob/master/doc/sr_subscribe.1.rst#syntaxe-des-options <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
+        </li>
+        </ul>
+</div>
+
+====================================================================================================
+
 <div id="fr-filters">
     <h5>ATTENTION</h5>
     <p> Les filtres de <em><strong>Sarracenia</strong> sont sensibles à la casse (Majuscules&nbsp;/&nbsp;minuscules).</em><br>
@@ -126,8 +186,8 @@
         <strong>Règles AMQP</strong><br>
         - Ces règles sont <strong>sensibles à la casse</strong> et sont appliquées au catalogue sélectionné.<br>
         - Le filtre AMQP ne peut jamais commencer par un point (<strong style="color: #f00;"> . </strong>)<br>
-        - L'étoile est utilisée uniquement entre deux points ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> ) sauf si c'est le premier caractère (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> ) du filtre<br>
-        - Le dièse est toujours précédé d'un point ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> ) sauf si c'est le premier caractère (<strong style="color: #de9226;"> # </strong>) du filtre</p>
+        - L'étoile est utilisée uniquement entre deux points ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> )<br>&nbsp; &nbsp; sauf si c'est le premier caractère du filtre (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> )<br>
+        - Le dièse est toujours précédé d'un point ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> )<br>&nbsp; &nbsp; sauf si c'est le premier caractère du filtre (<strong style="color: #de9226;"> # </strong>)</p>
     <p>
         Il y a plusieurs manières de personnaliser les règles AMQP de ce champ.</p>
     <p style="padding-left:20px">
@@ -160,8 +220,8 @@
         <strong>AMQP rules</strong><br>
         - These rules are <strong>case sensitive</strong> and are appliyed to the selected catalogue.<br>
         - The AMQP filter can never start with a dot (<strong style="color: #f00;"> . </strong>)<br>
-        - The star wildcard can only be used between two dots ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> ) unless it's the begining character of the filter (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> )<br>
-        - The sharp wildcard is always preceded by a period ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> ) unless it's the begining character of the filter (<strong style="color: #de9226;"> # </strong>)</p>
+        - The star wildcard can only be used between two dots ( <strong style="color: #f00;">.</strong><strong style="color: #2c8e2c;">*</strong><strong style="color: #f00;">.</strong> )<br>&nbsp; &nbsp; &nbsp; unless it's the begining character of the filter (<strong style="color: #2c8e2c;"> *</strong><strong style="color: #f00;">.</strong> )<br>
+        - The sharp wildcard is always preceded by a period ( <strong style="color: #f00;">.</strong><strong style="color: #de9226;">#</strong> )<br>&nbsp; &nbsp; &nbsp; unless it's the begining character of the filter (<strong style="color: #de9226;"> # </strong>)</p>
     <p>
         There are several ways to customize the AMQP rules for this field.</p>
     <p style="padding-left:20px">

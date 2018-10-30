@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-10-12 11:14:24
+  last-modified : 2018-10-29 15:56:00
 -----------------------------------------------------------
 */
 .select2-container--default .select2-selection--multiple { border-radius: 3px; border-color: #ddd; }
@@ -24,7 +24,7 @@ h3     { font-size:1.4em; }
 h4     { font-size:1.3em; }
 p      { font-size: 1em; line-height: 1.2em; margin: 0 1em; padding: .2em; }
 label  { padding-right: 5px; margin: 0; }
-th, td { padding: 1px 0 0 0; }
+th, td { padding: 1px 0 0 0; line-height: 1em; }
 
 .c-vert  { color: green; }
 .c-cyan  { color: cyan; }
@@ -44,11 +44,14 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 
 /* -[ HELPERS ]------------------------------------------ */
 
+ul.notes { padding: 15px !important; margin: 0; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; }
+ul.notes li { margin-left: 20px !important; padding-bottom: 5px; line-height: 1.2em; }
+
 .notif-cookies { background-color: #1092ed; border-radius: 5px; color: #fff; display:none; font-size: 12px; margin-bottom: 10px; padding: 10px 40px; position: relative; text-align: center; }
 .notif-cookies a { color: #fff; }
 .notif-cookies a:hover { cursor: pointer; }
 
-.modal-dialog.modal-sm { width: 770px; }
+.modal-dialog.modal-sm { width: 650px; }
 .stop-search .modal-dialog.modal-sm { max-width: 500px; }
 .modal-dialog.modal-sm .modal-header { padding: 10px 15px; background-color: #09d; }
 .modal-dialog.modal-sm .modal-body { padding: 15px 15px 20px; }
@@ -60,8 +63,14 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .modal-dialog.modal-sm .bootstrap-dialog-message ol,
 .modal-dialog.modal-sm .bootstrap-dialog-message ul { padding-left: 20px; }
 .modal-dialog.modal-sm .bootstrap-dialog-footer-buttons .btn { font-size: 12px; padding: 3px 8px; }
+.modal-dialog.modal-sm .configSampleSelector { margin: 0 auto; text-align: center; }
+.modal-dialog.modal-sm .configSampleSelector span { display:inline-block; font-size: 14px; font-weight: bold; color: #379; padding:10px; }
+.modal-dialog.modal-sm .configSampleSelector #configSampleSelector { width: auto; display:inline-block; }
+
 .modal.bootstrap-dialog.type-primary.fade.in.size-small { padding-right: 0 !important; }
 .modal.bootstrap-dialog.type-danger .modal-header { background-color: #d00; }
+.modal.bootstrap-dialog.modal-xs .modal-dialog.modal-sm { width: 500px; margin: 20px auto; }
+
 
 .collapsable { margin: 0 1em; padding: .2em; }
 .collapse-btns { text-align: center; }
@@ -97,12 +106,12 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .title-btns button { margin-bottom: 2px; }
 .title-btns span { display: inline-block; padding: 0 0 2px 4px; white-space: nowrap; margin-right: 5px; }
 .title-btns .btn { padding: 5px 8px; }
-.title-btns #help,
-.title-btns #switchLang { display: none; }
-.title-btns #switchLang.en { border-color: #78c; color: #00c; outline: none; }
-.title-btns #switchLang.fr { border-color: #f77; color: #f33; outline: none; }
-.title-btns #switchLang.en:hover { background-color: #8bf; }
-.title-btns #switchLang.fr:hover { background-color: #fcc; }
+/* .title-btns #help,
+.title-btns #switchLang { display: none; } */
+.title-btns #switchLang.en { border-color: #78c; color: #05d; outline: none; }
+.title-btns #switchLang.fr { border-color: #f77; color: #d22; outline: none; }
+.title-btns #switchLang.en:hover { background-color: #cef; border-color: #57b; color: #009; }
+.title-btns #switchLang.fr:hover { background-color: #fcc; border-color: #b22; color: #900; }
 
 .entry:not(:first-of-type) { margin-top: 5px; }
 
@@ -113,25 +122,39 @@ noscript h2 small { color: #fc0; background-color: #060; padding: 2px 10px; font
 .input-group-addon .fa { color: #07d; }
 .glyphicon { font-size: 12px; }
 .glyphicon.input-group-addon { top: 0; }
-.glyphicon.input-group-addon:hover { cursor: pointer; }
+.glyphicon.input-group-addon:hover { cursor: pointer; color: #080; }
 table.accept_unmatch.filter td { position: relative; }
+
+#btnConfigurations { border: 1px solid #ddd; background-color: #fefefe; color: #777; border-radius: 0 3px 3px 0 }
+#btnConfigurations .fa { color: #444; }
+#btnConfigurations:hover { border-color: #bbb; }
+#btnConfigurations:hover .fa { color: #080; }
+#btnConfigurations:focus { outline: 0 !important; }
+#btnConfigurations:active { box-shadow: none; -webkit-box-shadow: none; background-color: #f6f6f6; border-color: #ccc; }
+
+#btnResetSubtopic { background-color: #e6e6e6; color: #444; border: none; cursor: pointer; display: inline; height: 100%; width: 27px; }
+#btnResetSubtopic:disabled { background-color: #f6f6f6; color: #ddd; cursor: default; }
+#btnResetSubtopic:disabled .glyphicon-remove { color: #ddd; }
+#btnResetSubtopic .glyphicon-remove { color: #f00; }
 #btnSearch { background-color: #e6e6e6; color: #444; position: absolute; top: 0; right: 0; }
 #btnSearch:hover { cursor: pointer; }
 #btnSearch:disabled { background-color: #f6f6f6; color: #bbb; cursor: default; }
 #btnSearch:disabled .glyphicon-search { color: #aaa; }
 #btnSearch .glyphicon-search { color: #090; }
-#btnSearchReset { background-color: #e6e6e6; color: #444; border: none; cursor: pointer; display: inline; /* height: 100%; width: 27px; */ }
-#btnSearchReset:disabled { background-color: #f6f6f6; color: #ddd; cursor: default; }
-#btnSearchReset:disabled .glyphicon-remove { color: #ddd; }
-#btnSearchReset .glyphicon-remove { color: #f00; }
 
+select.custom {
+  line-height: 2; vertical-align: middle; background: #fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E") no-repeat right .75rem center;
+  background-size: 8px 10px; -webkit-appearance: none; -moz-appearance: none; appearance: none;
+}}
 select.input-sm { line-height: 1.3; height: 28px; }
-.btn-group-sm>.btn, .btn-sm { line-height: 1.3; padding: 5px 8px; }
+.btn-group-sm>.btn, .btn-sm { line-height: 1.3; padding: 5px 10px; }
 .input-group-sm>.form-control,
 .input-group-sm>.input-group-addon,
-.input-group-sm>.input-group-btn>.btn { line-height: 1.3; height: 27px; padding: 5px 8px; }
-.subtopic.subtopic.filter .input-group-addon { padding: 0; width: 28px; }
+.input-group-sm>.input-group-btn>.btn { line-height: 1.3; height: 27px; padding: 5px 10.5px; }
+.input-group-sm>.input-group-btn>.btn-add { padding: 5px 8px; }
 .input-group-sm>.text.form-control { font-size: 11px; }
+.subtopic.filter .input-group-addon { padding: 0; width: 28px; }
+.subtopic.subtopic.filter .selectize-input { border-radius: 0; }
 .btn .fa.checked { display:none; }
 .btn .fa.unchecked { display:inline-block; }
 .btn.active .fa.checked { display:inline-block; }
@@ -139,14 +162,14 @@ select.input-sm { line-height: 1.3; height: 28px; }
 
 .input-group-sm>.catalogue-short-list { padding: 1px; }
 .input-group-sm>.catalogue-short-list .dropdown-toggle { padding: 3px 6px; }
-.input-group-sm>.catalogue-short-list .dropdown-menu   { padding: 5px; left: auto; /*right: -20px; */ max-height: 360px !important; }
+.input-group-sm>.catalogue-short-list .dropdown-menu   { padding: 5px; left: auto; max-height: 360px !important; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 12px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li.header { clear: both; display: block; }
 .input-group-sm>.catalogue-short-list .dropdown-menu li.header h3 { font-size: .9em; color: #35d; border-bottom: 1px solid #bcd; background-color: #def; padding: 5px; margin: 3px; }
 .input-group-sm>.catalogue-short-list .dropdown-menu .form-control { width: 100%; border-radius: 4px; padding: 0px 6px; font-size: 12px;  margin:0 auto; margin-bottom: 5px; height: 30px; }
 
-#catalogueSelector { display: inline-block; width: auto; max-width: 195px; margin-bottom: 0; padding: 2px 5px; height: 27px; }
-#catalogues { margin: 3px; }
+#catalogueSelector { display: inline-block; width: auto; box-shadow: none; max-width: 195px; margin-bottom: 0; padding: 2px 20px 2px 5px; height: 27px; border-radius: 0 3px 3px 0; }
+#catalogueSelector:hover { border-color: #777; cursor: pointer; }
 #info-catalogue span { background-color: #fe9; padding: 1px 3px; }
 #info-catalogue span span { font-weight: bold; }
 
@@ -173,11 +196,11 @@ select.input-sm { line-height: 1.3; height: 28px; }
   .modal-dialog.modal-sm { width: auto; min-width: 340px; }
   .title-logo { margin-bottom: 5px; }
   .title-btns { text-align: center !important; min-height:25px; line-height:25px; }
-  .title-btns .btn { padding: 2px 8px; }
+  .title-btns .btn { padding: 3px 8px; }
 }
 
 @media (max-width: 500px) {
-  .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: /*'BenchNine',*/ sans-serif; font-weight: 500; line-height: 2; }
+  .input-group-sm>.catalogue-short-list .dropdown-menu li a { font-size: 13px; font-family: sans-serif; font-weight: 500; line-height: 2; }
 }
 
 @media (max-width: 490px) {
@@ -211,6 +234,10 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 /* PANES [ Folders | Subtopics | Files | Results ] */
 #folders #folders-search { padding: 5px; }
 #folders #folders-input { font-size: 11px; line-height: 1em; height: 2.5em; }
+#btn-filters { padding: 5px 10px;￼ }
+#btn-filters,     #btn-topic .btn-topic:last-child { border-radius: 0 3px 3px 0;￼ }
+#btn-filters .fa, #btn-topic .fa { margin-right: 3px; }
+
 #input-subtopics { width: 100%; height: 27px; background-color: #fff; padding: 0px 5px; border: 1px solid #ccc; box-shadow: inset 0 1px 1px rgba(0,0,0,.075); }
 
 #files { overflow: hidden; }

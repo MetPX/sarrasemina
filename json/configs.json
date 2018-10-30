@@ -1,0 +1,144 @@
+{
+    "example" : [
+        {
+            "title": {
+                "fr":"Bulletins OMI",
+                "en":"WMO Bulletins"},
+            "comment": {
+                "fr":"# Ceci est un flux des bulletins de l'OMI (un ensemble appelé AMIS dans le passé)",
+                "en":"# This is a feed of WHO bulletins (a set called AMIS in the old times)"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"5",
+                    "hint":{
+                        "fr":"# La valeur par défaut est 1. Ce n'est pas assez pour ce cas-ci",
+                        "en":"# The default value is 1. It is not enough for this case"
+                        }
+                },{
+                    "name":"mirror", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.WMO-BULLETINS.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"acceptReject", "val":[[".*",true]],
+                    "hint":{
+                        "fr":"Accepter tous les bulletins de l'OMI",
+                        "en":"Accept all WHO Bulletins"
+                        }
+                },{
+                    "name":"unmatched", "val":false,
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Bulletins OMI 2",
+                "en":"WMO Bulletins 2"},
+            "comment": {
+                "fr":"# Ceci est un flux des bulletins de l'OMI (un ensemble appelé AMIS dans le passé)",
+                "en":"# This is a feed of WHO bulletins (a set called AMIS in the old times)"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"5",
+                    "hint":{
+                        "fr":"# La valeur par défaut est 1. Ce n'est pas assez pour ce cas-ci",
+                        "en":"# The default value is 1. It is not enough for this case"
+                        }
+                },{
+                    "name":"mirror", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.BULLETINS.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"acceptReject", "val":[[".*",true]],
+                    "hint":{
+                        "fr":"Accepter tous les bulletins de l'OMI",
+                        "en":"Accept all WHO Bulletins"
+                        }
+                },{
+                    "name":"unmatched", "val":true,
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        }
+    ]
+}

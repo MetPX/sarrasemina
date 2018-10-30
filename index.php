@@ -6,7 +6,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-10-15 11:50:46
+  last-modified : 2018-10-30 07:48:51
 
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
@@ -77,8 +77,8 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 <div class="col-sm-4 title-text"></div>
                 <div class="col-sm-3 title-btns text-right">
                     <span style="white-space: nowrap">
-                        <button type="button" class="btn btn-default btn-sm help" id="about" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about"></button>                    
-                        <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title=""></button>
+                        <button type="button" class="btn btn-default btn-sm help" id="about" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>                    
+                        <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
                     </span>
                 </div>
             </div>
@@ -96,10 +96,10 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                 <p id="logger"></p>
             </div>
             <ul class="nav nav-tabs">
-                <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab"></a></li>
-                <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab"></a></li>
-                <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab"></a></li>
-                <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab"></a></li>
+                <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab" tabindex="-1"></a></li>
+                <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab" tabindex="-1"></a></li>
+                <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab" tabindex="-1"></a></li>
+                <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab" tabindex="-1"></a></li>
             </ul>
 <?php /* -----------------------------------------------------------------------------------------------------------------------------------------------------------------*/ ?>
 <?php /*BUILDER PANE
@@ -113,24 +113,39 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                             <div class="sarra-configs col-xm-12 accepts-rejects">
                                 <table>
                                     <tr>
-                                        <td width="90" style="vertical-align: middle; padding-top: 10px;"><label class="label-filters" data-label="unchecked">Filters: </label></td>
-                                        <td>
-                                            <div style="display:inline-block; position: relative; top: 10px; ">
+                                        <td width="90" style="vertical-align: middle; padding-top: 10px;"><label class="label-catalogue">Catalogue : </label></td>
+                                        <td style="vertical-align: middle; padding-top: 10px;">
+                                            <div style="display:inline-block;" class="pull-left">
                                                 <div class="input-group input-group-sm disabled">
-                                                    <span id="help-filters" class="help filters input-group-addon glyphicon glyphicon-question-sign" data-help="filters" data-toggle="tooltip" data-placement="right"></span>
-                                                    <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                                        <label class="btn btn-primary btn-regex_case" data-label="regex_case" style="border-radius: 0 3px 3px 0;">
-                                                            <input type="checkbox" name="checkbox-regex_case" id="checkbox-regex_case" autocomplete="off">
-                                                            <i class="fa fa-square unchecked" aria-hidden="true"></i>
-                                                            <i class="fa fa-check-square checked" aria-hidden="true"></i>
-                                                            <span id="caseInsensitive">Case insensitive</span>
-                                                        </label>
+                                                    <span id="help-catalogues" class="help catalogues input-group-addon glyphicon glyphicon-question-sign" data-help="catalogues" data-toggle="tooltip" data-placement="right"></span>
+                                                    <span id="catalogues"></span>
+                                                </div>
+                                            </div>
+                                            <div style="display: inline-block; margin-left: 20px;" class="input-group input-group-sm pull-right">
+                                                <div class="input-group input-group-sm disabled">
+                                                    <span id="help-configs" class="help configs input-group-addon glyphicon glyphicon-question-sign" data-help="configs" data-toggle="tooltip" data-placement="left"></span>
+                                                    <div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                        <button class="btn-default btn-sm" id="btnConfigurations">Configurations... <i class="fa fa-file-text-o" aria-hidden="true"></i></button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div style="display: inline-block;">
-                                            <label style="padding-left: 5px" class="label-catalogue" for="selectCatalogue">Catalogue : </label>
-                                            <span id="catalogues"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="90"><label class="label-filters" data-label="unchecked">Filters: </label></td>
+                                        <td>
+                                            <div style="display:inline-block;" class="pull-left">
+                                                <div class="input-group input-group-sm disabled">
+                                                    <span id="help-filters" class="help filters input-group-addon glyphicon glyphicon-question-sign" data-help="filters" data-toggle="tooltip" data-placement="right"></span>
+                                                    <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
+                                                        <button id="btn-filters" class="btn btn-primary" data-label="filters">
+                                                            <input type="checkbox" id="checkbox-filters" name="checkbox-filters" autocomplete="off" tabindex="-1">
+                                                            <i class="fa fa-square unchecked" aria-hidden="true"></i>
+                                                            <i class="fa fa-check-square checked" aria-hidden="true"></i>
+                                                            <span id="caseInsensitive">Case insensitive</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -143,18 +158,21 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                             <div class="input-group input-group-sm disabled">
                                                 <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-help="topic" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                                    <label class="btn btn-primary btn-topic active" data-label="v02.post" style="border-radius: 0;">
-                                                        <input type="radio" name="options" id="option1" autocomplete="off" checked>
-                                                        <i class="fa fa-circle-thin unchecked" aria-hidden="true"></i>
-                                                        <i class="fa fa-check-circle checked" aria-hidden="true"></i>
-                                                        post
-                                                    </label>
-                                                    <label class="btn btn-primary btn-topic" data-label="v02.report">
-                                                        <input type="radio" name="options" id="option2" autocomplete="off">
-                                                        <i class="fa fa-circle-thin unchecked" aria-hidden="true"></i>
-                                                        <i class="fa fa-check-circle checked" aria-hidden="true"></i>
-                                                        report
-                                                    </label>
+                                                    <span id="btn-topic" class="input-group-btn btn-group-sm" data-selected="post" data-toggle="buttons">
+                                                        <button class="btn btn-primary btn-topic post active" data-selected="post" checked tabindex="-1">
+                                                            <input type="radio" name="options" autocomplete="off">
+                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                            post
+                                                        </button>
+                                                        <button class="btn btn-primary btn-topic report" data-selected="report" tabindex="-1">
+                                                            <input type="radio" name="options" autocomplete="off">
+                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                            report
+                                                        </button>
+                                                    </span>
+
                                                 </div>
                                             </div>
                                         </td>
@@ -170,7 +188,7 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                             <div class="subtopic filter input-group input-group-sm disabled">
                                                 <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
                                                 <input id="input-subtopics" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
-                                                <span class="input-group-addon"><button id="btnSearchReset" class="input-group-addon" disabled><span class="glyphicon glyphicon-remove"></span></button></span>
+                                                <span class="input-group-addon"><button id="btnResetSubtopic" class="input-group-addon" disabled tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button></span>
                                             </div>
                                         </td>
                                     </tr>
@@ -189,12 +207,12 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                                 <div class="filter input-group input-group-sm">
                                                     <span class="input-group-btn btn-group-sm" data-toggle="buttons">
                                                         <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
-                                                            <input type="radio" name="options" id="option1" autocomplete="off">
+                                                            <input type="radio" name="options" autocomplete="off">
                                                             <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
                                                             <i aria-hidden="true" class="fa fa-check-circle checked"></i>
                                                         </button>
                                                         <button class="btn btn-reject-regex btn-danger" tabindex="-1">
-                                                            <input type="radio" name="options" id="option2" autocomplete="off">
+                                                            <input type="radio" name="options" autocomplete="off">
                                                             <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
                                                             <i aria-hidden="true" class="fa fa-check-circle checked"></i>
                                                         </button>
@@ -217,12 +235,12 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
                                                 <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-help="accept_unmatch" data-toggle="tooltip" data-placement="right"></span>
                                                 <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
                                                     <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
-                                                        <input type="radio" name="options" id="option1" autocomplete="off">
+                                                        <input type="radio" data-toggle="button" name="options" id="option1" autocomplete="off">
                                                         <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
                                                         <i aria-hidden="true" class="fa fa-check-circle checked"></i>
                                                     </label>
                                                     <label class="btn btn-reject-unmatch btn-danger active" tabindex="-1">
-                                                        <input type="radio" name="options" id="option2" autocomplete="off">
+                                                        <input type="radio" data-toggle="button" name="options" id="option2" autocomplete="off">
                                                         <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
                                                         <i aria-hidden="true" class="fa fa-check-circle checked"></i>
                                                     </label>
@@ -252,13 +270,6 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         </div>
         <a id="back-to-top" href="#" class="btn btn-primary back-to-top" role="button" title="Click to return on the top page" data-toggle="tooltip" data-placement="left"><span class="glyphicon glyphicon-chevron-up"></span></a>
 <?php /*SCRIPTS
-        
-        <script src="/js/plugins/boomerang/boomerang.js"></script>
-        <script src="/js/plugins/boomerang/plugins/auto-xhr.js"></script>
-        <script src="/js/plugins/boomerang/plugins/bw.js"></script>
-        <script src="/js/plugins/boomerang/plugins/rt.js"></script>
-        <script src="/js/plugins/boomerang/plugins/spa.js"></script>
-        <script src="/js/plugins/boomerang/plugins/zzz-last-plugin.js"></script>
         -------------------------------------------------------------------- */ ?>
         <script>
             if( unSupported_IE ) {
@@ -283,10 +294,15 @@ $v = '?v'.date("YmdHis"); // TODO remove this DEV snippet used to clear cache
         <script src="/js/plugins/download.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
-
-        <script src="/js/plugins/selectize/js/selectize.js"></script>
+        <script src="/js/plugins/selectize/js/selectize.js<?= $v ?>"></script>
         <script>
-            var jsonURLs = ['/data/', '/json/ui-texts.json<?= $v ?>', '/json/ui-docs.json<?= $v ?>', '/json/brokers.json<?= $v ?>'];
+            var jsonURLs = [
+                '/data/', 
+                '/json/ui-texts.json<?= $v ?>', 
+                '/json/ui-docs.json<?= $v ?>', 
+                '/json/brokers.json<?= $v ?>',
+                '/json/configs.json<?= $v ?>'
+                ];
         </script>
         <script src="/js/main.js<?= $v ?>"></script>
     </body>

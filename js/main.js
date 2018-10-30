@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-10-15 12:41:23
+// last-modified : 2018-10-29 15:54:10
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -57,11 +57,27 @@ class CancellationTokenSource {
 // ---------------------------------------------------------------------
 
 const
-    L    = '\n',
+    L      = '\n',
     FILTER = {
-        CHAR_DELIMITER : '|',
-        MAX_SUBTOPICS  : null,                  // User may enter an unlimited number of subtopics...
-        INPUT_AMQP_SRC : '#input-subtopics'
+        CASE_INSENSITIVE   : false,
+        CHAR_DELIMITER     : '|',
+        MAX_SUBTOPICS      : null,                  // User may enter an unlimited number of subtopics...
+        INPUT_AMQP_SRC     : '#input-subtopics',
+        INPUT_ACCEPT_REJECT: '.input-accept_reject',
+        BTN_ACCEPT_REJECT  : '.btn-accept-reject',
+        BTN_UNMATCH        : '.btn-unmatch'
+    },
+    CATALOG = {
+        MAX            : 5,                                             // Display only the latest MAX (5) Catalogues available; i.e.: ignore the rest (older ones)
+        NAME           : '',
+        LOADED         : false,
+        LOADTIME       : 0,
+        FILETYPE       : 'toc',
+        DATA_SEPARATOR : '|',
+        id_NB_FILES    : 0,
+        id_RANGE_START : 1,
+        id_RANGE_STOP  : 2,
+        id_TOTAL_SIZE  : 3
     },
     CONFIG = {
         options : {
@@ -71,15 +87,19 @@ const
             inflight      : ".tmp",                                      // default: .tmp  - or NONE if post_broker is set
             instances     : "1",                                         // default:  1    - add more instances if there is lagging
             mirror        : "True",                                      // default:  True - will build a mirror directory structure; False: will put all files in same directory
+            topic_version : "v02.",
+            topic         : "post",
             topic_prefix  : "v02.post",
             subtopic      : [],
             accept_reject : [],
             accept_unmatch: "False"
         },
-        setup   : ( newOptions = {} ) => {
+        cookie   : getConfigCookie(),
+        samples  : {},
+        setup    : ( newOptions = {} ) => {
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
         },
-        write   : ( includeHints = false, includeMan = false ) => {
+        write    : ( includeHints = false, includeMan = false ) => {
             let config=getConfigHeader(includeMan), pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[];
 
             subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
@@ -88,7 +108,7 @@ const
             }
             
             $( ".input-accept_reject" ).each( (index, item)  => { let filter = $(item).val(); if( filter ) accept_rejects.push( [$(item).data('ar'),filter] ); });
-            newOptions.topic_prefix   = $(".label-topic").data('label');
+            newOptions.topic_prefix   = CONFIG.options.topic_version + $(".btn-topic").data('selected');
             newOptions.subtopic       = subtopics;
             newOptions.accept_reject  = accept_rejects;
             newOptions.accept_unmatch = $("#btn-accept_unmatch").data('accept_unmatch');
@@ -105,6 +125,7 @@ const
                             if( includeHints ) config += t.confComment[opt];
                         }
                         break;
+                    case 'regex':
                     case 'accept_reject':
                         if( CONFIG.options[opt].length > 0 ) {
                             for( let i=0; i<CONFIG.options[opt].length; i++ ) {
@@ -123,17 +144,6 @@ const
             });
             return config;
         }
-    },
-    CATALOG = {
-        MAX            : 5,                                             // Display only the latest MAX (5) Catalogues available; i.e.: ignore the rest (older ones)
-        NAME           : '',
-        LOADTIME       : 0,
-        FILETYPE       : 'toc',
-        DATA_SEPARATOR : '|',
-        id_NB_FILES    : 0,
-        id_RANGE_START : 1,
-        id_RANGE_STOP  : 2,
-        id_TOTAL_SIZE  : 3
     },
     GUI = {
         state           : 0,
@@ -168,9 +178,9 @@ const
         CV: ['<strong class="c-vert">'  , '</strong>']
     };
     
-var
-    t       = {},                                                       // GUI's text container
-    selectedFilesCatalogue,                                             // ### NOTE ### Catalogue is splitted in two data files: .json (contains folder paths) and .toc (contains file names)
+var t               = {},                                               // GUI's text container               found in /json/ui-texts.json
+    configExamples  = {},                                               // Bunch of selected config examples  found in /json/configs.json
+    selectedFilesCatalogue,                                             // Catalogue, build from 2 data files found in /data/AAAAMMJJ/catalogue.json (paths) and catalogue.toc (file names)
     bigData_Folders = [],                                               // Array of objects - folders data (catalogue.json)
     bigData_Files   = [],                                               // Array of objects - files   data (catalogue.toc - byterange)
     GUIstate        = 0,
@@ -234,29 +244,6 @@ var
 
 // ---------------------------------------------------------------------
 
-// Test if a config is available in cookie.
-/** /
-
-// Serialize user's config
-Person.prototype.toJson = function() {
-    return JSON.stringify({age: this.age});
-};
-
-// Similar for deserializing:
-Person.fromJson = function(json) {
-    var data = JSON.parse(json); // Parsing the json string.
-    return new Person(data.age);
-};
-
-// The usage would be:
-var serialize = p1.toJson();
-var _p1 = Person.fromJson(serialize);
-alert("Is old: " + _p1.isOld());
-/**/
-
-
-// ---------------------------------------------------------------------
-
 // 
 // Returns server origin
 // Since development domains do not host product files,
@@ -268,95 +255,162 @@ function getOrigin() {
 }
 
 function getConfigHeader( includeMan ) {
-    let regxWarning  = $("#checkbox-regex_case").is(":checked") ? t.confComment.regex_case:"";
-    let configHeader = regxWarning + t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
+    let regexWarning  = ( CONFIG.cookie.filters ) || false;
+    let configHeader = regexWarning + t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
     if( includeMan ) {
         let url = t.confManual.baseURL.split('|');
         configHeader = configHeader.replace('(git)', `<a href="${url[0]}" target="_blank">${url[0]}</a>`);
     }
     return configHeader;
 }
+
+// Manuals are stores in external file: 
 function getConfigManual(opt) {
     let man = t.confManual[opt];
     if( man ) {
         let url = t.confManual.baseURL.split('|'),
             lnk = man.split('|'),
-//             out = L+'# <a href="'+url[0]+lnk[0]+'" target="_blank">'+url[1]+lnk[1]+' <i class="fa fa-external-link" aria-hidden="true"></a>';
             out = url[1] +' <a href="'+url[0]+lnk[0]+'" target="_blank">'+lnk[1]+'</a>';
-//     console.log('opt[',opt,']\nman[',man,']\nurl[',url,']\nlnk[',lnk,']\nout[',out,']\n');
+    // console.log('opt[',opt,']\nman[',man,']\nurl[',url,']\nlnk[',lnk,']\nout[',out,']\n');
         return out;
     }
 }
+
+// ---------------------------------------------------------------------
+// Retrieve config if it's in cookie.
+
+// Json Serializer
+function serializeData( data ) {
+    return JSON.stringify( data );
+}
+
+// Json Deserialiser 
+function deserializeData( json ) {
+    let data = (json)? JSON.parse( json ) : {} ;
+    return data;
+}
+
+function getConfigCookie() {
+let DEBUG = true;
+/*#*/if( DEBUG ){ console.group(me()); }/*#*/
+    let jsonStr = $.cookie('config');
+    let config  = (jsonStr) ? deserializeData( jsonStr ) : {};
+/*#*/if( DEBUG ){ console.log("getConfigCookie[",config,"]"); console.groupEnd();};/*#*/
+    return config;
+}
+
+function setConfigCookie( withSampleConfigIndex=-1 ) {
+let DEBUG = true;
+/*#*/if( DEBUG ){ console.group(me()); }/*#*/
+
+    CATALOG.LOADED = ( withSampleConfigIndex > -1 ) || CATALOG.LOADED;
+    if( !CATALOG.LOADED ){ console.groupEnd(); return; }
+
+    let _5_Days   = 1000*60*60*24*5;
+    let in_5_Days = new Date();
+    let filters   = getFilters();
+    let config      = {
+            filters     : $("#checkbox-filters").is(':checked'),
+            catalogId   : $("#catalogueSelector").prop('selectedIndex'),
+            topic       : $("#btn-topic").data("selected"),
+            subtopics   : filters.shift()[0].split("|"),
+            unmatched   : filters.pop()[1],
+            acceptReject: filters
+        };
+
+    // If user chooses to load a sample config, alter existing one with it
+    if( withSampleConfigIndex > -1 ) {
+        let cs = CONFIG.samples[withSampleConfigIndex];
+        config.usedSample  = `#\n# ${cs.title}\n#${cs.comment}`
+        $.each(cs.options, (i,o) => { (o.val !== "") ? (config[o.name] = o.val):"" });
+/*#*/if( DEBUG ){ console.log("config",config); };/*#*/
+    }
     
-function setSubtopicFilters( filterOptions=[], groupOptions=[] ) {
-    
-    var eventHandler = function get (name) {
+    // in_5_Days.setTime( in_5_Days.getTime() + _5_Days );
+    // $.cookie( 'config', serializeData( configs ), { expires: in_5_Days } );
+    $.cookie( 'config', serializeData( config ) );
+    CONFIG.cookie = config;
+
+/*#*/if( DEBUG ){ console.groupEnd(); console.log("CONFIG.cookie",CONFIG.cookie); };/*#*/
+}
+
+// ---------------------------------------------------------------------
+// Refill filters with user's configs found in session cookie
+
+function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[] ) {
+// let DEBUG = true;
+/*#*/if( DEBUG ){ console.group(me()); console.log("filterOptions[",filterOptions,"]"); console.log("groupOptions[",groupOptions,"]"); console.log("subtopics[",subtopics,"]"); };/*#*/
+
+    var eventHandler = function get( name ) {
         return function give() {
             if( name === "onChange" ) {
-                $('#btnSearchReset').prop('disabled', ($(FILTER.INPUT_AMQP_SRC).val() === "") );
                 setFilterSubtopic( isValidAMQP( $(FILTER.INPUT_AMQP_SRC).val() ) ? 'enable':'disable' );
             }
-            /** /
-            if( $selectize[0] )
-                if( $selectize[0].selectize )
-                    if( $selectize[0].selectize.$activeItems ) {
-                        console.log( me(), name, $selectize[0].selectize.$activeItems);
-                        $selectize[0].selectize.$activeItems;
-                    }
-                    else
-                        console.log( me(), name, $selectize[0].selectize);
-                else
-                    console.log( me(), name, $selectize[0]);
-            else
-                console.log( me(), name );
-            /**/
         };
     };
-    
+
     if( $selectize.length ) {
         $selectize[0].selectize.setValue( '' );
         $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.destroy();
         $selectize = {}
     }
-    
-    $selectize =
-    $(FILTER.INPUT_AMQP_SRC).selectize({
-         persist          : true
-        ,diacritics       : true
-        ,closeAfterSelect : true
-        ,plugins          : ['remove_button','restore_on_backspace','drag_drop']
-        ,maxItems         : FILTER.MAX_SUBTOPICS
-        ,delimiter        : FILTER.CHAR_DELIMITER
-        ,placeholder      : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
-        ,options          : filterOptions
-        ,optgroups        : groupOptions
-        ,optgroupField    : 'path'
-        ,valueField       : 'filter'
-        ,labelField       : 'filter'
-        ,searchField      : ['filter']
-        ,create           : (input) => { return { path: 'X', filter: input }; }
-        ,render           : {
-             optgroup_add   : (input) => { return { id:'X', data: input }; }
-            ,optgroup_header: (data, escape) => { return '<div class="optgroup-header">' + escape(data.label) + '</div>'; }
-            ,item   : (item, escape) => {
-                if( item.filter ) {
-                    let classAMQP = !isValidAMQP( item.filter, false ) ? ' c-ERR':'';
-                    return `<div class="editable-click item${classAMQP}">${escape(item.filter)}</div>`;
+
+    $selectize = $(FILTER.INPUT_AMQP_SRC).selectize(
+        {
+            persist          : true
+            ,diacritics       : true
+            ,closeAfterSelect : true
+            ,plugins          : ['remove_button','restore_on_backspace','drag_drop']
+            ,maxItems         : FILTER.MAX_SUBTOPICS
+            ,delimiter        : FILTER.CHAR_DELIMITER
+            ,placeholder      : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
+            ,options          : filterOptions
+            ,items            : subtopics
+            ,optgroups        : groupOptions
+            ,optgroupField    : 'path'
+            ,valueField       : 'filter'
+            ,labelField       : 'filter'
+            ,searchField      : ['filter']
+            ,create           : (input) => { return { path: 'X', filter: input }; }
+            ,render           : {
+                optgroup_add   : (input) => { return { id:'X', data: input }; }
+               ,optgroup_header: (data, escape) => { return '<div class="optgroup-header">' + escape(data.label) + '</div>'; }
+               ,item   : (item, escape) => {
+                    if( item.filter ) {
+                        let classAMQP = !isValidAMQP( item.filter, false ) ? ' c-ERR':'';
+                        return `<div class="editable-click item${classAMQP}">${escape(item.filter)}</div>`;
+                    }
                 }
             }
-        }
-        ,onChange        : eventHandler('onChange')
-        ,onItemAdd       : eventHandler('onItemAdd')
-        ,onItemRemove    : eventHandler('onItemRemove')
-        ,onOptionAdd     : eventHandler('onOptionAdd')
-        ,onOptionRemove  : eventHandler('onOptionRemove')
-        ,onDropdownOpen  : eventHandler('onDropdownOpen')
-        ,onDropdownClose : eventHandler('onDropdownClose')
-        ,onFocus         : eventHandler('onFocus')
-        ,onBlur          : eventHandler('onBlur')
-        ,onInitialize    : eventHandler('onInitialize')
-    });
+            ,onChange        : eventHandler('onChange')
+            ,onItemAdd       : eventHandler('onItemAdd')
+            ,onItemRemove    : eventHandler('onItemRemove')
+            ,onOptionAdd     : eventHandler('onOptionAdd')
+            ,onOptionRemove  : eventHandler('onOptionRemove')
+            ,onDropdownOpen  : eventHandler('onDropdownOpen')
+            ,onDropdownClose : eventHandler('onDropdownClose')
+            ,onFocus         : eventHandler('onFocus')
+            ,onBlur          : eventHandler('onBlur')
+            ,onInitialize    : eventHandler('onInitialize')
+        });
 
+        
+    let count      = 1;
+    let btnRegex   = { accept_reject: { true:".btn-accept-regex", false:".btn-reject-regex" }, unmatched: { true:".btn-accept-unmatch", false:".btn-reject-unmatch" } };
+    let regexClass = { true:".btn-accept-regex", false:".btn-reject-regex" };
+    let accRej_Map = new Map( CONFIG.cookie.acceptReject );
+    $((`.btn-topic.${CONFIG.cookie.topic}`)).trigger("click");
+    accRej_Map.forEach( (val,regex) => { 
+        $(".accept_reject.filters .entry").last().find(".input-accept_reject").val( regex );
+        $(".accept_reject.filters .entry").last().find( btnRegex.accept_reject[val] ).trigger('click');
+        ( count++ < accRej_Map.size ) ? $('.btn-add').trigger('click') : "";
+    });
+    $("#btn-accept_unmatch").find( btnRegex.unmatched[CONFIG.cookie.unmatched] ).trigger('click');
+
+    $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.refreshItems();
+    $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.trigger('onChange');
+
+/*#*/if( DEBUG ){ console.groupEnd();};/*#*/
 }
 
 // ---------------------------------------------------------------------
@@ -421,7 +475,6 @@ function _initialize_() {
     testCookies();
     testBrowserCompatibility();
     
-    
     Promise .all    ( requests )
             .then   ( processData )
             .catch  ( processError );                                    // Load GUI texts  ### MS IE don't support Promise -> Only MS Edge
@@ -435,9 +488,11 @@ function _initialize_() {
         let dataDirs = data[0]; // raw data: need processing
         let GUItexts = data[1];
         let DOCtexts = data[2];
-        var brokers  = data[3];
+        let brokers  = data[3];
+        let configs  = data[4];
         let dirBase  = jsonURLs[0];
         let catalogs = [];
+
         $(dataDirs).find('a[href$="/"]').each( function(){ 
             let jUrl = $(this).attr('href');
             if( jUrl !== "/" ) {
@@ -451,6 +506,7 @@ function _initialize_() {
         $("#title")                .html(t.title);
         $(".title-text")           .html(t.titleHeader);
         $(".label-filters")        .html(t.filters._        +t.comma);
+        if( CONFIG.cookie.filters ) { $("#checkbox-filters").parent(".btn").addClass('active'); }
         $("#caseInsensitive")      .html(t.filters.caseInsensitive);
         $(".label-topic")          .html(t.topic            +t.comma);
         $(".label-subtopic")       .html(t.subtopic         +t.comma);
@@ -458,11 +514,13 @@ function _initialize_() {
         $(".label-accept_reject")  .html(wrap(t.accept,    TAG.cV) +t.comma);
         $(".input-accept_reject")  .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
         $(".label-accept_unmatch") .html(wrap(t.reject,    TAG.cR) +t.comma);
-        $(".label-catalogue")      .html(t.selectedCatalogue+t.comma);
+        $(".label-catalogue")      .html(t.catalog          +t.comma);
 
         $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
-        $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip().show();
+        $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip();
         
+        $(".help.catalogues")      .attr("title", t.help.tip +" - "+ t.help.title.catalogues)     .data("title", t.help.title.catalogues)     .tooltip();
+        $(".help.configs")         .attr("title", t.help.tip +" - "+ t.help.title.configs)        .data("title", t.help.title.configs)        .tooltip();
         $(".help.filters")         .attr("title", t.help.tip +" - "+ t.help.title.filters)        .data("title", t.help.title.filters)        .tooltip();
         $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
         $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)       .data("title", t.help.title.subtopic)       .tooltip();
@@ -485,19 +543,14 @@ function _initialize_() {
             
             let options = catalogs.map( dirName => `<option value="${dirBase}${dirName}/catalogue.json">${dirName}</option>` ).join('');
             let mySelector = `
-            <select id="catalogueSelector" class="form-control input-sm">
+            <select id="catalogueSelector" class="custom form-control input-sm" tabindex="-1">
                 ${options}
             </select>`;
 
             $catalogues.html( mySelector );
-            $('#catalogueSelector').on('change', function(){
-                let selectedCatalogue  = $(this).find("option:selected").val();
-                selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG.FILETYPE;
-                loadCatalogueData( selectedCatalogue );
-            });
             
             // Auto select the latest catalog when loading page
-            $('#catalogueSelector').find('option:nth-child(1)').prop('selected',true).trigger('change');
+            // $('#catalogueSelector').find('option:nth-child(1)').prop('selected',true).trigger('change');
         }
         
         if( brokers ) {
@@ -505,9 +558,23 @@ function _initialize_() {
             $.each( brokers, ( filter, thisBroker ) => { rx = new RegExp(filter,'i'); if( thisSubdomain.match(rx) ){ CONFIG.setup( { broker: thisBroker } ); } });
         }
         
+        if( configs ) { // keep low profile memory: only keep user's language strings in the config samples
+            let configSamples = [];
+            $.each( configs.example, ( i, c ) => { 
+                let config = { "title":c.title[LANG], "comment":c.comment[LANG], "options":[] };
+                $.each( c.options, ( j, o ) => { config.options.push( { "name":o.name, "val":o.val, "hint":o.hint[LANG] } ) });
+                configSamples.push( config );
+            });
+            CONFIG.samples = configSamples;
+        }
+        
         showTabPane( PANE.EDITOR );
         activatePane( PANE.EDITOR );
         $('#input-subtopics').attr('placeholder',t.wait.loadingData);
+        CATALOG.LOADED = true;
+        // FIXME 
+        // for now, keep this trigger at last to avoid messing up accept_reject et accept_unmatch CONFIG.cookie 
+        $('#catalogueSelector').find('option:nth-child(1)').prop('selected',true).trigger('change');
     }
     
     function testCookies() {
@@ -625,6 +692,8 @@ function loadCatalogueData( selectedCatalogue ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(selectedCatalogue);};/*#*/
     
+    CATALOG.LOADED = false;
+
     let loadtime = Date.now();
     
     $('#msg').html(`<p class="title-text">${t.wait.loadingData}</p>`).show();
@@ -650,20 +719,22 @@ function loadCatalogueData( selectedCatalogue ) {
             let catalogueName  = cataloguePaths[cataloguePaths.length -2];
             let paneHeader     = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma} ${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}<br>${t.click2AddSubtopic}`;
             CATALOG.NAME       = catalogueName;
-
+            
             setSubtopicDirs();
+
             cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, paneHeader );
             statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
             _init_data_tabs ( total.folders, total.files );
             setGUIstate     ( GUI.STATE_LOADING );
             
-            setFilterSubtopic ( "reset" );
-            
+            // $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.trigger('onChange');
+            setGUIstate(GUI.STATE_READY);
+            CATALOG.LOADED   = true;
             CATALOG.LOADTIME = Date.now() - loadtime;
         },
         error: function( XMLHttpRequest, textStatus, errorThrown ) {
             $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small> >>> ${errorThrown} <<< </small></h2>`).show();
-            console.log( t.error + " - loadCatalogueData("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
+            console.log( t.error + " - load Catalogue Data("+ selectedCatalogue +")",L,'XMLHttpRequest',XMLHttpRequest,L,'textStatus',textStatus,L,'errorThrown',errorThrown );
         }
     });
     
@@ -933,13 +1004,17 @@ function getScrollClusterData( pane = PANE.CATALOGUE, data, paneTitle ) {
 
 // ---------------------------------------------------------------------
 //
-// 
+// Populate the pulldown list of subtopics with products and sources.
 // for products only = only second level dirs -> subtopics are: *.*.dir2.#                   
 // otherwise, show source and products only   -> subtopics are: *.dir1.dir2.#
+//
+// Also, if user has subtopics in cookie, pre-populate input with them.
 
 function setSubtopicDirs() {
     
-    let path="", paths=[], groups=[], paths_P=[], paths_SP=[];
+    let groups=[], 
+        path="", paths=[], paths_P=[], paths_SP=[],
+        subtopics=CONFIG.cookie.subtopics;
     
     bigData_Folders.forEach( (item,index) => {
         
@@ -961,9 +1036,14 @@ function setSubtopicDirs() {
     
     paths_P .forEach( (path,index)=>{ paths.push({path:'P', filter:path}); });
     paths_SP.forEach( (path,index)=>{ paths.push({path:'SP', filter:path}); });
-    groups=[{value: 'P', label:t.products},{value:'SP', label:t.sources_products}, {value: 'X', label:'AUTRES'}];
+    groups=[{value: 'P', label:t.products},{value:'SP', label:t.sources_products}, {value: 'X', label:t.others}];
     
-    setSubtopicFilters( paths, groups );
+    // 
+    // Find which subtopics were not in paths: we'll have to invoke option_add to make them visible
+    if(subtopics)
+        subtopics.forEach( (subtopic, i)=>{ if( subtopic.length > 0 && !( paths_P.includes(subtopic) || paths_SP.includes(subtopic) ) ) { paths.push({path:'X', filter:subtopic}); } });
+    
+    loadConfigCookieSession( paths, groups, subtopics );
 }
 
 
@@ -1134,7 +1214,7 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+reg+']',L,'filesData :',L,filesData);};/*#*/
     
     reg[0][0] = reg[0][0].replace('$','.*$');   // First filter is subtopic. When Accept-Reject filters kiks in, make sure subtopic will allow everything beyond its path.
-    let rxModifier = $("#checkbox-regex_case").is(":checked") ? "i":""
+    let rxModifier = $("#checkbox-filters").is(":checked") ? "i":""
     
     let regex    = reg.map( (r) => { return new RegExp(r[0],rxModifier); } );
     let accept   = reg.map( (r) => { return r[1]; } );
@@ -1417,7 +1497,7 @@ async function performSearch ( allFilters ) {
             cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.unmatch, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilter}</span>` );
     }
     
-    if( folders.length < 1 ) subtopicCluster.clear();
+    if( folders.length < 1 ) subtopicCluster.clear();
     
     // All files found with SubTopic filter are
     // stored in the global var bigData_Files
@@ -1680,7 +1760,7 @@ function optimizeMultipartRanges( multipartRanges ) {
             }
             r.push(byteRangeStop);
         }
-        if( r.length > 1 ) {
+        if( r.length > 1 ) {
             let rr = [];
             for( let i=0, n=r.length; i < n; i += 2 ) {
                 rr.push( [r[i], r[i+1]] );
@@ -1744,6 +1824,22 @@ $(document)
     })
     .focus()
     
+    .on('change', FILTER.INPUT_AMQP_SRC, function(e) {
+        setConfigCookie();
+    })
+    
+    // For future use...
+    .on('change', FILTER.INPUT_ACCEPT_REJECT, function() {
+        setConfigCookie();
+        // console.log(me(), FILTER.INPUT_ACCEPT_REJECT, $(this).val());
+    })
+        
+    // For future use...
+    .on('change', FILTER.BTN_ACCEPT_REJECT, function() {
+        setConfigCookie();
+        // console.log(me(), FILTER.BTN_ACCEPT_REJECT, $(this).val());
+    })
+    
     .on('keyup mouseout', '.input-accept_reject', function(e){
         if( e.which === $.ui.keyCode.ENTER ) { 
             $('#btnSearch').trigger('click');
@@ -1755,17 +1851,13 @@ $(document)
     .on('click', '#scroll-folders li', function(e) {
         let filterText      = path_2_AMQP( $(this).find('.content').text() );
         $selectize[0].selectize.addOption({ path:'SP',filter:filterText });
-        $selectize[0].selectize.addItem( filterText );                          // ( e.ctrlKey ) ? $selectize[0].selectize.addItem( filterText ) : $selectize[0].selectize.setValue( filterText );
+        $selectize[0].selectize.addItem( filterText );
         setFilterSubtopic( "enable" );
     })
     
-    .on('click', '#scroll-files .content', function() {
-        // let url   = $(this).text().replace( /^\d+ - \//, getOrigin() );
+    .on('click', '#scroll-files .content', function(e) {
         let url   = $(this).text().replace( /^\d+ - \//, '/' );
         let file  = url.replace( /http.?:\/\//, '' ).replace( /\//g, '_' ).replace( /:/g, '-' );
-        // let getIt = $('<a>').attr('href',url).attr('download',url).append('<span>file</span>').find('span'); // force download in HTML5
-        // getIt.trigger('click');
-
         $.ajax({
             url       : url,
             success   : download.bind(true, "blob", file),
@@ -1784,12 +1876,30 @@ $(document)
         return false;
     })
     
+    .on('change', "#checkbox-filters", function(e) {
+        FILTER.CASE_INSENSITIVE = $(this).is(":checked");
+        setConfigCookie();
+    })
+    
+    .on('change', '#catalogueSelector', function(e) {
+        let selectedCatalogue  = $(this).find("option:selected").val();
+        selectedFilesCatalogue = selectedCatalogue.split("json")[0]+ CATALOG.FILETYPE;
+        loadCatalogueData( selectedCatalogue );
+        $(this).blur();
+    })
+    
+    .on('click', '#btnConfigurations', function(e) {
+        showConfigSampleSelector();
+    })
+    
     .on('click', '.btn-topic', function(e) {
-        $(".label-topic").data('label',$(this).data('label'));
+        $("#btn-topic").data('selected',$(this).data("selected"));
+        setConfigCookie();
+        $(this).blur();
     })
 
     .on('click', '.help', function(e) {
-        let url = `/docs/help.html #${LANG}-${$(this).data('help')}`;
+        let url = `/docs/help.html?v=${Date.now()} #${LANG}-${$(this).data('help')}`;
         BSDialogUrl( url, $(this).data('title') );
     })
     
@@ -1803,7 +1913,7 @@ $(document)
             nextEntryID  = function (){
                                 let ids = [];
                                 for( let i=0, n=accept_reject.length; i < n; i++ ) ids.push( accept_reject[i].id );
-                                return ("input-accept_reject__" + parseInt(ids.sort().pop().split("__").pop()) + 1);
+                                return ("input-accept_reject__" + ( parseInt(ids.sort().pop().split("__").pop()) + 1) );
                             };
         newEntry.find('label:first').attr('for',nextEntryID);
         newEntry.find('.help.accept_reject').attr("title", t.help.tip).data("title", t.help.title.accept_reject).tooltip();
@@ -1821,24 +1931,28 @@ $(document)
         return false;
     })
     
-    .on('click', '.btn-accept-regex', function(e) {
+    .on('change', '.btn-accept-regex', function(e) {
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.accept, TAG.cV) +t.comma);
         dude.find('.input-accept_reject').data("ar","accept");
+        setConfigCookie();
     })
-    .on('click', '.btn-reject-regex', function(e) {
+    .on('change', '.btn-reject-regex', function(e) {
         let dude = $(this).closest(".entry");
         dude.find('.label-accept_reject').html(wrap(t.reject, TAG.cR) +t.comma);
         dude.find('.input-accept_reject').data("ar","reject");
+        setConfigCookie();
     })
     
-    .on('click', '.btn-accept-unmatch', function(e) {
+    .on('change', '.btn-accept-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','True');
         $(".label-accept_unmatch").html(wrap(t.accept, TAG.cV) +t.comma);
+        setConfigCookie();
     })
-    .on('click', '.btn-reject-unmatch', function(e) {
+    .on('change', '.btn-reject-unmatch', function(e) {
         $("#btn-accept_unmatch").data('accept_unmatch','False');
         $(".label-accept_unmatch").html(wrap(t.reject, TAG.cR) +t.comma);
+        setConfigCookie();
     })
     
     .on('click', '#btnCopy', function() {
@@ -1861,7 +1975,7 @@ $(document)
         }
     })
     
-    .on('click', '#btnSearchReset', function() {                     // Do reset search
+    .on('click', '#btnResetSubtopic', function() {                     // Do reset search
         $selectize[0].selectize.setValue( '' );
     })
     
@@ -1973,6 +2087,59 @@ function BSDialogPrompt( dMessage, dTitle = "Information", dType=BootstrapDialog
         });
 }
 
+function showConfigSampleSelector() {
+    let options = ""; //`<option value="-1">${t.sampleConfigs.selectOne}</option>`;
+    $.each( CONFIG.samples, (index, sample) => { options += `<option value="${index}">${sample.title}</option>` } )
+    let html = 
+            '<div class="configSampleSelector">'+
+                '<span>'+ t.sampleConfigs.tryAconfig +'</span><select id="configSampleSelector" class="form-control input-sm" tabindex="-1">'+
+                    options+
+                '</select>'+
+            '</div>';
+    BootstrapDialog.show({
+        title:    t.sampleConfigs.dialogTitle,
+        message:  html,
+        type:     "type-info modal-xs",
+        size:     BootstrapDialog.SIZE_SMALL,
+        closable: false,
+        buttons: [{
+            label: t.dialog.btn.reset,
+            cssClass: 'btn-default btn-sm pull-left',
+            action: function(dialog){
+                resetConfigs();
+                dialog.close();
+            }
+        }, {
+            label: t.dialog.btn.cancel,
+            cssClass: 'btn-default btn-sm',
+            action: function(dialog){
+                dialog.close();
+            }
+        }, {
+            label: t.dialog.btn.ok,
+            cssClass: 'btn-default btn-sm',
+            action: function(dialog){
+                setSelectedConfigSample( $("#configSampleSelector").val() );
+                dialog.close();
+            }
+        }]
+    });
+
+}
+
+function resetConfigs() {
+
+    $.removeCookie('config')
+    CATALOG.LOADED = false;  // This will prevent setCookieConfig to update on beforeunload window event
+    location.reload();
+}
+
+function setSelectedConfigSample( strNum ) {
+    
+    let index = Number( strNum );
+    setConfigCookie( index );
+    location.reload();
+}
 
 // ---------------------------------------------------------------------
 //
@@ -2003,7 +2170,7 @@ function plural( str, qty, format="", wrapper="" ) {
     if( str == "" )
         return numeral(qty).format(format === "" ? "0,0":format);
 
-    let string = (qty < 0 ? "" : (format ? numeral(qty).format(format) : qty) +"&nbsp;")+ str + (Math.abs(qty) > 1 ? "s":"");
+    let string = (qty < 0 ? "" : (format ? numeral(qty).format(format) : qty) +"&nbsp;")+ str + (Math.abs(qty) > 1 ? "s":"");
     return wrapper ? wrap(string, wrapper) : string;
 }
 
@@ -2015,6 +2182,27 @@ function plural( str, qty, format="", wrapper="" ) {
 // for searching files in selected catalogue
 
 function getFilters() {
+    
+    // The first item on the filter's list is the AMQP filter
+    let filters = [ [$(FILTER.INPUT_AMQP_SRC).val(), true] ];
+    
+    // Add to the list all other Regex filters provided by the user
+    $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) filters.push( [filter,$(item).data('ar')==='accept'] ); });
+    
+    // The last item of the list is accept_unmatch value 
+    filters.push( ['.*', $("#btn-accept_unmatch").data('accept_unmatch')==='True'] );
+    
+    return filters;
+}
+
+
+// ---------------------------------------------------------------------
+//
+// setFilters 
+// Returns an array of sarracenia filters to apply
+// for searching files in selected catalogue
+
+function setFilters() {
     
     // The first item on the filter's list is the AMQP filter
     let filters = [ [$(FILTER.INPUT_AMQP_SRC).val(), true] ];
@@ -2119,7 +2307,7 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
         updateResultsTab();
         
         cluster.files = getScrollClusterData( PANE.FILES, bigData_Files, header );
-        if( bigData_Files.length < 1 ) cluster.files.clear();
+        if( bigData_Files.length < 1 ) cluster.files.clear();
         
 /*#*/if( DEBUG ){ console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); console.groupEnd(); };/*#*/
     }
@@ -2139,14 +2327,16 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
 // 
 
 function  setFilterSubtopic( state ) {
-    
+
     switch ( state ) {
         
         case "enable" :
+            $('#btnResetSubtopic').prop('disabled', false );
             $("#btnSearch").prop('disabled',false);
             break;
-
+            
         case "disable" :
+            $('#btnResetSubtopic').prop('disabled', true );
             $("#btnSearch").prop('disabled',true).html(t.g_search + t.search);
             break;
 
@@ -2156,7 +2346,7 @@ function  setFilterSubtopic( state ) {
             $("#topics-tab, #files-tab").data("display").shown = 0;
             setFilterSubtopic( "disable" );
             setGUIstate(GUI.STATE_RESET);
-            if( folders.length < 1 ) cluster.subtopic.clear();
+            if( folders.length < 1 ) cluster.subtopic.clear();
             if( $(FILTER.INPUT_AMQP_SRC).val() == "" ) {
                 $("#topics-tab, #files-tab, #stats-tab").addClass('hidden');
             }
