@@ -10,9 +10,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20181030073646">
-        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20181030073646">
-        <link rel="stylesheet" href="/css/style.css?v20181030073646">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20181113074727">
+        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20181113074727">
+
+        <link rel="stylesheet" href="/css/style.css?v20181113074727">
         <script>
             // if we have less than IE Edge, redirect to incompatible page
             var unSupported_IE = (/msie\ [0-9]{1}|Trident\/[7]{1}/i.test(navigator.userAgent));
@@ -70,45 +71,50 @@
                 <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab" tabindex="-1"></a></li>
             </ul>
+
             <div class="tab-content clearfix">
                 <div id="editor" class="tab-pane">
                     <div id="sarra-formula">
                         <div class="row">
                             <div class="sarra-configs col-xm-12 accepts-rejects">
                                 <table>
-                                    <tr>
-                                        <td width="90" style="vertical-align: middle; padding-top: 10px;"><label class="label-catalogue">Catalogue : </label></td>
-                                        <td style="vertical-align: middle; padding-top: 10px;">
-                                            <div style="display:inline-block;" class="pull-left">
-                                                <div class="input-group input-group-sm disabled">
-                                                    <span id="help-catalogues" class="help catalogues input-group-addon glyphicon glyphicon-question-sign" data-help="catalogues" data-toggle="tooltip" data-placement="right"></span>
-                                                    <span id="catalogues"></span>
-                                                </div>
-                                            </div>
-                                            <div style="display: inline-block; margin-left: 20px;" class="input-group input-group-sm pull-right">
-                                                <div class="input-group input-group-sm disabled">
-                                                    <span id="help-configs" class="help configs input-group-addon glyphicon glyphicon-question-sign" data-help="configs" data-toggle="tooltip" data-placement="left"></span>
-                                                    <div class="btn-group btn-group-sm" data-toggle="buttons">
-                                                        <button class="btn-default btn-sm" id="btnConfigurations">Configurations... <i class="fa fa-file-text-o" aria-hidden="true"></i></button>
-                                                    </div>
+                                    <tr class="line catalogue">
+                                        <td width="90"><label class="label-catalogue">Catalogue : </label></td>
+                                        <td>
+                                            <div>
+                                                <div class="selects input-group input-group-sm">
+                                                    <span id="help-catalogues" class="help catalogues input-group-addon" data-help="catalogues" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <div id="catalogues"></div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr class="line filters">
                                         <td width="90"><label class="label-filters" data-label="unchecked">Filters: </label></td>
                                         <td>
-                                            <div style="display:inline-block;" class="pull-left">
-                                                <div class="input-group input-group-sm disabled">
-                                                    <span id="help-filters" class="help filters input-group-addon glyphicon glyphicon-question-sign" data-help="filters" data-toggle="tooltip" data-placement="right"></span>
-                                                    <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                                        <button id="btn-filters" class="btn btn-primary" data-label="filters">
-                                                            <input type="checkbox" id="checkbox-filters" name="checkbox-filters" autocomplete="off" tabindex="-1">
-                                                            <i class="fa fa-square unchecked" aria-hidden="true"></i>
-                                                            <i class="fa fa-check-square checked" aria-hidden="true"></i>
-                                                            <span id="caseInsensitive">Case insensitive</span>
-                                                        </button>
+                                            <div class="btns input-group pull-left">
+                                                <div class="input-group input-group-sm">
+                                                    <span id="help-filters" class="help filters input-group-addon" data-help="filters" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                        <div class="include">
+                                                            <div class="btns input-group input-group-sm">
+                                                                <span class="input-group-addon"><i class="fa fa-check text-primary"></i></span>
+                                                                <button id="btn-case-insensitive" type="checkbox" class="btn-default btn-sm" tabindex="-1">Case insensitive</button>
+                                                            </div>
+                                                        </div>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="btns input-group input-group-sm">
+                                                    <span   id="help-configs"      class="help configs input-group-addon" data-help="configs" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <button id="btnConfigurations" class="btn-default btn-sm">Configurations... <i class="fa fa-file-text-o" aria-hidden="true"></i></button>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="btns input-group input-group-sm">
+                                                    <span   id="help-reset_configs" class="help reset_configs input-group-addon" data-help="reset_configs" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <button id="btnResetConfigs"    class="btn-default btn-sm">Reset...</button>
                                                 </div>
                                             </div>
                                         </td>
@@ -116,101 +122,101 @@
                                 </table>
                                 <hr>
                                 <table>
-                                    <tr>
+                                    <tr class="line topic">
                                         <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
-                                            <div class="input-group input-group-sm disabled">
-                                                <span id="help-topic" class="help topic input-group-addon glyphicon glyphicon-question-sign" data-help="topic" data-toggle="tooltip" data-placement="right"></span>
-                                                <div class="btn-group btn-group-sm disabled" data-toggle="buttons">
-                                                    <span id="btn-topic" class="input-group-btn btn-group-sm" data-selected="post" data-toggle="buttons">
-                                                        <button class="btn btn-primary btn-topic post active" data-selected="post" checked tabindex="-1">
-                                                            <input type="radio" name="options" autocomplete="off">
-                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                            post
-                                                        </button>
-                                                        <button class="btn btn-primary btn-topic report" data-selected="report" tabindex="-1">
-                                                            <input type="radio" name="options" autocomplete="off">
-                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                            report
-                                                        </button>
-                                                    </span>
-
+                                            <div>
+                                                <div class="input-group input-group-sm">
+                                                    <span id="help-topic" class="help topic input-group-addon" data-help="topic" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <div class="btn-group btn-group-sm" data-toggle="buttons">
+                                                        <span id="btn-topic" class="input-group-btn btn-group-sm" data-selected="post" data-toggle="buttons">
+                                                            <button class="btn btn-default btn-topic post active" data-selected="post" checked tabindex="-1">
+                                                                <input type="radio" name="options">
+                                                                <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                                <i aria-hidden="true" class="fa fa-check-circle-o checked"></i>
+                                                                post
+                                                            </button>
+                                                            <button class="btn btn-default btn-topic report" data-selected="report" tabindex="-1">
+                                                                <input type="radio" name="options">
+                                                                <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
+                                                                <i aria-hidden="true" class="fa fa-check-circle-o checked"></i>
+                                                                report
+                                                            </button>
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr id="err-subtopic"><td> </td><td class="err"> </td></tr>
-                                    <tr>
+                                                                        <tr id="err-subtopic"><td> </td><td class="err"> </td></tr>
+                                    <tr class="line subtopic">
                                         <td><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
                                         <td>
-                                            <div class="subtopic filter input-group input-group-sm disabled">
-                                                <span  id="help-subtopic" class="help subtopic input-group-addon glyphicon glyphicon-question-sign" data-help="subtopic" data-toggle="tooltip" data-placement="right"></span>
-                                                <input id="input-subtopics" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
-                                                <span class="input-group-addon"><button id="btnResetSubtopic" class="input-group-addon" disabled tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button></span>
+                                            <div>
+                                                <div class="subtopic filter input-group input-group-sm">
+                                                    <span  id="help-subtopic" class="help subtopic input-group-addon" data-help="subtopic" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <input id="subtopics-input" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
+                                                    <span class="input-group-addon"><button id="btnResetSubtopic" class="input-group-addon" disabled tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button></span>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
-                                </table>
+                                                                    </table>
                                 <hr>
-                                <table class="accept_reject filters">
-                                    <tr class="entry">
-                                        <td width="90"><label class="label-accept_reject" for="input-accept_reject__1">Accept/Reject: </label></td>
+                                <table id="match-filters">
+                                    <tr class="match entry">
+                                        <td class="tag">[Auto]</td>
                                         <td>
-                                            <div class="input-group input-group-sm disabled">
-                                                <span class="help accept_reject input-group-addon glyphicon glyphicon-question-sign" data-help="accept_reject" data-toggle="tooltip" data-placement="right"></span>
-                                                <div class="filter input-group input-group-sm">
-                                                    <span class="input-group-btn btn-group-sm" data-toggle="buttons">
-                                                        <button class="btn btn-accept-regex btn-success active" type="btn btn-success" tabindex="-1">
-                                                            <input type="radio" name="options" autocomplete="off">
-                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                            <div class="input-group input-group-sm">
+                                                <span class="help match input-group-addon" data-help="match" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                <div class="filter">
+                                                    <span class="input-group-btn btn-group-sm" id="match-btn__1" data-toggle="buttons">
+                                                        <button class="match status accept btn btn-success active" data-status="accept" tabindex="-1">
+                                                            <input type="radio" data-toggle="button" name="match" tabindex="-1">
+                                                            <i aria-hidden="true" class="fa fa-thumbs-o-up"></i>
                                                         </button>
-                                                        <button class="btn btn-reject-regex btn-danger" tabindex="-1">
-                                                            <input type="radio" name="options" autocomplete="off">
-                                                            <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                            <i aria-hidden="true" class="fa fa-check-circle checked"></i>
+                                                        <button class="match status reject btn btn-default" data-status="reject" tabindex="-1">
+                                                            <input type="radio" data-toggle="button" name="match" tabindex="-1">
+                                                            <i aria-hidden="true" class="fa fa-thumbs-o-down"></i>
                                                         </button>
                                                     </span>
-                                                    <input class="text form-control input-accept_reject" id="input-accept_reject__1" type="text" data-ar="accept" placeholder="..." aria-label="..." />
-                                                    <span class="input-group-btn"><button class="btn btn-secondary btn-add" type="button" tabindex="-1"><span class="glyphicon glyphicon-plus c-vert"></span></button></span>
+                                                    <input class="match input text form-control" id="match-input__1" type="text" data-status="accept" placeholder="..." aria-label="..." />
+                                                    <span class="add-remove input-group-btn">
+                                                        <button class="btn btn-default btn-remove" tabindex="-1" type="button"><span class="glyphicon glyphicon-minus c-rouge"></span></button>
+                                                        <button class="btn btn-default btn-add"    tabindex="-1" type="button"><span class="glyphicon glyphicon-plus  c-vert"></span></button>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
                                 </table>
                                 <hr>
-                                <table class="accept_unmatch filter">
-                                    <tr>
-                                        <td width="90">
-                                            <label class="label-accept_unmatch" style="padding:0;">Accept: </label>&nbsp; 
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            <div class="input-group input-group-sm disabled" style="display:inline-table; width: 100px;">
-                                                <span class="help accept_unmatch input-group-addon glyphicon glyphicon-question-sign" data-help="accept_unmatch" data-toggle="tooltip" data-placement="right"></span>
-                                                <div class="btn-group btn-group-sm" data-toggle="buttons" id="btn-accept_unmatch" data-accept_unmatch="False">
-                                                    <label class="btn btn-accept-unmatch btn-success" tabindex="-1">
-                                                        <input type="radio" data-toggle="button" name="options" id="option1" autocomplete="off">
-                                                        <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                        <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                    </label>
-                                                    <label class="btn btn-reject-unmatch btn-danger active" tabindex="-1">
-                                                        <input type="radio" data-toggle="button" name="options" id="option2" autocomplete="off">
-                                                        <i aria-hidden="true" class="fa fa-circle-thin unchecked"></i>
-                                                        <i aria-hidden="true" class="fa fa-check-circle checked"></i>
-                                                    </label>
+                                <table>
+                                    <tr class="unmatch entry">
+                                        <td class="tag">[Auto]</td>
+                                        <td>
+                                            <div class="input-group input-group-sm">
+                                                <span class="help unmatch input-group-addon" data-help="accept_unmatch" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                <div id="unmatch-status" data-status="reject" class="btn-group btn-group-sm" data-toggle="buttons">
+                                                    <button class="unmatch status btn accept btn-default" data-status="accept" data-value="True" tabindex="-1">
+                                                        <input type="radio" data-toggle="button" name="unmatch">
+                                                        <i aria-hidden="true" class="fa fa-thumbs-o-up"></i>
+                                                    </button>
+                                                    <button class="unmatch status btn reject btn-danger active" data-status="reject" data-value="False" tabindex="-1">
+                                                        <input type="radio" data-toggle="button" name="unmatch">
+                                                        <i aria-hidden="true" class="fa fa-thumbs-o-down"></i>
+                                                    </button>
                                                 </div>
                                             </div>
-                                            <button class="btn btn-default btn-sm pull-right" id="btnSearch" disabled><span class="glyphicon glyphicon-search"></span> Chercher</button>
+                                            <button id="btnSearch" class="btn btn-default btn-sm pull-right" disabled><span class="glyphicon glyphicon-search"></span> Chercher</button>
                                         </td>
                                     </tr>
                                 </table>
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-                                <br>
-                                <span class="info pull-left"></span>
-                            </div>
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <br>
+                                    <span class="info pull-left"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -244,20 +250,18 @@
         <script src="/js/plugins/bootstrap3-dialog/js/bootstrap-dialog.min.js"></script>
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/download.js"></script>
-        <script src="/js/plugins/toc-generator/js/buildIndexSelector.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
         <script src="/js/plugins/clusterize/clusterize.min.js"></script>
-
-        <script src="/js/plugins/selectize/js/selectize.js?v20181030073646"></script>
+        <script src="/js/plugins/selectize/js/selectize.js?v20181113074727"></script>
         <script>
             var jsonURLs = [
                 '/data/', 
-                '/json/ui-texts.json?v20181030073646', 
-                '/json/ui-docs.json?v20181030073646', 
-                '/json/brokers.json?v20181030073646',
-                '/json/configs.json?v20181030073646'
+                '/json/ui-texts.json?v20181113074727', 
+                '/json/ui-docs.json?v20181113074727', 
+                '/json/brokers.json?v20181113074727',
+                '/json/configs.json?v20181113074727'
                 ];
         </script>
-        <script src="/js/main.js?v20181030073646"></script>
+        <script src="/js/main.js?v20181113074727"></script>
     </body>
 </html> 

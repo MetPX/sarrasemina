@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-10-30 10:10:20
+// last-modified : 2018-11-13 13:04:34
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -58,28 +58,43 @@ class CancellationTokenSource {
 
 const
     L      = '\n',
+    ACCEPT = 'accept',
+    REJECT = 'reject',
     FILTER = {
-        CASE_INSENSITIVE   : false,
+        case_insensitive   : getConfigCookie()['filters'],
         CHAR_DELIMITER     : '|',
-        MAX_SUBTOPICS      : null,                  // User may enter an unlimited number of subtopics...
-        INPUT_AMQP_SRC     : '#input-subtopics',
-        INPUT_ACCEPT_REJECT: '.input-accept_reject',
-        BTN_ACCEPT_REJECT  : '.btn-accept-reject',
-        BTN_UNMATCH        : '.btn-unmatch'
-    },
+        TAG                : ".tag"
+        },
+    SUBTOPICS          = {
+        INPUT    : '#subtopics-input',
+        MAX      : null                                             // User may enter an unlimited number of subtopics...
+        },
+    MATCH              = {
+        BUTTON   : '.match.btn',
+        ENTRY    : '.match.entry',
+        ENTRY_TAG: '.match.entry .tag',
+        INPUT    : '.match.input'
+        },
+    UNMATCH            = {
+        BUTTON   : '.unmatch.btn',
+        ENTRY    : '.unmatch.entry',
+        ENTRY_TAG: '.unmatch.entry .tag',
+        STATUS   : '#unmatch-status'
+        },
     CATALOG = {
-        MAX            : 5,                                             // Display only the latest MAX (5) Catalogues available; i.e.: ignore the rest (older ones)
-        NAME           : '',
-        LOADED         : false,
-        LOADTIME       : 0,
-        FILETYPE       : 'toc',
         DATA_SEPARATOR : '|',
+        FILETYPE       : 'toc',
         id_NB_FILES    : 0,
         id_RANGE_START : 1,
         id_RANGE_STOP  : 2,
-        id_TOTAL_SIZE  : 3
-    },
+        id_TOTAL_SIZE  : 3,
+        MAX            : 5,                                             // Display only the latest MAX (5) Catalogues available; i.e.: ignore the rest (older ones)
+        loaded         : false,
+        loadtime       : 0,
+        name           : ''
+        },
     CONFIG = {
+        topic : { prefix: "post", version:"v02." },
         options : {
             broker        : "amqps://anonymous@dd.weather.gc.ca",
             exchange      : "xpublic",
@@ -87,11 +102,9 @@ const
             inflight      : ".tmp",                                      // default: .tmp  - or NONE if post_broker is set
             instances     : "1",                                         // default:  1    - add more instances if there is lagging
             mirror        : "True",                                      // default:  True - will build a mirror directory structure; False: will put all files in same directory
-            topic_version : "v02.",
-            topic         : "post",
             topic_prefix  : "v02.post",
             subtopic      : [],
-            accept_reject : [],
+            match         : [],
             accept_unmatch: "False"
         },
         cookie   : getConfigCookie(),
@@ -100,22 +113,23 @@ const
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
         },
         write    : ( includeHints = false, includeMan = false ) => {
-            let config=getConfigHeader(includeMan), pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], accept_rejects=[];
+            let config=getConfigHeader(includeMan), pad='accept_unmatch'.length+2, newOptions={}, subtopics=[], matches=[];
 
-            subtopics = $( "#input-subtopics" ).val().split(FILTER.CHAR_DELIMITER);
+            subtopics = $(SUBTOPICS.INPUT).val().split(FILTER.CHAR_DELIMITER);
             for( let i=0; i<subtopics.length; i++ ) {
                 subtopics[i] = subtopics[i].trim();
             }
             
-            $( ".input-accept_reject" ).each( (index, item)  => { let filter = $(item).val(); if( filter ) accept_rejects.push( [$(item).data('ar'),filter] ); });
-            newOptions.topic_prefix   = CONFIG.options.topic_version + $(".btn-topic").data('selected');
+            $(MATCH.INPUT).each( (index,input) => { let filter = $(input).val(); if( filter ) matches.push( [$(input).data('status'),filter] ); });
+            newOptions.topic_prefix   = CONFIG.topic.version + CONFIG.topic.prefix;
             newOptions.subtopic       = subtopics;
-            newOptions.accept_reject  = accept_rejects;
-            newOptions.accept_unmatch = $("#btn-accept_unmatch").data('accept_unmatch');
+            newOptions.match          = matches;
+            newOptions.accept_unmatch = $(".unmatch.status.active").data('value');
             
             CONFIG.options = Object.assign( {}, CONFIG.options, newOptions );
             
             Object.keys(CONFIG.options).forEach( (opt) => {
+
                 switch( opt ) {
                     case 'subtopic':
                         if( CONFIG.options[opt].length > 0 ) {
@@ -125,8 +139,7 @@ const
                             if( includeHints ) config += t.confComment[opt];
                         }
                         break;
-                    case 'regex':
-                    case 'accept_reject':
+                    case 'match':
                         if( CONFIG.options[opt].length > 0 ) {
                             for( let i=0; i<CONFIG.options[opt].length; i++ ) {
                                 config += L+ CONFIG.options[opt][i][0].padEnd(pad) + CONFIG.options[opt][i][1];
@@ -154,14 +167,14 @@ const
         STATE_FOUND     : 4,
         BLACK :'black',
         BLUE  :'blue'
-    },
+        },
     LANG = $.cookie("LANG"),                                            // Select user's prefered language
     PANE = {
         EDITOR   : "editor",
         CATALOGUE: "folders",
         SUBTOPIC : "topics",
         FILES    : "files"
-    },
+        },
     TAG = { 
         H1: ['<h1>','</h1>'],                                       // Predefined tag wrapers
         cG: ['<span class="c-gris">'    , '</span>'],
@@ -176,7 +189,7 @@ const
         CB: ['<strong class="c-bleu">'  , '</strong>'],
         CR: ['<strong class="c-rouge">' , '</strong>'],
         CV: ['<strong class="c-vert">'  , '</strong>']
-    };
+        };
     
 var t               = {},                                               // GUI's text container               found in /json/ui-texts.json
     configExamples  = {},                                               // Bunch of selected config examples  found in /json/configs.json
@@ -243,8 +256,6 @@ var t               = {},                                               // GUI's
 // ---------------------------------------------------------------------
 
 // ---------------------------------------------------------------------
-
-// 
 // Returns server origin
 // Since development domains do not host product files,
 // a default server is provided.
@@ -255,8 +266,12 @@ function getOrigin() {
 }
 
 function getConfigHeader( includeMan ) {
-    let regexWarning  = ( CONFIG.cookie.filters ) || false;
-    let configHeader = regexWarning + t.confComment[(includeMan ? 'SarraS_git':'SarraS')].replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`).replace('(catalogue)',CATALOG.NAME).replace('(date)',(new Date()).toJSON());
+    let regexWarning = FILTER.case_insensitive ? t.confComment.filters :"";
+    let configHeader = regexWarning +
+                         t.confComment[(includeMan ? 'SarraS_git':'SarraS')]
+                                        .replace('(url)',`<a href="${window.location.href}" target="_blank">${window.location.href}</a>`)
+                                        .replace('(catalogue)',CATALOG.name)
+                                        .replace('(date)',(new Date()).toJSON());
     if( includeMan ) {
         let url = t.confManual.baseURL.split('|');
         configHeader = configHeader.replace('(git)', `<a href="${url[0]}" target="_blank">${url[0]}</a>`);
@@ -284,11 +299,14 @@ function serializeData( data ) {
     return JSON.stringify( data );
 }
 
+// ---------------------------------------------------------------------
 // Json Deserialiser 
 function deserializeData( json ) {
     let data = (json)? JSON.parse( json ) : {} ;
     return data;
 }
+
+function getRegexModifier() { return FILTER.case_insensitive ? 'i':''; }
 
 function getConfigCookie() {
 // let DEBUG = true;
@@ -303,19 +321,19 @@ function setConfigCookie( withSampleConfigIndex=-1 ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); }/*#*/
 
-    CATALOG.LOADED = ( withSampleConfigIndex > -1 ) || CATALOG.LOADED;
-    if( !CATALOG.LOADED ){ console.groupEnd(); return; }
+    CATALOG.loaded = ( withSampleConfigIndex > -1 ) || CATALOG.loaded;
+    if( !CATALOG.loaded ){ console.groupEnd(); return; }
 
     let _5_Days   = 1000*60*60*24*5;
     let in_5_Days = new Date();
     let filters   = getFilters();
     let config      = {
-            filters     : $("#checkbox-filters").is(':checked'),
+            filters     : $("#btn-case-insensitive").parent().hasClass('active'),
             catalogId   : $("#catalogueSelector").prop('selectedIndex'),
             topic       : $("#btn-topic").data("selected"),
             subtopics   : filters.shift()[0].split("|"),
-            unmatched   : filters.pop()[1],
-            acceptReject: filters
+            unmatch     : filters.pop(),
+            match       : filters
         };
 
     // If user chooses to load a sample config, alter existing one with it
@@ -341,29 +359,30 @@ function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.log("filterOptions[",filterOptions,"]"); console.log("groupOptions[",groupOptions,"]"); console.log("subtopics[",subtopics,"]"); };/*#*/
 
-    var eventHandler = function get( name ) {
-        return function give() {
-            if( name === "onChange" ) {
-                setFilterSubtopic( isValidAMQP( $(FILTER.INPUT_AMQP_SRC).val() ) ? 'enable':'disable' );
-            }
-        };
+    let gotCookies = !jQuery.isEmptyObject(CONFIG.cookie);
+    let eventHandler = function get( name ) {
+        return function give() { if( name === "onChange" ) { setFilterSubtopic( isValidAMQP( $(SUBTOPICS.INPUT).val() ) ? 'enable':'disable' ); } };
     };
 
+    // Update Form according to Config Cookies
+
+    // -- SubTopics... if any, clear subtopics
     if( $selectize.length ) {
         $selectize[0].selectize.setValue( '' );
-        $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.destroy();
+        $(SUBTOPICS.INPUT).selectize()[0].selectize.destroy();
         $selectize = {}
     }
-
-    $selectize = $(FILTER.INPUT_AMQP_SRC).selectize(
+    
+    // -- Then prepare recepient 
+    $selectize = $(SUBTOPICS.INPUT).selectize(
         {
             persist          : true
             ,diacritics       : true
             ,closeAfterSelect : true
             ,plugins          : ['remove_button','restore_on_backspace','drag_drop']
-            ,maxItems         : FILTER.MAX_SUBTOPICS
+            ,maxItems         : SUBTOPICS.MAX
             ,delimiter        : FILTER.CHAR_DELIMITER
-            ,placeholder      : FILTER.MAX_SUBTOPICS !== null ? t.addUpTo_N_filters.replace('_N_',FILTER.MAX_SUBTOPICS) : t.addAMQPfilters
+            ,placeholder      : SUBTOPICS.MAX !== null ? t.addUpTo_N_filters.replace('_N_',SUBTOPICS.MAX) : t.addAMQPfilters
             ,options          : filterOptions
             ,items            : subtopics
             ,optgroups        : groupOptions
@@ -394,21 +413,37 @@ function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[
             ,onInitialize    : eventHandler('onInitialize')
         });
 
-        
-    let count      = 1;
-    let btnRegex   = { accept_reject: { true:".btn-accept-regex", false:".btn-reject-regex" }, unmatched: { true:".btn-accept-unmatch", false:".btn-reject-unmatch" } };
-    let regexClass = { true:".btn-accept-regex", false:".btn-reject-regex" };
-    let accRej_Map = new Map( CONFIG.cookie.acceptReject );
-    $((`.btn-topic.${CONFIG.cookie.topic}`)).trigger("click");
-    accRej_Map.forEach( (val,regex) => { 
-        $(".accept_reject.filters .entry").last().find(".input-accept_reject").val( regex );
-        $(".accept_reject.filters .entry").last().find( btnRegex.accept_reject[val] ).trigger('click');
-        ( count++ < accRej_Map.size ) ? $('.btn-add').trigger('click') : "";
-    });
-    $("#btn-accept_unmatch").find( btnRegex.unmatched[CONFIG.cookie.unmatched] ).trigger('click');
+    // If we have cookies, setup form
+    if( gotCookies ) {
+        // -- Topic
+        $((`.btn-topic.${CONFIG.cookie.topic}`)).trigger("click");
+        // -- Match Filters
+        // -- Remove all except first Match Entry
+        while( $('.match.entry').length > 1 ) {
+            $('.match.entry').last().remove();
+        }
 
-    $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.refreshItems();
-    $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.trigger('onChange');
+        let count  = 1;
+        let matchs = CONFIG.cookie.match;
+        matchs.forEach( (match) => {
+            let match_entry  = $(MATCH.ENTRY).last();
+            let status = match[0], filter = match[1];
+            if( count++ < matchs.length ) {
+                match_entry.find('.btn-add').trigger('click');
+            }
+            match_entry.find(MATCH.INPUT).val(filter);
+            match_entry.find(MATCH.BUTTON+`.${status}`).trigger('click');
+
+        });
+        
+        // -- Unmatch Filter
+        let unmatch_status = CONFIG.cookie.unmatch[0];
+        $(UNMATCH.ENTRY).last().find(UNMATCH.BUTTON+`.${unmatch_status}`).trigger('click');
+    }    
+    
+    // Refresh display
+    $(SUBTOPICS.INPUT).selectize()[0].selectize.refreshItems();
+    $(SUBTOPICS.INPUT).selectize()[0].selectize.trigger('onChange');
 
 /*#*/if( DEBUG ){ console.groupEnd();};/*#*/
 }
@@ -503,29 +538,38 @@ function _initialize_() {
         
         $.extend(t,GUItexts[LANG],DOCtexts[LANG],GUItexts.icons);
 
-        $("#title")                .html(t.title);
-        $(".title-text")           .html(t.titleHeader);
-        $(".label-filters")        .html(t.filters._        +t.comma);
-        if( CONFIG.cookie.filters ) { $("#checkbox-filters").parent(".btn").addClass('active'); }
-        $("#caseInsensitive")      .html(t.filters.caseInsensitive);
+        $(".top-text")           .html(t.titleHeader);
+        $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip();
+        $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
+
+        $("label.catalogue")       .html(t.catalog +t.comma);
+            $(".help.catalogues")  .attr("title", t.help.tip +" - "+ t.help.title.catalogues)     .data("title", t.help.title.catalogues)     .tooltip();
+
+        $("label.configuration")       .html(t.filters.configurations);
+            $("#btn-case-insensitive")      .html(t.filters.caseInsensitive); if( CONFIG.cookie.filters ) { $("#btn-case-insensitive").parents(".btns.input-group").addClass("active"); }
+            $(".help.case-insensitive")     .attr("title", t.help.tip +" - "+ t.help.title.case_insensitive)        .data("title", t.help.title.case_insensitive)        .tooltip();
+
+            $("#btn-load_example")          .html(t.filters.load_example);
+            $(".help.load_example")         .attr("title", t.help.tip +" - "+ t.help.title.load_example)        .data("title", t.help.title.load_example)        .tooltip();
+
+            $("#btn-reset")                 .html(t.filters.Reset);
+            $(".help.reset")                .attr("title", t.help.tip +" - "+ t.help.title.reset)          .data("title", t.help.title.reset)          .tooltip();
+
         $(".label-topic")          .html(t.topic            +t.comma);
+        $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
+
         $(".label-subtopic")       .html(t.subtopic         +t.comma);
         $(".input-subtopic")       .attr("placeholder", t.placeholder.AMQP_filter ).attr("aria-label",t.enterYourFilter);
-        $(".label-accept_reject")  .html(wrap(t.accept,    TAG.cV) +t.comma);
-        $(".input-accept_reject")  .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
-        $(".label-accept_unmatch") .html(wrap(t.reject,    TAG.cR) +t.comma);
-        $(".label-catalogue")      .html(t.catalog          +t.comma);
-
-        $("#switchLang")                                                                          .data("title", switchLangue[LANG].title)    .tooltip();
-        $("#about").text( t.about ).attr("title", t.help.tip +" - "+ t.help.title.page)           .data("title", t.help.title.page)           .tooltip();
-        
-        $(".help.catalogues")      .attr("title", t.help.tip +" - "+ t.help.title.catalogues)     .data("title", t.help.title.catalogues)     .tooltip();
-        $(".help.configs")         .attr("title", t.help.tip +" - "+ t.help.title.configs)        .data("title", t.help.title.configs)        .tooltip();
-        $(".help.filters")         .attr("title", t.help.tip +" - "+ t.help.title.filters)        .data("title", t.help.title.filters)        .tooltip();
-        $(".help.topic")           .attr("title", t.help.tip +" - "+ t.help.title.topic)          .data("title", t.help.title.topic)          .tooltip();
         $(".help.subtopic")        .attr("title", t.help.tip +" - "+ t.help.title.subtopic)       .data("title", t.help.title.subtopic)       .tooltip();
-        $(".help.accept_reject")   .attr("title", t.help.tip +" - "+ t.help.title.accept_reject)  .data("title", t.help.title.accept_reject)  .tooltip();
-        $(".help.accept_unmatch")  .attr("title", t.help.tip +" - "+ t.help.title.accept_unmatch) .data("title", t.help.title.accept_unmatch) .tooltip();
+        
+        $(MATCH.INPUT)      .attr("placeholder", t.placeholder.Regex_filter).attr("aria-label",t.enterYourFilter);
+        $(MATCH.ENTRY_TAG)  .html(t.tag.match.accept   +t.comma);
+        $(UNMATCH.ENTRY_TAG).html(t.tag.unmatch.reject +t.comma);
+        
+
+        
+        $(".help.match")           .attr("title", t.help.tip +" - "+ t.help.title.match)          .data("title", t.help.title.match)          .tooltip();
+        $(".help.unmatch")         .attr("title", t.help.tip +" - "+ t.help.title.unmatch)        .data("title", t.help.title.unmatch)        .tooltip();
         
         $("#btnSearch")            .html(t.g_search + t.search);
 
@@ -533,11 +577,9 @@ function _initialize_() {
         $("#stats-tab")            .html(t.f_config_tab +wrap(t.configuration,TAG.Hxs) +wrap(t.conf,TAG.Vxs)).attr('title',t.configuration);
         
         if( !catalogs ) {
-
             $catalogues.html(msg.err.noCatalogues[LANG]);
         }
         else {
-            
             catalogs.sort().reverse();
             if( catalogs.length > CATALOG.MAX ) catalogs.length = CATALOG.MAX;
             
@@ -546,7 +588,6 @@ function _initialize_() {
             <select id="catalogueSelector" class="custom form-control input-sm" tabindex="-1">
                 ${options}
             </select>`;
-
             $catalogues.html( mySelector );
             
             // Auto select the latest catalog when loading page
@@ -558,7 +599,7 @@ function _initialize_() {
             $.each( brokers, ( filter, thisBroker ) => { rx = new RegExp(filter,'i'); if( thisSubdomain.match(rx) ){ CONFIG.setup( { broker: thisBroker } ); } });
         }
         
-        if( configs ) { // keep low profile memory: only keep user's language strings in the config samples
+        if( configs ) { // only keep user's language strings in the config samples
             let configSamples = [];
             $.each( configs.example, ( i, c ) => { 
                 let config = { "title":c.title[LANG], "comment":c.comment[LANG], "options":[] };
@@ -570,10 +611,10 @@ function _initialize_() {
         
         showTabPane( PANE.EDITOR );
         activatePane( PANE.EDITOR );
-        $('#input-subtopics').attr('placeholder',t.wait.loadingData);
-        CATALOG.LOADED = true;
+        $(SUBTOPICS.INPUT).attr('placeholder',t.wait.loadingData);
+        CATALOG.loaded = true;
         // FIXME 
-        // for now, keep this trigger at last to avoid messing up accept_reject et accept_unmatch CONFIG.cookie 
+        // for now, keep this trigger at last to avoid messing up match & unmatch CONFIG.cookie 
         $('#catalogueSelector').find('option:nth-child(1)').prop('selected',true).trigger('change');
     }
     
@@ -692,7 +733,7 @@ function loadCatalogueData( selectedCatalogue ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log(selectedCatalogue);};/*#*/
     
-    CATALOG.LOADED = false;
+    CATALOG.loaded = false;
 
     let loadtime = Date.now();
     
@@ -706,7 +747,7 @@ function loadCatalogueData( selectedCatalogue ) {
         statusCode: { 404: function() { BSDialog( t.fileNotFound, t.error, "type-danger" ); } },
         success: function(foldersData){
             
-            $('#input-subtopics').prop("disabled", false);
+            $(SUBTOPICS.INPUT).prop("disabled", false);
             bigData_Folders = foldersData;
             
             let getSums     = function(folders) { let s = { folders:folders.length, files:0,bytes:0 }; folders.forEachFromTo( (folder) => { s.files += folder.inf[CATALOG.id_NB_FILES]; s.bytes += folder.inf[CATALOG.id_TOTAL_SIZE]; }); return s; };
@@ -718,19 +759,19 @@ function loadCatalogueData( selectedCatalogue ) {
             let cataloguePaths = selectedCatalogue.split("/");
             let catalogueName  = cataloguePaths[cataloguePaths.length -2];
             let paneHeader     = `${t.catalogue} [ <strong>${catalogueName}</strong> ] ${t.contains}${t.comma} ${fmtTotal.folders},&nbsp;${fmtTotal.files}&nbsp;${fmtTotal.bytes}<br>${t.click2AddSubtopic}`;
-            CATALOG.NAME       = catalogueName;
+            CATALOG.name       = catalogueName;
             
-            setSubtopicDirs();
+            setSubtopicDirs(); // and will manage Config cookies
 
             cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, paneHeader );
             statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
             _init_data_tabs ( total.folders, total.files );
             setGUIstate     ( GUI.STATE_LOADING );
             
-            // $(FILTER.INPUT_AMQP_SRC).selectize()[0].selectize.trigger('onChange');
+            // $(SUBTOPICS.INPUT).selectize()[0].selectize.trigger('onChange');
             setGUIstate(GUI.STATE_READY);
-            CATALOG.LOADED   = true;
-            CATALOG.LOADTIME = Date.now() - loadtime;
+            CATALOG.loaded   = true;
+            CATALOG.loadtime = Date.now() - loadtime;
         },
         error: function( XMLHttpRequest, textStatus, errorThrown ) {
             $('#msg').html(`<h2 class="clusterize-no-data">${t.error}<br><small> >>> ${errorThrown} <<< </small></h2>`).show();
@@ -829,6 +870,7 @@ function getFileSize(url, byteRange) {
     
 }
 
+
 // ---------------------------------------------------------------------
 //
 // Get an "estimate" size of the byte range response
@@ -888,6 +930,7 @@ function getRangeSize( byteRange, filesize ) {
     }
 }
 
+
 // ---------------------------------------------------------------------
 //
 // Get part file within byte range
@@ -930,6 +973,7 @@ function getHttpByteRange( url, fileinfo, byteRange="", responseType="" ) {
             request.send();
         });
 }            
+
 
 // ---------------------------------------------------------------------
 //
@@ -1153,21 +1197,23 @@ function buildBigDataFiles( filesInFolders, withAcceptRejectFilters = false ) {
 // ---------------------------------------------------------------------
 // 
 // getSubtopicMatch
-// Fnds folder that match/unmatch the AMQP filter
+// Find folders that match/unmatch the AMQP filter
 // Receives a data array, regex string and accept/reject (true/false)
 // Returns an object containing stats, matched and unmatched data
 
-function getSubtopicMatch( foldersData, subtopicFilters, accept_rejectFilters ) {
+function getSubtopicMatch( foldersData, subtopicFilters, allFilters ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+subtopicFilters+'] foldersData :',L,foldersData);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.log('foldersData',foldersData,'\nsubtopicFilters', subtopicFilters, '\nallFilters', allFilters ); };/*#*/
 
-    let regex = $.map( subtopicFilters, ( subtopicFilter ) => { return new RegExp( subtopicFilter ) } );
+    let regex = $.map( subtopicFilters, ( subtopicFilter ) => { return new RegExp( subtopicFilter,getRegexModifier() ) } );
     let stats = { matched: { nbFiles: 0, totSize: 0, ranges: [] }, unmatch: { nbFiles: 0, totSize: 0, ranges: [] } };
     let matched = [];
     let unmatch = [];
-    let withARFilters = accept_rejectFilters.length > 2;
-
-    if( withARFilters || (!withARFilters && accept_rejectFilters[1][1] ) ) {
+    let withMatchFilters =  allFilters.length > 2;
+    let acceptUnmatch    = (allFilters[allFilters.length-1][0] == ACCEPT);
+/*#*/if( DEBUG ){ console.log('withMatchFilters[',withMatchFilters,']\nacceptUnmatch[',acceptUnmatch,']'); };/*#*/
+    // if( withMatchFilters || (!withMatchFilters && accept_rejectFilters[1][1] ) ) {
+    if( withMatchFilters || (acceptUnmatch && !withMatchFilters) ) {
         for( let i=0, n=foldersData.length; i < n; i++ ) {
             for( let ii=0, nn=regex.length; ii<nn; ii++) {
                 if( regex[ii].test( foldersData[i].dir ) && !matched.includes(foldersData[i]) ) {
@@ -1197,7 +1243,8 @@ function getSubtopicMatch( foldersData, subtopicFilters, accept_rejectFilters ) 
     }
     
     
-/*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
+/*#*/if( DEBUG ){ console.log('--- matched',matched, '\n--- unmatch',unmatch, '\n--- stats',stats );};/*#*/
+/*#*/if( DEBUG ){ console.groupEnd(); logMe('-','-');};/*#*/
     return { matched, unmatch, stats }
 }
 
@@ -1205,19 +1252,18 @@ function getSubtopicMatch( foldersData, subtopicFilters, accept_rejectFilters ) 
 // ---------------------------------------------------------------------
 // 
 // getAcceptRejectMatch
-// Finds files that match/unmatch the accept_reject regex filter
+// Finds files that match accepts/rejects & unmatch regex filters
 // Receives a data array, regex string and accept/reject (true/false)
 // Returns an object containing stats, matched and unmatched data
 
 async function getAcceptRejectMatch( filesData, reg, cancel ) {
 // let DEBUG = true;
-/*#*/if( DEBUG ){ console.group(me()); console.time( "   " ); console.log('regex['+reg+']',L,'filesData :',L,filesData);};/*#*/
+/*#*/if( DEBUG ){ console.group(me()); console.log('reg[',reg,']',L,'filesData :',L,filesData);};/*#*/
     
     reg[0][0] = reg[0][0].replace('$','.*$');   // First filter is subtopic. When Accept-Reject filters kiks in, make sure subtopic will allow everything beyond its path.
-    let rxModifier = $("#checkbox-filters").is(":checked") ? "i":""
     
-    let regex    = reg.map( (r) => { return new RegExp(r[0],rxModifier); } );
-    let accept   = reg.map( (r) => { return r[1]; } );
+    let regex    = reg.map( (r) => { return new RegExp(r[1],getRegexModifier()); } );
+    let accept   = reg.map( (r) => { return ( r[0] == ACCEPT ); } );
     let matched  = reg.map( () => { return [] } );
     let unmatch  = reg.map( () => { return [] } );
     let nbLines  = filesData.length;
@@ -1229,8 +1275,9 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
     let subtopic    = regex[0];        // First regex filter is SubTopic
     let keepUnmatch = accept[lastReg]; // Last accept value for unmatched elements: true for accept or false for reject
 
-    statistics.search.accept_reject = reg.map( (r) => { return { filter : r[0], accept : r[1], matched: {files:0, totalSize:0 }, unmatch: {files:0, totalSize:0 } }; });
+    statistics.search.accept_reject = reg.map( (r) => { return { accept : r[0]==ACCEPT, filter : r[1], matched: {files:0, totalSize:0 }, unmatch: {files:0, totalSize:0 } }; });
     statistics.results.found = 0;
+/*#*/if( DEBUG ){ console.log('regex[',regex,']');};/*#*/
     
     loopLines: for( let line = 0; line < nbLines; line++ ) {
         
@@ -1247,9 +1294,6 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
                 case firstReg:
                     
                     continue loopRegex;
-
-                    if( !subtopic.test( filesData[ line ].path ) )
-                        continue loopLines;
                     break;
                     
                 case lastReg:
@@ -1306,7 +1350,7 @@ async function getAcceptRejectMatch( filesData, reg, cancel ) {
     }
     
     if( progressBar.isWorthDisplay ) { await wait(250); progressBar.doHide(); await wait(10); }
-/*#*/if( DEBUG ){ console.timeEnd( "   " ); console.groupEnd(); logMe('-','-');};/*#*/
+/*#*/if( DEBUG ){ console.groupEnd(); logMe('-','-');};/*#*/
 
     return { matched, unmatch, stats };
 }
@@ -1426,11 +1470,13 @@ async function performSearch ( allFilters ) {
 //             
     setGUIstate( GUI.STATE_SEARCHING );
     
-    let AMQPfilter          = allFilters[0][0],     // AMQP filter    is the first item of allFilters list;
+    let AMQPfilter          = allFilters[0][0],     // AMQP filter is the first item of the first element of the allFilters list;
         AMQPfilters         = AMQPfilter.split(FILTER.CHAR_DELIMITER),
-        accept_rejectFilters = allFilters,           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
         subtopicFilter      = AMQP_2_RegExp( AMQPfilter ),
         subtopicFilters     = $.map( AMQPfilters, (filter) => { return AMQP_2_RegExp( filter ); }),
+        accept_rejectFilters = allFilters,           // The leftovers are accept_reject plain regex filters; -> Set in a separate variable for readability
+        matchFilters        = allFilters.slice(1,allFilters.length-1), // grab Match   filters; -> Set in a separate variable for readability
+        unmatchFilter       = allFilters.slice(allFilters.length-1),   // grab UnMatch filter; -> Set in a separate variable for readability
         config              = '',                   // Sarra config to be displayed on screen according to user's choices
         STm                 = {},                   // STm (SubTopic match)     stores selectedCatalogue's data filtered with subtopicFilter
         ARm                 = {},                   // ARm (AcceptReject match) stores STm's (SubTopic match)'s data filtered with accept_rejectFilters
@@ -1440,15 +1486,15 @@ async function performSearch ( allFilters ) {
         unmatchs   = [],                            // Store a list unmatching filters criteria
         filesInFolders = { matched: [], unmatch: [], stats: { matched: { nbFiles:0,totSize:0 }, unmatch: { nbFiles:0,totSize:0 } } },
         
-        nbFilters     = accept_rejectFilters.length,
-        withARFilters = nbFilters > 2,
-        acceptUnmatch = accept_rejectFilters[ nbFilters-1 ][1];
-
-
+        nbFilters        = accept_rejectFilters.length,
+        withMatchFilters = nbFilters > 2,
+        acceptUnmatch    = accept_rejectFilters[nbFilters-1][0] == ACCEPT;
+        
+        
     // Apply Subtopic filter if different 
     // from a previous search...
     // --------------------------------------------------
-    STm = getSubtopicMatch( bigData_Folders, subtopicFilters, accept_rejectFilters );             // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
+    STm = getSubtopicMatch( bigData_Folders, subtopicFilters, accept_rejectFilters );  // From JSON's catalogue bigData_Folders (global var), get SubTopic Matchs
     statistics.reset({
                         search: {
                             subtopic:{
@@ -1469,7 +1515,12 @@ async function performSearch ( allFilters ) {
         $.merge(filesInFolders.unmatch, match.unmatch);
     });
     
-/*#*/if( DEBUG ){ console.log('STm',STm); };/*#*/
+/*#*/if( DEBUG ){ console.log('0 - STm',STm); } /*#*/
+/*#*/if( DEBUG ){ console.log('1 - STm',STm);
+    console.log('Filters',allFilters);
+    console.log('matchFilters',matchFilters);
+    console.log('unmatchFilter',unmatchFilter);
+};/*#*/
     
     // Extract some info for the logger...
     nbFolders     = STm.matched.length + STm.unmatch.length;
@@ -1484,7 +1535,7 @@ async function performSearch ( allFilters ) {
     progressBar.updateDisplay( nbFiles );
 
     // And update display...
-    if( withARFilters || acceptUnmatch ) {
+    if( withMatchFilters || acceptUnmatch ) {
         if( AMQPfilters.length > 1 )
             cluster.subtopic = getScrollClusterData( PANE.SUBTOPIC, STm.matched, `${paneFolderHeader}<span class="amqp-filters">${AMQPfilters.join('<br>')}</span>` );
         else
@@ -1524,7 +1575,7 @@ async function performSearch ( allFilters ) {
     
     // Apply accept_rejectFilters if any...
     // --------------------------------------------------
-    if( withARFilters ) {                                                                               // If no accept_rejectFilters, update files tab as well with found files...
+    if( withMatchFilters ) {                                                                               // If no accept_rejectFilters, update files tab as well with found files...
 
         let matchfiles = [],
             total      = bigData_Files.length,
@@ -1553,7 +1604,7 @@ async function performSearch ( allFilters ) {
         filesInFolders.stats = ARm.stats;
         nbFilesHtml = plural(t.file,   nbFiles,   '0,0', TAG.CR);
         
-        updateFilesTab( filesInFolders, withARFilters );
+        updateFilesTab( filesInFolders, withMatchFilters );
     }
     else {
 
@@ -1561,7 +1612,7 @@ async function performSearch ( allFilters ) {
     }
     /*#*/if( DEBUG ){ console.log('filesInFolders',filesInFolders); };/*#*/
     
-    activatePane( PANE.CATALOGUE );
+    activatePane(PANE.CATALOGUE);
     setGUIstate(GUI.STATE_FOUND);
     setGUIstate(GUI.STATE_READY);
 
@@ -1574,7 +1625,7 @@ async function performSearch ( allFilters ) {
 // updateResults
 // Update content of Results Tab
 
-function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=false ) {
+function updateResultsTab( withHints=false, withMan=false ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); logMe('-','-'); console.log('>>> statistics[', statistics, ']'); };/*#*/
     
@@ -1587,13 +1638,24 @@ function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=fal
     numFiles   = numeral(numFiles).format('0,0');
 
     // --------------------------------------
-    // User's config
+    // User's config - [ Hints] [ Manuals]
     // --------------------------------------
     let tbody_config = `
         <tbody id="user-conf">
-            <tr><th colspan="4" class="title">${t.data.table.config} &nbsp; - &nbsp;${t.include} &nbsp;
-               [ <label class="toggle"><input id="include-hints" type="checkbox" name="toggle" ${withHints?'checked=""':''}> <span class="label-text">${t.inc_hints}</span></label> ]  &nbsp;
-               [ <label class="toggle"><input id="include-man"   type="checkbox" name="toggle" ${withMan?'checked=""':''}> <span class="label-text">${t.inc_man}</span></label> ]
+            <tr><th colspan="4" class="title">
+                <div class="include">${t.data.table.config}${t.comma}</div>
+                <div class="include">
+                    <div class="btns input-group input-group-sm ${withHints?'active':''}">
+                        <span class="input-group-addon"><i class="fa fa-check text-primary"></i></span>
+                        <button id="btn-include-hints" type="checkbox" class="btn-default btn-sm" tabindex="-1">${t.include_hints}</button>
+                    </div>
+                </div>
+                <div class="include">
+                    <div class="btns input-group input-group-sm ${withMan?'active':''}">
+                        <span class="input-group-addon"><i class="fa fa-check text-primary"></i></span>
+                        <button id="btn-include-man" type="checkbox" class="btn-default btn-sm" tabindex="-1">${t.include_manuals}</button>
+                    </div>
+                </div>
             </th></tr>
             <tr><td colspan="4"><div class="flex"><button id="btnCopy" class="btn btn-secondary" type="button" data-original-title title="${t.copyConfig}" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-clipboard" aria-hidden="true"></i><br><span>${t.copy}</span></button><pre id="config">${CONFIG.write( withHints, withMan )}</pre></td></div></tr>
         </tbody>`;
@@ -1614,10 +1676,10 @@ function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=fal
     let tr_findings   = "",
         allFilters    = getFilters(),
         nbFilters     = allFilters.length,
-        withARFilters = nbFilters > 2,
+        withMatchFilters = nbFilters > 2,
         acceptUnmatch = allFilters[ nbFilters-1 ][1];
     
-    numFolders = ( withARFilters || acceptUnmatch ) ? statistics.search.subtopic.matched.folders : statistics.search.subtopic.unmatch.folders;
+    numFolders = ( withMatchFilters || acceptUnmatch ) ? statistics.search.subtopic.matched.folders : statistics.search.subtopic.unmatch.folders;
     numFiles   = statistics.search.subtopic.matched.files;
     strFolders = numFolders == 0 ? t.noFolders : plural( t.folder, -numFolders ),
     strFiles   = numFiles   == 0 ? t.noFiles   : plural( t.file,   -numFiles   );
@@ -1651,7 +1713,7 @@ function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=fal
             tr_findings  += `
             <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} (${ numeral(size).format("0.00 b") }) &nbsp;</td><td>&nbsp; ${filter}</td></tr>`;
         }
-    } else if( !withARFilters && !acceptUnmatch ) {
+    } else if( !withMatchFilters && !acceptUnmatch ) {
         let color, choice, files, size, elem, plural;
         color  = ' class="c-rouge"',
         choice = t.data.table.rejected,
@@ -1678,7 +1740,7 @@ function updateResultsTab( withHints=false, withMan=false, withCaseSensitive=fal
         statistics.results.size  = statistics.search.subtopic.matched.totalSize == 0 ? "" : "("+numeral(statistics.search.subtopic.matched.totalSize).format('0.00 b')+")";
         statistics.results.str   = statistics.results.files < 2  ? t.searchHits[ statistics.results.files ] : t.searchHits[2];
     }
-    if( !withARFilters && !acceptUnmatch ) {
+    if( !withMatchFilters && !acceptUnmatch ) {
         statistics.results.str   = t.searchHits[0];
     }
     
@@ -1799,11 +1861,6 @@ Array.prototype.forEachAsync = function (fn) { return this.reduce((promise, n) =
 // Document events handlers
 
 $(document)
-    .on('keyup', '#input-subtopics-selectized', function(e){
-        if( e.originalEvent.code === "NumpadEnter" )
-            $('#btnSearch').trigger('click');
-    })
-
     .on('keyup', '.input-subtopic', function(e){
         let AMQPfilter = $.trim( $(this).val() );
         if( AMQPfilter !== "" && e.type === "mouseout" ) {
@@ -1824,23 +1881,19 @@ $(document)
     })
     .focus()
     
-    .on('change', FILTER.INPUT_AMQP_SRC, function(e) {
+    .on('click', '#btn-reset', function(e) {
+        resetConfigs();
+    })    
+
+    .on('change', SUBTOPICS.INPUT, function(e) {
         setConfigCookie();
-    })
-    
-    // For future use...
-    .on('change', FILTER.INPUT_ACCEPT_REJECT, function() {
+    })    
+
+    .on('change', MATCH.INPUT, function(e) {
         setConfigCookie();
-        // console.log(me(), FILTER.INPUT_ACCEPT_REJECT, $(this).val());
-    })
-        
-    // For future use...
-    .on('change', FILTER.BTN_ACCEPT_REJECT, function() {
-        setConfigCookie();
-        // console.log(me(), FILTER.BTN_ACCEPT_REJECT, $(this).val());
-    })
-    
-    .on('keyup mouseout', '.input-accept_reject', function(e){
+    })    
+
+    .on('keyup mouseout', MATCH.INPUT, function(e){
         if( e.which === $.ui.keyCode.ENTER ) { 
             $('#btnSearch').trigger('click');
         }
@@ -1866,19 +1919,12 @@ $(document)
     })
     
     .on('click', 'a.dropdown-filter', function(e) {
-        
         let $subtopic_input = $('.input-subtopic');
         $(this).parents('.dropdown-menu').find('.form-control').val( "" );
         $(this).parents('.catalogue-short-list .dropdown.open').removeClass( "open" );
         $subtopic_input.val( (e.ctrlKey ? $subtopic_input.val()+FILTER.CHAR_DELIMITER:'') + $(this).text() ).focus();
         setFilterSubtopic( "enable" );
-        
         return false;
-    })
-    
-    .on('change', "#checkbox-filters", function(e) {
-        FILTER.CASE_INSENSITIVE = $(this).is(":checked");
-        setConfigCookie();
     })
     
     .on('change', '#catalogueSelector', function(e) {
@@ -1887,13 +1933,14 @@ $(document)
         loadCatalogueData( selectedCatalogue );
         $(this).blur();
     })
-    
-    .on('click', '#btnConfigurations', function(e) {
+
+    .on('click', '#btn-load_example', function(e) {
         showConfigSampleSelector();
     })
     
     .on('click', '.btn-topic', function(e) {
-        $("#btn-topic").data('selected',$(this).data("selected"));
+        CONFIG.topic.prefix = $(this).data("selected");
+        $("#btn-topic").data('selected',CONFIG.topic.prefix);
         setConfigCookie();
         $(this).blur();
     })
@@ -1903,56 +1950,55 @@ $(document)
         BSDialogUrl( url, $(this).data('title') );
     })
     
+    // Handle Accept/Reject buttons behaviors for mach and unmatch entries
+    .on('change', '.status.btn', function(e) {
+        let $myBtn = $(this);
+        let status = $myBtn.data('status');
+        let type   = $myBtn.hasClass("match") ? "match":"unmatch";
+        let TYPE   = type.toUpperCase();
+        let input  = type === "match" ? { entry:MATCH.ENTRY, status:MATCH.STATUS }:{ entry:UNMATCH.ENTRY, status:UNMATCH.STATUS };
+        let $myBro = $myBtn.siblings(); // my brother button
+        let $myTag = $myBtn.closest(input.entry).find(FILTER.TAG); 
+        let button = $myBtn.hasClass("accept")
+                    ? {myClass:"btn-success", hisClass:"btn-danger"}
+                    : {myClass:"btn-danger",  hisClass:"btn-success"};
+
+        $myBtn.removeClass("btn-default").addClass( button.myClass );
+        $myBro.addClass("btn-default").removeClass( button.hisClass );
+        $myTag.html( t.tag[type][status] +t.comma );
+        type === "match" 
+                    ? $( $myBtn.parent().siblings()[0] ).data( "status", status )
+                    : $( input.status ).data( "status", status );
+
+        setConfigCookie();
+        $myBtn.blur();
+    })
+
     .on('click', '.btn-add', function(e) {
         e.preventDefault();
-        let accept_reject = $('.input-accept_reject'),
-            controlForm  = $('.accepts-rejects .filters:last'),
-            currentEntry = $(this).parents('.entry:last'),
-            currentState = currentEntry.find('.btn-accept-regex').hasClass('active') ? 'accept':'reject',
-            newEntry     = $(currentEntry.clone()).appendTo(controlForm),
-            nextEntryID  = function (){
-                                let ids = [];
-                                for( let i=0, n=accept_reject.length; i < n; i++ ) ids.push( accept_reject[i].id );
-                                return ("input-accept_reject__" + ( parseInt(ids.sort().pop().split("__").pop()) + 1) );
-                            };
-        newEntry.find('label:first').attr('for',nextEntryID);
-        newEntry.find('.help.accept_reject').attr("title", t.help.tip).data("title", t.help.title.accept_reject).tooltip();
-        newEntry.find('.input-accept_reject').val('').data('ar',currentState).attr('id',nextEntryID);
-        controlForm.find('.entry:not(:first) .btn-add')
-            .removeClass('btn-add').addClass('btn-remove')
-            .removeClass('btn-success').addClass('btn-danger')
-            .html('<span class="glyphicon glyphicon-minus"></span>');
+        let splitter   = "__",
+            my_entries = $(MATCH.ENTRY),
+            this_entry = $(this).parents('.match.entry').last(),
+            this_value = $(this_entry).find(MATCH.INPUT).val(),
+            this_state = $(this_entry).data('status'),
+            last_entry = $(my_entries).last(),
+            last_input = $(last_entry).find(MATCH.INPUT),
+            oldInputID = $(last_input).prop('id').split(splitter),
+            newInputID = oldInputID[0] +splitter+ ( parseInt(oldInputID[1])+1 ),
+            new_entry  = $(this_entry.clone()).appendTo(this_entry.parent());
+            
+        $(new_entry).find('.match.help').attr("title", t.help.tip +" - "+ t.help.title.match).data("title", t.help.title.match).tooltip();
+        $(new_entry).find(MATCH.INPUT).prop('id',newInputID).data('status',this_state).val(this_value);
+
         adjustTabsHeight(true);
     })
+
     .on('click', '.btn-remove', function(e) {
-        $(this).parents('.entry:last').remove();
+        $(this).parents('.entry').remove();
+        setConfigCookie();
         e.preventDefault();
         adjustTabsHeight(true);
         return false;
-    })
-    
-    .on('change', '.btn-accept-regex', function(e) {
-        let dude = $(this).closest(".entry");
-        dude.find('.label-accept_reject').html(wrap(t.accept, TAG.cV) +t.comma);
-        dude.find('.input-accept_reject').data("ar","accept");
-        setConfigCookie();
-    })
-    .on('change', '.btn-reject-regex', function(e) {
-        let dude = $(this).closest(".entry");
-        dude.find('.label-accept_reject').html(wrap(t.reject, TAG.cR) +t.comma);
-        dude.find('.input-accept_reject').data("ar","reject");
-        setConfigCookie();
-    })
-    
-    .on('change', '.btn-accept-unmatch', function(e) {
-        $("#btn-accept_unmatch").data('accept_unmatch','True');
-        $(".label-accept_unmatch").html(wrap(t.accept, TAG.cV) +t.comma);
-        setConfigCookie();
-    })
-    .on('change', '.btn-reject-unmatch', function(e) {
-        $("#btn-accept_unmatch").data('accept_unmatch','False');
-        $(".label-accept_unmatch").html(wrap(t.reject, TAG.cR) +t.comma);
-        setConfigCookie();
     })
     
     .on('click', '#btnCopy', function() {
@@ -1983,17 +2029,35 @@ $(document)
         switchLangue(this);
     })
     
-    .on('click', '#include-hints', function() {                      // Show/Hide Config Hints
-        updateResultsTab( this.checked, $('#include-man').is(':checked') );
+    .on('click', '#btn-case-insensitive', function() {                  // Show/Hide Config Hints
+        $(this).parents(".btns.input-group").toggleClass("active");
+        FILTER.case_insensitive = $(this).parents(".btns.input-group").hasClass("active");
+        setConfigCookie();
+        $(this).blur();
     })
-    .on('click', '#include-man', function() {                        // Show/Hide Config Hints
-        updateResultsTab( $('#include-hints').is(':checked'), this.checked );
+    .on('click', '#btn-include-hints', function() {                  // Show/Hide Config Hints
+        $(this).parents(".btns.input-group").toggleClass("active");
+        let withHints   = $(this).parents(".btns.input-group").hasClass("active");
+        let withManuals = $("#btn-include-man").parents(".btns.input-group").hasClass("active");
+        updateResultsTab( withHints, withManuals );
+        $(this).blur();
     })
-    
+    .on('click', '#btn-include-man', function() {                    // Show/Hide Config Manuals
+        $(this).parents(".btns.input-group").toggleClass("active");
+        let withHints   = $("#btn-include-hints").parents(".btns.input-group").hasClass("active");
+        let withManuals = $(this).parents(".btns.input-group").hasClass("active");
+        updateResultsTab( withHints, withManuals );
+        $(this).blur();
+    })
+
     .on('click', '.notif-cookies .fa.fa-times-circle', function() { // Register cookies & close notification
         $.cookie( 'cookies', 'notified', {expires:365} );
         $(".notif-cookies").hide();
     })
+
+    .on('click',        '#back-to-top',         (e) => { $('body,html').animate( {scrollTop: 0}, 500 ); return false; })
+    .on('shown.bs.tab', 'a[data-toggle="tab"]', (e) => {  adjustTabsHeight( true ); })
+
     ;
 
     
@@ -2002,13 +2066,6 @@ $(window)
     .resize(() => { adjustTabsHeight( true ); })
     ;
 
-// On click, scroll body to top
-$('#back-to-top')         .click(() => { $('body,html').animate( {scrollTop: 0}, 500 ); return false; });
-
-// Track tabs' activation and adjust clusterized scroll's height
-$('a[data-toggle="tab"]') .on('shown.bs.tab', (e) => { adjustTabsHeight( true ); });
-
-$('.collapse')            .on('show.bs.collapse', () => { $('.collapse.in').each(()=>{ $(this).collapse('hide'); }); });
 
 // ---------------------------------------------------------------------
 //
@@ -2055,7 +2112,6 @@ function BSDialogUrl( url, dTitle = "Information", dType=BootstrapDialog.TYPE_IN
     
 }
 
-
 // ---------------------------------------------------------------------
 //
 // BSDialogPrompt
@@ -2092,7 +2148,7 @@ function showConfigSampleSelector() {
     $.each( CONFIG.samples, (index, sample) => { options += `<option value="${index}">${sample.title}</option>` } )
     let html = 
             '<div class="configSampleSelector">'+
-                '<span>'+ t.sampleConfigs.tryAconfig +'</span><select id="configSampleSelector" class="form-control input-sm" tabindex="-1">'+
+                '<span>'+ t.sampleConfigs.tryAconfig +'</span><select id="configSampleSelector" class="custom form-control input-sm" tabindex="-1">'+
                     options+
                 '</select>'+
             '</div>';
@@ -2103,13 +2159,6 @@ function showConfigSampleSelector() {
         size:     BootstrapDialog.SIZE_SMALL,
         closable: false,
         buttons: [{
-            label: t.dialog.btn.reset,
-            cssClass: 'btn-default btn-sm pull-left',
-            action: function(dialog){
-                resetConfigs();
-                dialog.close();
-            }
-        }, {
             label: t.dialog.btn.cancel,
             cssClass: 'btn-default btn-sm',
             action: function(dialog){
@@ -2130,7 +2179,7 @@ function showConfigSampleSelector() {
 function resetConfigs() {
 
     $.removeCookie('config')
-    CATALOG.LOADED = false;  // This will prevent setCookieConfig to update on beforeunload window event
+    CATALOG.loaded = false;  // This will prevent setCookieConfig to update on beforeunload window event
     location.reload();
 }
 
@@ -2183,44 +2232,23 @@ function plural( str, qty, format="", wrapper="" ) {
 
 function getFilters() {
     
-    // The first item on the filter's list is the AMQP filter
-    let filters = [ [$(FILTER.INPUT_AMQP_SRC).val(), true] ];
+    // The first filter item on the list is the AMQP filter(s)
+    let filters = [ [$(SUBTOPICS.INPUT).val(), true] ];
     
-    // Add to the list all other Regex filters provided by the user
-    $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) filters.push( [filter,$(item).data('ar')==='accept'] ); });
+    // Add all other MATCH filters to the list provided by the user
+    $( MATCH.INPUT ).each( (index, item) => { let filter = $(item).val(); if( filter ) filters.push( [$(item).data('status'),filter] ); });
     
-    // The last item of the list is accept_unmatch value 
-    filters.push( ['.*', $("#btn-accept_unmatch").data('accept_unmatch')==='True'] );
-    
-    return filters;
-}
-
-
-// ---------------------------------------------------------------------
-//
-// setFilters 
-// Returns an array of sarracenia filters to apply
-// for searching files in selected catalogue
-
-function setFilters() {
-    
-    // The first item on the filter's list is the AMQP filter
-    let filters = [ [$(FILTER.INPUT_AMQP_SRC).val(), true] ];
-    
-    // Add to the list all other Regex filters provided by the user
-    $( ".input-accept_reject" ).each( (index, item) => { let filter = $(item).val(); if( filter ) filters.push( [filter,$(item).data('ar')==='accept'] ); });
-    
-    // The last item of the list is accept_unmatch value 
-    filters.push( ['.*', $("#btn-accept_unmatch").data('accept_unmatch')==='True'] );
+    // The last item of the list is the UNMATCH value 
+    filters.push( [$(UNMATCH.STATUS).data('status'),'.*'] );
     
     return filters;
 }
 
 
-// ---------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // 
 // https://coderwall.com/p/kvzbpa/don-t-use-array-foreach-use-for-instead
-// 
+
 Array.prototype.forEach2 = function(a) {
     for(let i=0, n=this.length; i < n; i++) a( this[i], i );
 }
@@ -2232,6 +2260,7 @@ Array.prototype.forEachFromTo = function(a, inn=0, out=this.length) {
     for(let i=inn; i<out; i++) a( this[i], i );
 }
 
+
 // ---------------------------------------------------------------------
 //
 // Show Pane Tab
@@ -2241,14 +2270,16 @@ function showTabPane( tabID ) {
     if( tabID ) $(`#${tabID}-tab`).removeClass('hidden');
 }
 
+
 // ---------------------------------------------------------------------
 //
 // Activate Pane Tab
 // Simulate a click on a given tab through its ID
 
 function activatePane( tabID ) {
-    if( tabID ) $(`#${tabID}-tab`).trigger('click');
+    if( tabID ) $(`#${tabID}-tab`).trigger('click').blur();
 }
+
 
 // ---------------------------------------------------------------------
 //
@@ -2268,13 +2299,14 @@ function resetDataDisplay( obj, total=0, shown=0, lines=1000 ) {
 /*#*/if( DEBUG ){ console.timeEnd( "   " ); logMe('-','-'); console.groupEnd();};/*#*/
 }
 
+
 // ---------------------------------------------------------------------
 // 
 // updateFilesTab
 // Update files' tab with title as well as its page with text
 
 function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
-// let DEBUG = true;
+let DEBUG = true;
 /*#*/if( DEBUG ){ console.group('in -> '+me()); console.time( "   " ); console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); };/*#*/
 
     function getHeader( nbFiles=0, totSize=0 ) {
@@ -2347,7 +2379,7 @@ function  setFilterSubtopic( state ) {
             setFilterSubtopic( "disable" );
             setGUIstate(GUI.STATE_RESET);
             if( folders.length < 1 ) cluster.subtopic.clear();
-            if( $(FILTER.INPUT_AMQP_SRC).val() == "" ) {
+            if( $(SUBTOPICS.INPUT).val() == "" ) {
                 $("#topics-tab, #files-tab, #stats-tab").addClass('hidden');
             }
             setGUIstate(GUI.STATE_READY);
