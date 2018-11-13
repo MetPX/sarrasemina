@@ -121,7 +121,7 @@
                         "en":""
                         }
                 },{
-                    "name":"subtopics", "val":["*.*.BULLETINS.#"],
+                    "name":"subtopics", "val":["ec.ops.*.*.ninjo-a.#"],
                     "hint":{
                         "fr":"",
                         "en":""

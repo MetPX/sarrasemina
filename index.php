@@ -6,7 +6,7 @@
     Author        : Daniel Léveillé
                     SSC-SPC - Gouvernement du Canada
     created       : 2017-08-24 08:00:00
-    last-modified : 2018-11-13 07:50:42
+    last-modified : 2018-11-13 12:44:58
 
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
@@ -69,15 +69,15 @@
         <div class="notif-cookies">
           <span class="msg"></span> &nbsp; <a><i class="fa fa-times-circle" aria-hidden="true"></i></a>
         </div>
-<?php /*    LOGO & TOP TITLE
+<?php /*    TOP LOGO
             -------------------------------------------------------------------- */ ?>
         <div id="docs" class="row page">
             <div class="row">
-                <div class="col-sm-5 title-logo">
+                <div class="col-sm-5 top-logo">
                     <img height="26" src="/img/sig-blk-fr.svg"/>
                 </div>
-                <div class="col-sm-4 title-text"></div>
-                <div class="col-sm-3 title-btns text-right">
+                <div class="col-sm-4 top-text"></div>
+                <div class="col-sm-3 top-btns text-right">
                     <span style="white-space: nowrap">
                         <button type="button" class="btn btn-default btn-sm help" id="about" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>                    
                         <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
@@ -116,24 +116,24 @@
 <?php /*            CATALOGUE
                     -------------------------------------------------------------------- */ ?>
                                     <tr class="line catalogue">
-                                        <td width="90"><label class="label-catalogue">Catalogue : </label></td>
+                                        <td class="tag"><label class="catalogue">Catalogue : </label></td>
                                         <td>
                                             <div>
                                                 <div class="selects input-group input-group-sm">
-                                                    <span id="help-catalogues" class="help catalogues input-group-addon" data-help="catalogues" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <span class="help catalogues input-group-addon" data-help="catalogues" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
                                                     <div id="catalogues"></div>
                                                 </div>
                                             </div>
                                         </td>
                                     </tr>
-<?php /*            FILTERS OPTIONS
+<?php /*            CONFIGURATIONS
                     -------------------------------------------------------------------- */ ?>
                                     <tr class="line filters">
-                                        <td width="90"><label class="label-filters" data-label="unchecked">Filters: </label></td>
+                                        <td class="tag"><label class="configuration" data-label="unchecked">Config: </label></td>
                                         <td>
                                             <div class="btns input-group pull-left">
                                                 <div class="input-group input-group-sm">
-                                                    <span id="help-filters" class="help filters input-group-addon" data-help="filters" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <span class="help case-insensitive input-group-addon" data-help="case-insensitive" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
                                                     <div class="btn-group btn-group-sm" data-toggle="buttons">
                                                         <div class="include">
                                                             <div class="btns input-group input-group-sm">
@@ -146,14 +146,14 @@
                                             </div>
                                             <div>
                                                 <div class="btns input-group input-group-sm">
-                                                    <span   id="help-configs"      class="help configs input-group-addon" data-help="configs" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
-                                                    <button id="btnConfigurations" class="btn-default btn-sm">Configurations... <i class="fa fa-file-text-o" aria-hidden="true"></i></button>
+                                                    <span   class="help load_example input-group-addon" data-help="load_example" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <button id="btn-load_example" class="btn-default btn-sm">Configurations... <i class="fa fa-file-text-o" aria-hidden="true"></i></button>
                                                 </div>
                                             </div>
                                             <div>
                                                 <div class="btns input-group input-group-sm">
-                                                    <span   id="help-reset_configs" class="help reset_configs input-group-addon" data-help="reset_configs" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
-                                                    <button id="btnResetConfigs"    class="btn-default btn-sm">Reset...</button>
+                                                    <span   class="help reset input-group-addon" data-help="reset_configs" data-toggle="tooltip" data-placement="bottom"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
+                                                    <button id="btn-reset"          class="btn-default btn-sm">Reset...</button>
                                                 </div>
                                             </div>
                                         </td>
@@ -164,7 +164,7 @@
 <?php /*            TOPIC
                     -------------------------------------------------------------------- */ ?>
                                     <tr class="line topic">
-                                        <td width="90"><label class="label-topic" data-label="v02.post">Topic: </label></td>
+                                        <td class="tag"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
                                             <div>
                                                 <div class="input-group input-group-sm">

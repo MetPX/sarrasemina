@@ -18,8 +18,8 @@
                 "subtopic" : "Sous-thème :",
                 "accepted" : "Accepté :",
                 "rejected" : "Rejeté :",
-                "unmatch"  : "élément non-filtré",
-                "unmatchs" : "éléments non-filtrés",
+                "unmatch"  : "fichier non-filtré",
+                "unmatchs" : "fichiers non-filtrés",
                 "results"  : "Resultats",
                 "summary"  : "En résumé",
                 "found"    : "trouvé"
@@ -42,7 +42,7 @@
                 "display"       : "Afficher",
                 "cancel"        : "Annuler",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
-                "reset"         : "Réinitialiser Configurations",
+                "reset"         : "Réinitialiser...",
                 "stop"          : "Arrêter",
                 "stopSearch"    : "Arrêter maintenant",
                 "continueSearch": "Continuer la recherche"
@@ -52,16 +52,18 @@
         },
 
         "help": {
-            "tip"  : "Clic pour aide",
+            "tip"  : "Clic aide",
             "title": {
-                "page"         : "Sarra Semina",
-                "catalogues"   : "Catalogues",
-                "configs"      : "Exemples de configuration",
-                "filters"      : "Filtres",
-                "topic"        : "Thème",
-                "subtopic"     : "Sous-thème",
-                "accept_reject" : "Accepter/Rejeter",
-                "accept_unmatch": "Éléments non filtrés"
+                "page"             : "Sarra Semina",
+                "catalogues"       : "Catalogues",
+                "case_insensitive" : "Filtre insensible à la casse",
+                "load_example"     : "Charger un exemple",
+                "reset"            : "Réinitialiser Configuration",
+                "filters"          : "Filtres",
+                "topic"            : "Thème",
+                "subtopic"         : "Sous-thème",
+                "match"            : "Accepter/Rejeter produits",
+                "unmatch"          : "Produits non capturés"
             },
             
             "filterReset"      : "Réinitialiser le filtre",
@@ -117,7 +119,7 @@
                 "display"       : "Display",
                 "cancel"        : "Cancel",
                 "ok"            : "&nbsp; &nbsp OK &nbsp; &nbsp",
-                "reset"         : "Reset Configurations",
+                "reset"         : "Reset...",
                 "stop"          : "Stop",
                 "stopSearch"    : "Stop Now",
                 "continueSearch": "Continue Searching"
@@ -127,17 +129,20 @@
         },
 
         "help": {
-            "tip"  : "Click for help",
+            "tip"  : "Click help",
             "title":
             {
-                "page"          : "Sarra Semina",
-                "catalogues"    : "Catalogues",
-                "configs"       : "Config Examples",
-                "filters"       : "Filters",
-                "topic"         : "Topic",
-                "subtopic"      : "Subtopic",
-                "accept_reject" : "Accept/Reject",
-                "accept_unmatch": "Unmatched elements"
+                "page"             : "Sarra Semina",
+                "catalogues"       : "Catalogues",
+                "case_insensitive" : "Case insensitive filter",
+                "load_example"     : "Load an example",
+                "examples"         : "Examples",
+                "reset"            : "Reset Configuration",
+                "filters"          : "Filters",
+                "topic"            : "Topic",
+                "subtopic"         : "Subtopic",
+                "match"            : "Accept / Reject products",
+                "unmatch"          : "Unmatched products"
             },
             
             "filterReset"      : "Reset filter",

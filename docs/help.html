@@ -89,8 +89,8 @@
 
 ====================================================================================================
 
-<div id="fr-configs">
-    <h5>Le bouton <img src="/img/btn-configurations.png" /></h5>
+<div id="fr-load_example">
+    <h5>Le bouton <button class="btn static">Charger un exemple...</button></h5>
     <p> Ce bouton donne accès à des exemples pré-établis de configuration Sarracenia.
         Vous pouvez charger ceux-ci dans l'éditeur d'abonnements afin d'observer les résultats de recherche anticipés sur un catalogue de produits.<br>
         <br>
@@ -106,8 +106,8 @@
         </ul>
 </div>
 ----------------------------------------------------------------------------------------------------
-<div id="en-configs">
-    <h5><img src="/img/btn-configurations.png" /> Button</h5>
+<div id="en-load_example">
+    <h5><button class="btn static">Load an example...</button> Button</h5>
     <p> This button gives access to Sarracenia configuration examples.
         You can upload a config to the Subscription editor to get its expected results from a product's catalog.<br>
         <br>
@@ -125,19 +125,31 @@
 
 ====================================================================================================
 
-<div id="fr-filters">
+<div id="fr-reset_configs">
+    <h5>Remise à zéro des configurations</h5>
+    <p> Efface la dernière configuration utilisée et recharge la page.</p>
+</div>
+----------------------------------------------------------------------------------------------------
+<div id="en-reset_configs">
+    <h5>Reset Configurations</h5>
+    <p> Clears the last configuration used and reloads the page.</p>
+</div>
+
+====================================================================================================
+
+<div id="fr-case-insensitive">
     <h5>ATTENTION</h5>
     <p> Les filtres de <em><strong>Sarracenia</strong> sont sensibles à la casse (Majuscules&nbsp;/&nbsp;minuscules).</em><br>
         <small>Réf.: <a href="https://github.com/MetPX/sarracenia/blob/master/doc/fr/sr_subscribe.1.rst#syntaxe-des-options" target="_blank">https://github.com/MetPX/sarracenia/blob/master/doc/fr/sr_subscribe.1.rst#syntaxe-des-options <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
     <p> <strong>SarraSemina</strong> offre l'option <strong class="c-bleu">Casse insensible</strong> uniquement pour faciliter la recherche de produits.<br>
-        Par exemple, lorsqu'on ignore dans quelles sources rechercher des produits.</p>
+        Par exemple, lorsque vous ne savez pas dans quelles sources rechercher des produits.</p>
     <p> <strong>Veuillez donc garder ce détail à l'esprit quand cette option activée.</strong></p>
-    <p> Si vous cherchez des produits avec l'option <strong>Casse insensible</strong> activée,
-        il est recommandé de valider les résultats de recherche pour cette configuration en désactivant l'option et en 
-        relançant de nouveau la recherche pour confirmer que les produits trouvés sont toujours ceux désirés.</p>
+    <p> Si vous cherchez des produits avec l'option <strong>Casse insensible</strong> cochée,
+        il est recommandé de confirmer vos résultats de recherche en désactivant l'option et en 
+        lançant la recherche à nouveau pour vérifier si les produits désirés sont toujours présents.</p>
 </div>
 ----------------------------------------------------------------------------------------------------
-<div id="en-filters">
+<div id="en-case-insensitive">
     <h5>WARNING</h5>
     <p> <em><strong>Sarracenia's</strong> filters are case sensitive (upper&nbsp;/&nbsp;lower case).</em><br>
         <small>Ref.: <a href="https://github.com/MetPX/sarracenia/blob/master/doc/sr_subscribe.1.rst#client-side-filtering" target="_blank">https://github.com/MetPX/sarracenia/blob/master/doc/sr_subscribe.1.rst#client-side-filtering <i class="fa fa-external-link" aria-hidden="true"></i></a></small></p>
@@ -145,8 +157,8 @@
         For example, when you do not know in which sources to look for products.</p>
     <p> <strong>Please keep this in mind when the option is enabled.</strong></p>
     <p> If you are looking for products with the <strong>Case insensitive</strong> option enabled,
-        you should validate the configuration's results by disabling the option and proceed with the search
-        again in order to confirm that found products are still the ones you're looking for.</p>
+        you should validate your results by disabling the option and proceed with the search again
+        in order to confirm that found products are still the ones you're looking for.</p>
 </div>
 
 ====================================================================================================
@@ -243,7 +255,7 @@
 
 ====================================================================================================
 
-<div id="fr-accept_reject">
+<div id="fr-match">
     <h5>Les filtres Regex</h5>
     <p>
         Tout comme les règles AMQP, les filtres Regex sont <strong>sensibles à la casse</strong>.</p>
@@ -259,7 +271,7 @@
     </ul>
 </div>
 ----------------------------------------------------------------------------------------------------
-<div id="en-accept_reject">
+<div id="en-match">
     <h5>The Regex Filters</h5>
     <p>
         Like the AMQP rules, Regex filters are <strong>case sensitive</strong>.</p>
@@ -278,24 +290,28 @@
 ====================================================================================================
 
 <div id="fr-accept_unmatch">
-    <h5>Le dernier filtre</h5>
+    <h5>Le dernier filet de sécurité!</h5>
     <p>
+        Ce filtre s'applique aux produits non capturés par les filtres de recherche précédents.<br>
+        <br>
         Il n'y a que deux choix pour ce filtre :<br>
-        <strong class="c-vert">Accepter</strong> ou <strong class="c-rouge">Rejeter</strong> les éléments restant dans la liste.</p>
+        <strong class="c-vert">Accepter</strong> ou <strong class="c-rouge">Rejeter</strong> ces autres produits.</p>
     <ul style="margin: 5px 15px; line-height: 1.3em;">
-        <li style="margin-top: .5em;">En mode <strong class="c-vert">Accepter</strong>, tous les éléments restants dans la liste seront affichés dans les résultats.</li>
-        <li style="margin-top: .5em;">En mode <strong class="c-rouge">Rejeter</strong>, tous les éléments restants dans la liste seront éliminés.</li>
+        <li style="margin-top: .5em;">En mode <strong class="c-vert">Accepter</strong>, les produits restants seront ajoutés aux résultats.</li>
+        <li style="margin-top: .5em;">En mode <strong class="c-rouge">Rejeter</strong>, les produits restants seront éliminés des résultats.</li>
     </ul>
 </div>
 ----------------------------------------------------------------------------------------------------
 <div id="en-accept_unmatch">
-    <h5>The last filter</h5>
+    <h5>The last safety net!</h5>
     <p>
+        This filter applies to all products that were not captured by previous search filters.<br>
+        <br>
         There are only two choices for this filter:<br>
-        <strong class="c-vert">Accept</strong> or <strong class="c-rouge">Reject</strong> the remaining items in the list.<br>
+        <strong class="c-vert">Accept</strong> or <strong class="c-rouge">Reject</strong> those other products.<br>
     <ul class="margetop-5px">
-        <li>In <strong class="c-vert">Accept</strong> mode, all remaining items in the list will be displayed in the results.</li>
-        <li>In <strong class="c-rouge">Reject</strong> mode, all remaining items in the list will be eliminated .</li>
+        <li>In <strong class="c-vert">Accept</strong> mode, the remaining products will be added to the results.</li>
+        <li>In <strong class="c-rouge">Reject</strong> mode, the remaining products will be discarded from the results.</li>
     </ul>
 </div>
 
