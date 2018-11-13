@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-11-13 11:16:46
+  last-modified : 2018-11-13 13:25:46
 -----------------------------------------------------------
 */
 
@@ -121,6 +121,8 @@ th, td { padding: 1px 0 0 0; line-height: 1em; }
 
 a.btn.active .fa.onn, a.btn .fa.off { display: none; }
 a.btn.active .fa.off, a.btn .fa.onn { display: inline-block; }
+
+.btn.static { cursor: default; color: #333; background-color: #fff; border: 1px solid #aaa; height: 30px; font-size: 12px;  }
 /**/
 
 select.custom {
