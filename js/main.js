@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-13 13:04:34
+// last-modified : 2018-11-14 06:51:27
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -359,7 +359,7 @@ function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.log("filterOptions[",filterOptions,"]"); console.log("groupOptions[",groupOptions,"]"); console.log("subtopics[",subtopics,"]"); };/*#*/
 
-    let gotCookies = !jQuery.isEmptyObject(CONFIG.cookie);
+    let gotCookies = !jQuery.isEmptyObject(CONFIG.cookie) && (CONFIG.cookie.match !== undefined);
     let eventHandler = function get( name ) {
         return function give() { if( name === "onChange" ) { setFilterSubtopic( isValidAMQP( $(SUBTOPICS.INPUT).val() ) ? 'enable':'disable' ); } };
     };
@@ -425,6 +425,7 @@ function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[
 
         let count  = 1;
         let matchs = CONFIG.cookie.match;
+
         matchs.forEach( (match) => {
             let match_entry  = $(MATCH.ENTRY).last();
             let status = match[0], filter = match[1];
@@ -2306,7 +2307,7 @@ function resetDataDisplay( obj, total=0, shown=0, lines=1000 ) {
 // Update files' tab with title as well as its page with text
 
 function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
-let DEBUG = true;
+// let DEBUG = true;
 /*#*/if( DEBUG ){ console.group('in -> '+me()); console.time( "   " ); console.log('>>> filesInFolders wFilters['+withAcceptRejectFilters+']',L,filesInFolders,L,'>>> bigData_Files :',L,bigData_Files); };/*#*/
 
     function getHeader( nbFiles=0, totSize=0 ) {
