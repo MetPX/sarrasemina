@@ -73,11 +73,11 @@
             -------------------------------------------------------------------- */ ?>
         <div id="docs" class="row page">
             <div class="row">
-                <div class="col-sm-5 top-logo">
+                <div class="col-sm-4 top-logo">
                     <img height="26" src="/img/sig-blk-fr.svg"/>
                 </div>
                 <div class="col-sm-4 top-text"></div>
-                <div class="col-sm-3 top-btns text-right">
+                <div class="col-sm-4 top-btns text-right">
                     <span style="white-space: nowrap">
                         <button type="button" class="btn btn-default btn-sm help" id="about" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" data-help="about" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>                    
                         <button type="button" class="btn btn-default btn-sm" id="switchLang" data-toggle="tooltip" data-placement="bottom" title="" data-original-title="" tabindex="-1">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>

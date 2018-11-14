@@ -57,13 +57,13 @@
                         "en":""
                         }
                 },{
-                    "name":"acceptReject", "val":[[".*",true]],
+                    "name":"match", "val":[["accept",".*"]],
                     "hint":{
                         "fr":"Accepter tous les bulletins de l'OMI",
                         "en":"Accept all WHO Bulletins"
                         }
                 },{
-                    "name":"unmatched", "val":false,
+                    "name":"unmatch", "val":["reject",".*"],
                     "hint":{
                         "fr":"",
                         "en":""
@@ -72,11 +72,11 @@
         },
         {
             "title": {
-                "fr":"Bulletins OMI 2",
-                "en":"WMO Bulletins 2"},
+                "fr":"Bulletins CACN45",
+                "en":"CACN45 Bulletins"},
             "comment": {
-                "fr":"# Ceci est un flux des bulletins de l'OMI (un ensemble appelé AMIS dans le passé)",
-                "en":"# This is a feed of WHO bulletins (a set called AMIS in the old times)"},
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/bulletins/doc/README_bulletins.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/bulletins/doc/README_bulletins.txt"},
             "options": [
                 {
                     "name":"broker", "val":"amqps://dd.weather.gc.ca/",
@@ -93,8 +93,8 @@
                 },{
                     "name":"expire", "val":"10m",
                     "hint":{
-                        "fr":"# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
-                        "en":"# In operational use, EXPIRE should be longer than longest expected interruption"
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
                         }
                 },{
                     "name":"inflight", "val":"",
@@ -121,19 +121,439 @@
                         "en":""
                         }
                 },{
-                    "name":"subtopics", "val":["ec.ops.*.*.ninjo-a.#"],
+                    "name":"subtopics", "val":["*.*.MSC-BULLETINS.#"],
                     "hint":{
                         "fr":"",
                         "en":""
                         }
                 },{
-                    "name":"acceptReject", "val":[[".*",true]],
+                    "name":"match", "val":[["accept",".*CACN45.*"]],
                     "hint":{
-                        "fr":"Accepter tous les bulletins de l'OMI",
-                        "en":"Accept all WHO Bulletins"
+                        "fr":"Accepter tous les bulletins CACN45",
+                        "en":"Accept all CACN45 Bulletins"
                         }
                 },{
-                    "name":"unmatched", "val":true,
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Fichiers XML - Whitehorse",
+                "en":"XML Files - Whitehorse"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/citypage_weather/docs/README_citypage_weather.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/citypage_weather/docs/README_citypage_weather.txt"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"2",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.DD-XML.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*s0000825_f"]],
+                    "hint":{
+                        "fr":"Accepter tous les fichiers XML pour la ville de Whitehorse",
+                        "en":"Accept all XML files for Whitehorse city"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Fichiers GRIB - SRPD 15km",
+                "en":"GRIB files - RDPS 15km"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/grib/grib2_reg_15km_f.html",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/grib/grib2_reg_15km_f.html"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"5",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.GRIB2.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*15km.*"]],
+                    "hint":{
+                        "fr":"Accepter tous les fichiers GRIB2 de SRPD 15km",
+                        "en":"Accept all GRIB2 files of RDSP 15km"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Images radar XAM en format CAPPI",
+                "en":"CAPPI format images for XAM radar"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/radar/doc/README_radar.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/radar/doc/README_radar.txt"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"3",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.RADAR.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*XAM.*CAPPI.*"]],
+                    "hint":{
+                        "fr":"Accepter les images radar en format CAPPI pour le radar XAM",
+                        "en":"Accept radar images in CAPPI format for XAM radar"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Fichiers d'observations SWOB - Station CYQL",
+                "en":"Observation SWOB files - CYQL Station"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/observations/doc/README_SWOB.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/observations/doc/README_SWOB.txt"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"2",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.SWOB.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*xml.*cyql.*"]],
+                    "hint":{
+                        "fr":"Accepter seulement la station CYQL",
+                        "en":"Accept only CYQL station"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Fichiers d'observations SWOB - Toutes stations",
+                "en":"Observation SWOB files - All Stations"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/observations/doc/README_SWOB.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/observations/doc/README_SWOB.txt"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"2",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.SWOB.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*"]],
+                    "hint":{
+                        "fr":"Accepter toutes les stations",
+                        "en":"Accept all stations"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
+                "fr":"Flux Ninjo pour Serveur A",
+                "en":"Ninjo feed for server A"},
+            "comment": {
+                "fr":"# Exemple du flux Ninjo actuel (2013-10-10) pour le serveur A\n# Ce serveur est interne et non visible à l'extérieur de ECCC",
+                "en":"# Example of the current (10/10/2013) Ninjo feed for server A\n# This server is internal... is not be visible outside ECCC"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://ddi.cmc.ec.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"20",
+                    "hint":{
+                        "fr":"# Très grand volume de données téléchargé",
+                        "en":"# Very high volume of data downloaded"
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.NINJO.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*ABFS_1.0.*"],["accept",".*AQHI_1.0.*"],["accept",".*AMDAR_1.0.*"],["accept",".*AWOS_1.1.*"],["accept",".*BCFS_1.0.*"],["accept",".*CA_1.0.*"],["accept",".*ECMANNED_1.1.*"],["accept",".*METAR_1.0.*"],["accept",".*NCAWOS_1.1.*"],["accept",".*NCHWOS_1.1.*"],["accept",".*PIREP_1.0.*"],["accept",".*RMCQ_1.0.*"],["accept",".*RWIN_1.0.*"],["accept",".*SYNO_1.0.*"],["accept",".*SYNO_BUOY_1.0.*"],["accept",".*SYNO_SHIP_1.0.*"],["accept",".*TAF_1.0.*"],["accept",".*UPPERAIR_1.0.*ASCII.*.xml.*"],["accept",".*UPPERAIR_1.0.*BINARY.*.xml.*"]],
+                    "hint":{
+                        "fr":"Accepter toutes les stations",
+                        "en":"Accept all stations"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
                     "hint":{
                         "fr":"",
                         "en":""

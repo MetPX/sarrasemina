@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-14 06:51:27
+// last-modified : 2018-11-14 07:56:47
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -354,7 +354,7 @@ function setConfigCookie( withSampleConfigIndex=-1 ) {
 
 // ---------------------------------------------------------------------
 // Refill filters with user's configs found in session cookie
-
+// ---------------------------------------------------------------------
 function loadConfigCookieSession( filterOptions=[], groupOptions=[], subtopics=[] ) {
 // let DEBUG = true;
 /*#*/if( DEBUG ){ console.group(me()); console.log("filterOptions[",filterOptions,"]"); console.log("groupOptions[",groupOptions,"]"); console.log("subtopics[",subtopics,"]"); };/*#*/
@@ -612,7 +612,6 @@ function _initialize_() {
         
         showTabPane( PANE.EDITOR );
         activatePane( PANE.EDITOR );
-        $(SUBTOPICS.INPUT).attr('placeholder',t.wait.loadingData);
         CATALOG.loaded = true;
         // FIXME 
         // for now, keep this trigger at last to avoid messing up match & unmatch CONFIG.cookie 
@@ -738,7 +737,7 @@ function loadCatalogueData( selectedCatalogue ) {
 
     let loadtime = Date.now();
     
-    $('#msg').html(`<p class="title-text">${t.wait.loadingData}</p>`).show();
+    $('#msg').html(`<strong class="c-noir">${t.wait.loadingData}</strong>`).show();
     $('#logs').show();
 
     $.ajax({
