@@ -6,7 +6,7 @@
     Author        : Daniel Léveillé
                     SSC-SPC - Gouvernement du Canada
     created       : 2017-08-24 08:00:00
-    last-modified : 2018-11-13 12:44:58
+    last-modified : 2018-11-14 12:54:52
 
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
@@ -202,7 +202,7 @@
                                             <div>
                                                 <div class="subtopic filter input-group input-group-sm">
                                                     <span  id="help-subtopic" class="help subtopic input-group-addon" data-help="subtopic" data-toggle="tooltip" data-placement="right"><i class="fa fa-question-circle" aria-hidden="true"></i></span>
-                                                    <input id="subtopics-input" class="subtopic" placeholder="Sélectionner un catalogue pour procéder..." value="" disabled />
+                                                    <input id="subtopics-input" class="subtopic" placeholder="" value="" disabled />
                                                     <span class="input-group-addon"><button id="btnResetSubtopic" class="input-group-addon" disabled tabindex="-1"><span class="glyphicon glyphicon-remove"></span></button></span>
                                                 </div>
                                             </div>

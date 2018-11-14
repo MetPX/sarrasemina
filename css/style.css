@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-11-14 08:28:26
+  last-modified : 2018-11-14 10:07:38
 -----------------------------------------------------------
 */
 
@@ -255,15 +255,15 @@ td.label, td.tag { width: 110px; }
 }
 
 @media (max-width: 490px) {
-  #input-subtopics { font-size: 11px; }
+  #subtopics-input { font-size: 11px; }
 }
 
 @media (max-width: 470px) {
-  #input-subtopics { font-size: 10px; }
+  #subtopics-input { font-size: 10px; }
 }
 
 @media (max-width: 450px) {
-  #input-subtopics { font-size: 9px; }
+  #subtopics-input { font-size: 9px; }
 }
 
 
@@ -291,7 +291,7 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #btn-filters { border-raduis: 0 3px 3px 0; }
 #btn-topic .btn-topic:last-child { border-radius: 0 3px 3px 0; }
 #btn-filters .fa, #btn-topic .fa { margin-right: 3px; }
-#input-subtopics { width: 100%; height: 27px; background-color: #fff; padding: 0px 5px; border: 1px solid #ccc; box-shadow: inset 0 1px 1px rgba(0,0,0,.075); }
+#subtopics-input { width: 100%; height: 27px; background-color: #fff; padding: 0px 5px; border: 1px solid #ccc; box-shadow: inset 0 1px 1px rgba(0,0,0,.075); }
 
 #files { overflow: hidden; }
 #files p { font: 13px 'Ubuntu Mono', monospace; color: #960; }
