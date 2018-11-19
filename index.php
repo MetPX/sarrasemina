@@ -6,7 +6,7 @@
     Author        : Daniel Léveillé
                     SSC-SPC - Gouvernement du Canada
     created       : 2017-08-24 08:00:00
-    last-modified : 2018-11-14 12:54:52
+    last-modified : 2018-11-19 08:20:09
 
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
@@ -163,7 +163,7 @@
                                 <table>
 <?php /*            TOPIC
                     -------------------------------------------------------------------- */ ?>
-                                    <tr class="line topic">
+                                    <tr class="line topic" style="display: none;">
                                         <td class="tag"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
                                             <div>
@@ -197,7 +197,7 @@
                                     <?php /**/ ?>
                                     <tr id="err-subtopic"><td> </td><td class="err"> </td></tr>
                                     <tr class="line subtopic">
-                                        <td><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
+                                        <td class="tag"><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
                                         <td>
                                             <div>
                                                 <div class="subtopic filter input-group input-group-sm">
@@ -214,8 +214,9 @@
                                     <?php /**/ ?>
                                 </table>
                                 <hr>
-<?php /*            MATCHED  FILTERS - REGEX RULES NEW
+<?php /*            MATCHED  FILTERS - REGEX RULES
                     -------------------------------------------------------------------- */ ?>
+                                <div class="maxH300">
                                 <table id="match-filters">
                                     <tr class="match entry">
                                         <td class="tag">[Auto]</td>
@@ -243,10 +244,11 @@
                                         </td>
                                     </tr>
                                 </table>
+                                </div>
                                 <hr>
-<?php /*            UNMATCH  FILTERS - NEW
+<?php /*            UNMATCH  FILTERS
                     -------------------------------------------------------------------- */ ?>
-                                <table>
+                                <table id="unmatch-filters">
                                     <tr class="unmatch entry">
                                         <td class="tag">[Auto]</td>
                                         <td>
@@ -267,7 +269,7 @@
                                         </td>
                                     </tr>
                                 </table>
-<?php /*            PROGRESS BAR
+<?php /*            PROGRESS BAR & FOLDERS PANE
                     -------------------------------------------------------------------- */ ?>
                                 <div class="progress">
                                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
@@ -280,7 +282,7 @@
                     
                     <div id="folders" class="tab-pane cluster-ol"></div>
                 </div>
-<?php /*        RESULT PANES
+<?php /*        OTHER RESULT PANES
                     -------------------------------------------------------------------- */ ?>
                 <div id="stats"   class="tab-pane"></div>
                 <div id="topics"  class="tab-pane cluster-ol"></div>

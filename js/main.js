@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-14 07:56:47
+// last-modified : 2018-11-19 09:59:14
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -1665,9 +1665,9 @@ function updateResultsTab( withHints=false, withMan=false ) {
     // --------------------------------------
     let tr_catalogue = `
             <tr class="tr"><th class="th1" colspan="4">${t.searchResults} ${t.forThisConfig}</th></tr>
-            <tr class="c-bleu"><td class="title" colspan="4">Catalogue${t.comma} [ <strong>${statistics.catalog.name}</strong> ]</td></tr>
+            <tr class="c-bleu"><td class="title">Catalogue${t.comma}</td><td><strong>${statistics.catalog.name}</strong></td><td colspan="2"></td></tr>
             <tr class="c-bleu"><td></td><td>${numFolders}<br>${numFiles}</td><td colspan="2"> ${strFolders} <br> ${strFiles}</td></tr>
-            <tr><td></td><td colspan="2"></td><td><strong>${t.data.table.filter}</strong></td></tr>`;
+            <tr><td></td><td colspan="2"></td><td class="c-dark">&nbsp; <strong>${t.data.table.filter}</strong></td></tr>`;
     
     // --------------------------------------
     // Search filters
@@ -1694,21 +1694,24 @@ function updateResultsTab( withHints=false, withMan=false ) {
             numAcceptReject = statistics.search.accept_reject.length,
             lastAcceptReject = numAcceptReject - 1;
         for( let i = 1; i < numAcceptReject; i++ ) {
+            let matchUnmatch = (i < lastAcceptReject)? "matchs":"unmatchs";
+            matchUnmatch += (i == 1) ? " first":"";
+            matchUnmatch += (i == lastAcceptReject-1) ? " last":"";
             if( statistics.search.accept_reject[i].accept ) {
-                color  = ' class="c-vert"';
+                color  = ` class="${matchUnmatch} c-vert"`;
                 choice = t.data.table.accepted;
                 files  = statistics.search.accept_reject[i].matched.files;
                 size   = statistics.search.accept_reject[i].matched.totalSize;
             }
             else {
-                color  = ' class="c-rouge"',
+                color  = ` class="${matchUnmatch} c-rouge"`,
                 choice = t.data.table.rejected,
                 files  = statistics.search.accept_reject[i].unmatch.files,
                 size   = statistics.search.accept_reject[i].unmatch.totalSize;
             }
             plural = files > 1 ? "s":"";
             files  = numeral(files).format('0,0');
-            filter = i < lastAcceptReject ? statistics.search.accept_reject[i].filter : `( ${t.data.table.unmatchs} )`;
+            filter = i < lastAcceptReject ? statistics.search.accept_reject[i].filter : `<span class="c-dark">( ${t.data.table.unmatchs} )</span>`;
             elem   = t.file + plural; // i < lastAcceptReject ? t.file+plural : t.data.table['unmatch'+plural];
             tr_findings  += `
             <tr${color}><td>${choice}</td><td>${files}</td><td>${elem} (${ numeral(size).format("0.00 b") }) &nbsp;</td><td>&nbsp; ${filter}</td></tr>`;
@@ -2461,36 +2464,40 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
 function adjustTabsHeight( adjust ) {
     
     let 
-        $tabs          = $('#tabs'),
-        $stats         = $('#stats'),
-        tabsOffsetTop  = $tabs.offset().top,
-        liHeight       = parseInt( $('.clusterize-content.customize-counter li').css('line-height') ),
-        tabsMinHeight  = parseInt( $tabs.css('min-height') ),
-        tabsPaddingBot = parseInt( $tabs.css('padding-bottom') ),
-        newHeightTabs  = Math.max( ($(window).height() -tabsOffsetTop -parseInt($('body').css('padding-bottom'))), tabsMinHeight ),
-        progressHeight = $('.progress-scroll').height(),
+        $tabs             = $('#tabs'),
+        $stats            = $('#stats'),
+        heightLi          = parseInt( $('.clusterize-content.customize-counter li').css('line-height') ),
+        heightWin         = $(window).height() -parseInt($('body').css('padding-bottom')),
+        heightProgress    = $('.progress-scroll').height(),
+        tabsOffsetTop     = $tabs.offset().top,
+        tabsMinHeight     = parseInt( $tabs.css('min-height') ),
+        tabsPaddingBot    = parseInt( $tabs.css('padding-bottom') ),
+        tabsInnerHeight   = heightWin -tabsOffsetTop,
+        newTabsHeight     = Math.max( tabsInnerHeight, tabsMinHeight ),
         
         $cluster   = {},
         newHeight  = 0,
         rowInBlock = 0;
-    
+
     if(adjust) {
-        $tabs.outerHeight( newHeightTabs );
-        $stats.height(  $tabs.height() -parseInt($tabs.css("padding-bottom")) + tabsOffsetTop - $stats.offset().top );
+        $tabs.outerHeight( newTabsHeight );
+        $stats.height( $tabs.height() -tabsPaddingBot + tabsOffsetTop - $stats.offset().top );
         
         if( cluster.catalog ) {
-            $cluster   = $('#scroll-folders');
-            newHeight  = newHeightTabs -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -progressHeight;
-            rowInBlock = ( Math.round( ( newHeight / liHeight ) / 2 ) * 2 );
-            
+            $cluster  = $('#scroll-folders');
+            newHeight = Math.max( 250, newTabsHeight +tabsOffsetTop -tabsPaddingBot -heightProgress -$cluster.offset().top );
+            let minTabsHeight = newHeight +tabsOffsetTop +tabsPaddingBot +heightProgress+ $('#sarra-formula').outerHeight(true) +10;
+            (newTabsHeight < minTabsHeight ) ? $tabs.outerHeight( minTabsHeight +5 ) : '';
+            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
+
             $cluster.height( newHeight );
             cluster.catalog.options.rows_in_block = rowInBlock;
             cluster.catalog.refresh();
         }
         if( cluster.subtopic ) {
             $cluster   = $('#scroll-topics');
-            newHeight  = newHeightTabs -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -progressHeight;
-            rowInBlock = ( Math.round( ( newHeight / liHeight ) / 2 ) * 2 );
+            newHeight  = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -heightProgress;
+            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
             
             $cluster.height( newHeight );
             cluster.subtopic.options.rows_in_block = rowInBlock;
@@ -2498,8 +2505,8 @@ function adjustTabsHeight( adjust ) {
         }
         if( cluster.files ) {
             $cluster   = $('#scroll-files');
-            newHeight  = newHeightTabs -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -progressHeight;
-            rowInBlock = ( Math.round( ( newHeight / liHeight ) / 2 ) * 2 );
+            newHeight  = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -heightProgress;
+            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
             
             $cluster.height( newHeight );
             cluster.files.options.rows_in_block = rowInBlock;

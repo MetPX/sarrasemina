@@ -492,6 +492,76 @@
         },
         {
             "title": {
+                "fr":"Fichiers AQHI au format XML",
+                "en":"AQHI Files in XML format"},
+            "comment": {
+                "fr":"# Pour plus d'informations sur ce produit, veuillez consulter la documentation à\n#   http://dd.meteo.gc.ca/air_quality/doc/README_aqhi.txt",
+                "en":"# For more information about this product, please consult the documentation at\n#   http://dd.weather.gc.ca/air_quality/doc/README_aqhi.txt"},
+            "options": [
+                {
+                    "name":"broker", "val":"amqps://dd.weather.gc.ca/",
+                    "hint":{
+                        "fr":"# Si cet hôte ne fonctionne pas, commentez la ligne et utilisez celle par défaut",
+                        "en":"# If this host doesn't work, comment the line and use the default one"
+                        }
+                },{
+                    "name":"exchange", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"expire", "val":"10m",
+                    "hint":{
+                        "fr":"# Durée de vie du fichier sur le serveur.\n# En utilisation opérationnelle, EXPIRE devrait être plus longue que la plus longue interruption attendue",
+                        "en":"# File's lifetime on the server.\n# In operational use, EXPIRE should be longer than longest expected interruption"
+                        }
+                },{
+                    "name":"inflight", "val":"",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"instances", "val":"2",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"mirror", "val":"True",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"topic", "val":"post",
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"subtopics", "val":["*.*.AQHI.#"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                },{
+                    "name":"match", "val":[["accept",".*"]],
+                    "hint":{
+                        "fr":"Accepter toutes les stations",
+                        "en":"Accept all stations"
+                        }
+                },{
+                    "name":"unmatch", "val":["reject",".*"],
+                    "hint":{
+                        "fr":"",
+                        "en":""
+                        }
+                }]
+        },
+        {
+            "title": {
                 "fr":"Flux Ninjo pour Serveur A",
                 "en":"Ninjo feed for server A"},
             "comment": {

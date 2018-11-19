@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-11-14 10:07:38
+  last-modified : 2018-11-16 10:14:38
 -----------------------------------------------------------
 */
 
@@ -36,6 +36,7 @@ th, td { padding: 1px 0 0 0; line-height: 1em; }
 .c-cyan  { color: cyan; }
 .c-bleu  { color: blue; }
 .c-gris  { color: #ccc; }
+.c-dark  { color: #777; }
 .c-jaune { color: #b80; }
 .c-noir  { color: #000; }
 .c-rouge { color: red; }
@@ -182,8 +183,13 @@ td.label, td.tag { width: 110px; }
 .entry .filter .input-group-btn >.btn-add,
 .entry .filter .input-group-btn >.btn-remove { padding: 5px 8px; border-radius: 0 3px 3px 0; }
 
-.unmatch.entry .input-group { display: inline-table; width: 100px; }
 .unmatch.btn { border-radius: 0 3px 3px 0; }
+.unmatch.entry .input-group { display: inline-table; width: 100px; }
+
+.fr .unmatch.entry .tag strong {  }
+.fr .unmatch.entry .tag small  {  }
+.en .unmatch.entry .tag strong { letter-spacing: 2px; }
+.en .unmatch.entry .tag small  {  }
 /* ======================================= */
 
 .input-group-sm>.form-control,
@@ -269,8 +275,9 @@ td.label, td.tag { width: 110px; }
 
 /* -[BOT]------------------------------------------------ */
 
-.back-to-top { position: fixed; bottom: 20px; right: 20px; display:none; }
+.back-to-top { position: fixed; bottom: 20px; right: 20px; display:none; z-index: 100; }
 .back-to-top:hover { cursor: pointer; }
+.maxH300 { max-height: 300px; overflow-x:auto; }
 
 /* Nav TABS [ Folders | Subtopics | Files | Results ] tabs */
 ul.nav-tabs > li > a,
@@ -326,65 +333,37 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
  .include .btns.input-group .input-group-addon .fa { font-size: 18px; visibility: hidden; }
  .include .btns.input-group.active .input-group-addon .fa { visibility:visible; }
 
+ #stats tr.sub { height: 50px; border-bottom: 1px solid lightgrey; }
+ #stats tr.matchs.first { height: 30px; vertical-align: bottom; }
+ #stats tr.matchs.last { height: 30px; vertical-align: top; }
+ #stats tr.matchs.first.last { height: 50px; vertical-align: middle; }
+ #stats tr.matchs td { line-height: .9em; }
+ #stats tr.unmatchs { height: 50px; border-top: 1px solid lightgrey; border-bottom: 1px solid lightgrey; vertical-align: middle; }
+ #stats tr.sub td:last-child,
+ #stats tr.matchs td:last-child,
+ #stats tr.unmatchs td:last-child { background-color: #f6f6f6; }
+
 
 #stats table #results { border-top: 1px solid lightgrey; border-bottom: 1px solid darkgrey; }
-#stats table #results th { border-bottom: 1px solid darkgrey; }
+#stats table #results th { border-bottom: 1px solid darkgrey; height: 50px; vertical-align: bottom; }
 
 #topics .amqp-filter,
 #topics .amqp-filters { font-size:0.85em; font-weight: bold; }
 #topics .amqp-filters { margin-left: 10px; display: inline-block; }
 
 /* -------------------------------------------------------- */
-/* Config Tab                                               */
+/* Builder Tab                                             */
 /* -------------------------------------------------------- */
 
+
+/* -------------------------------------------------------- */
+/* Config Tab                                               */
+/* -------------------------------------------------------- */
 pre#config { line-height: 1.15em; }
 pre#config a[target="_blank"]:before { content:"\f08e   "; font-family:"FontAwesome"; }
 
-/** /
-input[type="checkbox"], input[type="radio"]{ position: absolute; right: 9000px; }
-
-/*Check box* /
-input[type="checkbox"] + .label-text:before{ 
-    content: "\f096"; font-family: "FontAwesome";
-    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 5px;
-}
-input[type="checkbox"]:checked  + .label-text:before{ content: "\f14a"; color: #2980b9; }
-input[type="checkbox"]:disabled + .label-text{ color: #aaa; }
-input[type="checkbox"]:disabled + .label-text:before{ content: "\f0c8"; color: #ccc; }
-
-/*Radio box* /
-input[type="radio"] + .label-text:before{
-    content: "\f10c"; font-family: "FontAwesome";
-    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 5px;
-}
-input[type="radio"]:checked  + .label-text:before{ content: "\f192"; color: #8e44ad; }
-input[type="radio"]:disabled + .label-text{ color: #aaa; }
-input[type="radio"]:disabled + .label-text:before{ content: "\f111"; color: #ccc; }
-
-/*Radio Toggle* /
-.toggle input[type="radio"] + .label-text:before{
-    content: "\f204"; font-family: "FontAwesome";
-    font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; -webkit-font-smoothing:antialiased;
-    width: 1em; display: inline-block; margin-right: 10px;
-}
-.toggle input[type="radio"]:checked + .label-text:before{ content: "\f205"; color: #16a085; }
-.toggle input[type="radio"]:disabled + .label-text{ color: #aaa; }
-.toggle input[type="radio"]:disabled + .label-text:before{ content: "\f204"; color: #ccc; }
-
-
-@keyframes effect{
-    0%{transform: scale(0);} 25%{transform: scale(1.3);} 75%{transform: scale(1.4);} 100%{transform: scale(1);} 
-}
-
 /* -------------------------------------------------------- */
-/* Folder Tab                                               */
+/* Files Tab                                               */
 /* -------------------------------------------------------- */
 #scroll-files .content:hover { color: green; background-color: #ccc; cursor: pointer; }
 #scroll-files .content:hover .size { color: #333; background-color: #fff; cursor: default; }
-
-/* -------------------------------------------------------- */
-/* Files Tab                                                */
-/* -------------------------------------------------------- */

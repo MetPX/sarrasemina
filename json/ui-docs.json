@@ -18,8 +18,8 @@
                 "subtopic" : "Sous-thème :",
                 "accepted" : "Accepté :",
                 "rejected" : "Rejeté :",
-                "unmatch"  : "fichier non-filtré",
-                "unmatchs" : "fichiers non-filtrés",
+                "unmatch"  : "le fichier restant",
+                "unmatchs" : "le reste des fichiers",
                 "results"  : "Resultats",
                 "summary"  : "En résumé",
                 "found"    : "trouvé"
@@ -92,8 +92,8 @@
                 "subtopic" : "Subtopic :",
                 "accepted" : "Accepted :",
                 "rejected" : "Rejected :",
-                "unmatch"  : "unmatched file",
-                "unmatchs" : "unmatched files",
+                "unmatch"  : "the remaining file",
+                "unmatchs" : "the remaining files",
                 "results"  : "Results",
                 "summary"  : "In Summary",
                 "found"    : "found"
