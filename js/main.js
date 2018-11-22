@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-19 09:59:14
+// last-modified : 2018-11-22 15:30:05
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -172,6 +172,7 @@ const
     PANE = {
         EDITOR   : "editor",
         CATALOGUE: "folders",
+        CONFIG   : "stats",
         SUBTOPIC : "topics",
         FILES    : "files"
         },
@@ -254,12 +255,29 @@ var t               = {},                                               // GUI's
 // ---------------------------------------------------------------------
 //  TEST ZONE BEGIN
 // ---------------------------------------------------------------------
+function setFavicon() {
+    document.head || (document.head = document.getElementsByTagName('head')[0]);
+    let link    = document.createElement('link'),
+        oldLink = document.getElementById('dynamic-favicon'),
+        sub     = getSubDomain();
+
+    sub       = ( (sub=='lab')? sub:((sub=='pfd-dev1')? 'dev':((sub.includes('ddi')? 'stage':'prod'))) );
+    link.id   = 'dynamic-favicon';
+    link.rel  = 'shortcut icon';
+    link.href = `/img/icon-${sub}.png`;
+    if( oldLink ) { document.head.removeChild( oldLink ); }
+    document.head.appendChild(link);
+}
 
 // ---------------------------------------------------------------------
 // Returns server origin
 // Since development domains do not host product files,
 // a default server is provided.
     
+function getSubDomain() {
+    return window.location.origin.split('//')[1].split('.')[0];
+}
+
 function getOrigin() {
     let domain = window.location.origin.split('//')[1].split('.')[0];
     return ['lab','pfd-dev1'].includes( domain ) ? 'http://ddi1.cmc.ec.gc.ca/' : window.location.origin +"/";
@@ -475,6 +493,7 @@ function _initialize_() {
     
     let switchLangue = { fr: { btn:"English", title:"Display in English" }, en: { btn:"Français", title:"Afficher en français" } }
     $("#switchLang").attr('title',switchLangue[LANG].title).text( switchLangue[LANG].btn ).addClass(LANG).show();
+    setFavicon();
 
     searchToken.cancel();
     _init_data_tabs();
@@ -763,7 +782,7 @@ function loadCatalogueData( selectedCatalogue ) {
             
             setSubtopicDirs(); // and will manage Config cookies
 
-            cluster   .catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, paneHeader );
+            cluster.catalog = getScrollClusterData( PANE.CATALOGUE, bigData_Folders, paneHeader );
             statistics.reset({ catalog:{ name:catalogueName, folders:total.folders, files:total.files, bytes:total.bytes }, search:{}, results:{} });
             _init_data_tabs ( total.folders, total.files );
             setGUIstate     ( GUI.STATE_LOADING );
@@ -1026,7 +1045,7 @@ function getScrollClusterData( pane = PANE.CATALOGUE, data, paneTitle ) {
     
     $pane.html(`
                     ${paneTitle}
-                    <div id="scroll-${pane}" class="clusterize-scroll emulate-progress">
+                    <div id="scroll-${pane}" class="clusterize-scroll emulate-progress minH240">
                         <ol id="scroll-${pane}-content" class="clusterize-content customize-counter ${pane}" tabindex="0" start="1" style="counter-increment: 1;">
                         </ol>
                     </div>
@@ -1777,7 +1796,9 @@ function updateResultsTab( withHints=false, withMan=false ) {
         .tooltip()
         .hover( ()=>{ $config.animate( colors.hover, 0 ) }, () => { $config.css( colors.origin ) })
         .click( ()=>{ $config.animate( colors.click, 10, resetColors ) });
-        
+    
+    adjustTabsHeight();
+
 /*#*/if( DEBUG ){ logMe('-','-'); console.groupEnd();};/*#*/
 }
 
@@ -1993,14 +2014,18 @@ $(document)
         $(new_entry).find('.match.help').attr("title", t.help.tip +" - "+ t.help.title.match).data("title", t.help.title.match).tooltip();
         $(new_entry).find(MATCH.INPUT).prop('id',newInputID).data('status',this_state).val(this_value);
 
-        adjustTabsHeight(true);
+        adjustTabsHeight();
     })
 
+    .on('click', '#navs a', function(e) {
+        adjustTabsHeight();
+    })
+    
     .on('click', '.btn-remove', function(e) {
         $(this).parents('.entry').remove();
         setConfigCookie();
         e.preventDefault();
-        adjustTabsHeight(true);
+        adjustTabsHeight();
         return false;
     })
     
@@ -2059,14 +2084,14 @@ $(document)
     })
 
     .on('click',        '#back-to-top',         (e) => { $('body,html').animate( {scrollTop: 0}, 500 ); return false; })
-    .on('shown.bs.tab', 'a[data-toggle="tab"]', (e) => {  adjustTabsHeight( true ); })
+    .on('shown.bs.tab', 'a[data-toggle="tab"]', (e) => {  adjustTabsHeight(); })
 
     ;
 
     
 $(window)
     .scroll(() => { ($(this).scrollTop() > 100) ? $('#back-to-top').fadeIn() : $('#back-to-top').fadeOut(); })
-    .resize(() => { adjustTabsHeight( true ); })
+    .resize(() => { adjustTabsHeight(); })
     ;
 
 
@@ -2315,9 +2340,9 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
     function getHeader( nbFiles=0, totSize=0 ) {
         let files_found=t.noFilesFoundFor, total_size="", size_file="";
         if( nbFiles > 0 ) {
-            files_found = wrap( numeral( nbFiles ).format('0,0') +" " +(nbFiles > 1 ? t.filesFound : t.fileFound), TAG.CR ) +' - ';
-            total_size  = t.totalSize +t.comma +numeral( totSize ).format('0,0')+" " +t.bytes +(totSize > 1024 ? ' ('+ numeral(totSize).format('0.00 b') +')' : '' ) +'<br>';
             size_file   = t.FileSize;
+            total_size  = t.totalSize +t.comma +numeral( totSize ).format('0,0')+" " +t.bytes +(totSize > 1024 ? ' ('+ numeral(totSize).format('0.00 b') +')' : '' ) +'<br>';
+            files_found = wrap( numeral( nbFiles ).format('0,0') +" " +(nbFiles > 1 ? t.filesFound : t.fileFound), TAG.CR ) +' - ';
         }
 
         return files_found + total_size + size_file;
@@ -2335,7 +2360,7 @@ function updateFilesTab( filesInFolders, withAcceptRejectFilters = false ) {
         else {
             header = getHeader( bigData_Files.length, filesInFolders.stats.matched.totSize );
         }
-      
+
         statistics.results.files = nbFiles == 0 ? "" :     numeral(nbFiles).format('0,0');
         statistics.results.size  = totSize == 0 ? "" : "("+numeral(totSize).format('0.00 b')+")";
         statistics.results.str   = nbFiles < 2  ? t.searchHits[ nbFiles ] : t.searchHits[2] ;
@@ -2413,7 +2438,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#btnSearch").html(t.g_search + t.search);
                 $("#btnCopy, #topics-tab, #files-tab, #stats-tab").removeClass('hidden');
                 $("#stats-tab").trigger('click');
-                adjustTabsHeight(true);
+                adjustTabsHeight();
                 break;
                 
             case GUI.STATE_LOADING: 
@@ -2423,7 +2448,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#logs, #tabs, #tabs .nav-tabs").show();
                 $("#sarra-formula").removeClass('hidden');
                 $("#editor-tab").trigger('click');
-                adjustTabsHeight(true);
+                adjustTabsHeight();
                 break;
                 
             case GUI.STATE_RESET: 
@@ -2434,7 +2459,7 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files pre").html( "" );
                 $(".input-subtopic").val("");
                 $("#editor-tab").trigger('click');
-                adjustTabsHeight(true);
+                adjustTabsHeight();
                 break;
                 
             case GUI.STATE_SEARCHING: 
@@ -2443,14 +2468,14 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
                 $("#files-tab, #stats-tab").addClass('hidden');
                 $("#btnSearch").html(t.f_superp + t.cancel);
                 $("#editor-tab").trigger('click');
-                adjustTabsHeight(true);
+                adjustTabsHeight();
                 break;
                 
             case GUI.STATE_READY: 
             default:
                 document.body.style.cursor = 'default';
                 $("#logs").hide();
-                adjustTabsHeight(true);
+                adjustTabsHeight();
         }
     }
 }
@@ -2461,60 +2486,75 @@ function setGUIstate( thisState = GUI.STATE_READY ) {
 // adjustTabsHeight
 // 
 
-function adjustTabsHeight( adjust ) {
+function adjustTabsHeight() {
     
     let 
+        activePane        = $('.tab-pane.active').attr('id'),
+        
         $tabs             = $('#tabs'),
-        $stats            = $('#stats'),
-        heightLi          = parseInt( $('.clusterize-content.customize-counter li').css('line-height') ),
-        heightWin         = $(window).height() -parseInt($('body').css('padding-bottom')),
-        heightProgress    = $('.progress-scroll').height(),
         tabsOffsetTop     = $tabs.offset().top,
-        tabsMinHeight     = parseInt( $tabs.css('min-height') ),
         tabsPaddingBot    = parseInt( $tabs.css('padding-bottom') ),
-        tabsInnerHeight   = heightWin -tabsOffsetTop,
-        newTabsHeight     = Math.max( tabsInnerHeight, tabsMinHeight ),
+        tabsInnerHeight   = $(window).height() -parseInt($('body').css('padding-bottom')) -tabsOffsetTop,
+        newTabsHeight     = Math.max( tabsInnerHeight, parseInt( $tabs.css('min-height') ) ),
+        
+        li_H              = parseInt( $('.clusterize-content.customize-counter li').css('line-height') ),
+        _content_H        = $('#navs').outerHeight(true) + $('#wrapper').outerHeight(true) +20,
+        progressbar_H     = $('.progress-scroll').outerHeight(true),
         
         $cluster   = {},
-        newHeight  = 0,
-        rowInBlock = 0;
+        newHeight  = 0;
 
-    if(adjust) {
+    if( activePane === PANE.EDITOR ) {
         $tabs.outerHeight( newTabsHeight );
-        $stats.height( $tabs.height() -tabsPaddingBot + tabsOffsetTop - $stats.offset().top );
-        
         if( cluster.catalog ) {
             $cluster  = $('#scroll-folders');
-            newHeight = Math.max( 250, newTabsHeight +tabsOffsetTop -tabsPaddingBot -heightProgress -$cluster.offset().top );
-            let minTabsHeight = newHeight +tabsOffsetTop +tabsPaddingBot +heightProgress+ $('#sarra-formula').outerHeight(true) +10;
+            newHeight = Math.max( 250, newTabsHeight +tabsOffsetTop -tabsPaddingBot -progressbar_H -$cluster.offset().top );
+            let minTabsHeight = newHeight +tabsOffsetTop +tabsPaddingBot +progressbar_H+ $('#sarra-formula').outerHeight(true) +10;
             (newTabsHeight < minTabsHeight ) ? $tabs.outerHeight( minTabsHeight +5 ) : '';
-            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
-
             $cluster.height( newHeight );
-            cluster.catalog.options.rows_in_block = rowInBlock;
+            cluster.catalog.options.rows_in_block = getRowsInBlock( newHeight, li_H );
+            cluster.catalog.options.scrollTopMax  = getScrollMax( $cluster );
             cluster.catalog.refresh();
         }
+    }
+
+    if( activePane === PANE.CONFIG ) {
+        $tabs.outerHeight( Math.max( tabsInnerHeight, _content_H ) );
+    }
+
+    if( activePane === PANE.SUBTOPIC ) {
+        $tabs.outerHeight( newTabsHeight );
         if( cluster.subtopic ) {
-            $cluster   = $('#scroll-topics');
-            newHeight  = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -heightProgress;
-            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
-            
+            $cluster  = $('#scroll-topics');
+            newHeight = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -progressbar_H;
             $cluster.height( newHeight );
-            cluster.subtopic.options.rows_in_block = rowInBlock;
+            cluster.subtopic.options.rows_in_block = getRowsInBlock( newHeight, li_H );
+            cluster.subtopic.options.scrollTopMax  = getScrollMax( $cluster );
             cluster.subtopic.refresh();
         }
+    }
+
+    if( activePane === PANE.FILES ) {
+        $tabs.outerHeight( newTabsHeight );
         if( cluster.files ) {
-            $cluster   = $('#scroll-files');
-            newHeight  = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -heightProgress;
-            rowInBlock = ( Math.round( ( newHeight / heightLi ) / 2 ) * 2 );
-            
+            $cluster  = $('#scroll-files');
+            newHeight = newTabsHeight -$cluster.offset().top +tabsOffsetTop -tabsPaddingBot -progressbar_H;            
             $cluster.height( newHeight );
-            cluster.files.options.rows_in_block = rowInBlock;
+            cluster.files.options.rows_in_block = getRowsInBlock( newHeight, li_H );
+            cluster.files.options.scrollTopMax  = getScrollMax( $cluster );
             cluster.files.refresh();
         }
     }
+
 }
 
+function getRowsInBlock( block_height, element_height ) {
+    return  Math.round( ( block_height / element_height ) / 2 ) * 2;
+}
+
+function getScrollMax( $cluster ) {
+    return $cluster.prop('scrollHeight') - $cluster.prop('offsetHeight');
+}
 
 // ---------------------------------------------------------------------
 // 

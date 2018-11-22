@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-11-16 10:14:38
+  last-modified : 2018-11-22 08:16:33
 -----------------------------------------------------------
 */
 
@@ -102,7 +102,7 @@ th, td { padding: 1px 0 0 0; line-height: 1em; }
 
 /* -[ INPUT GROUPS ]--------------------------------------- */
 .row.page { background: white; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.7); display: block; margin: 0; margin-bottom: 10px; padding: 10px; }
-#tabs      { margin-bottom: 0; min-height: 360px; }
+#tabs      { margin-bottom: 0; min-height: 500px; }
 #tabs.IErr { min-height: auto; padding-bottom: 20px; }
 
 .tooltip { white-space: nowrap; }
@@ -277,7 +277,8 @@ td.label, td.tag { width: 110px; }
 
 .back-to-top { position: fixed; bottom: 20px; right: 20px; display:none; z-index: 100; }
 .back-to-top:hover { cursor: pointer; }
-.maxH300 { max-height: 300px; overflow-x:auto; }
+.maxH240 { max-height: 240px; overflow-x:auto; }
+.minH240 { min-height: 240px; overflow-x:auto; }
 
 /* Nav TABS [ Folders | Subtopics | Files | Results ] tabs */
 ul.nav-tabs > li > a,
@@ -295,12 +296,11 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #btn-filters { padding: 5px 10px }
 .btn-default.active { background-color: #f6f6f6; }
 .btn-default.active:hover { background-color: #f0f0f0; }
-#btn-filters { border-raduis: 0 3px 3px 0; }
+#btn-filters { border-radius: 0 3px 3px 0; }
 #btn-topic .btn-topic:last-child { border-radius: 0 3px 3px 0; }
 #btn-filters .fa, #btn-topic .fa { margin-right: 3px; }
 #subtopics-input { width: 100%; height: 27px; background-color: #fff; padding: 0px 5px; border: 1px solid #ccc; box-shadow: inset 0 1px 1px rgba(0,0,0,.075); }
 
-#files { overflow: hidden; }
 #files p { font: 13px 'Ubuntu Mono', monospace; color: #960; }
 #files pre { margin: 2px; }
 
@@ -350,6 +350,9 @@ ul.nav-tabs > li > a#stats-tab i.fa { font-size:1.2em; line-height: 11px; }
 #topics .amqp-filter,
 #topics .amqp-filters { font-size:0.85em; font-weight: bold; }
 #topics .amqp-filters { margin-left: 10px; display: inline-block; }
+
+#files #files-label .content { font-size:10px; padding-left: 95px; }
+#files #files-label .content .c-vert { font-size:12px; }
 
 /* -------------------------------------------------------- */
 /* Builder Tab                                             */

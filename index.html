@@ -10,10 +10,10 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         
         <link rel="stylesheet" href="/js/plugins/bootstrap3-dialog/css/bootstrap-dialog.min.css">
-        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20181114135013">
-        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20181114135013">
+        <link rel="stylesheet" href="/js/plugins/clusterize/clusterize.css?v20181122153006">
+        <link rel="stylesheet" href="/js/plugins/selectize/css/selectize.default.css?v20181122153006">
 
-        <link rel="stylesheet" href="/css/style.css?v20181114135013">
+        <link rel="stylesheet" href="/css/style.css?v20181122153006">
         <script>
             // if we have less than IE Edge, redirect to incompatible page
             var unSupported_IE = (/msie\ [0-9]{1}|Trident\/[7]{1}/i.test(navigator.userAgent));
@@ -65,14 +65,14 @@
                 </div>
                 <p id="logger"></p>
             </div>
-            <ul class="nav nav-tabs">
+            <ul id="navs" class="nav nav-tabs">
                 <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="files-tab"  href="#files"  data-toggle="tab" tabindex="-1"></a></li>
             </ul>
 
-            <div class="tab-content clearfix">
+            <div id="wrapper" class="tab-content clearfix">
                 <div id="editor" class="tab-pane">
                     <div id="sarra-formula">
                         <div class="row">
@@ -122,7 +122,7 @@
                                 </table>
                                 <hr>
                                 <table>
-                                    <tr class="line topic">
+                                    <tr class="line topic" style="display: none;">
                                         <td class="tag"><label class="label-topic" data-label="v02.post">Topic: </label></td>
                                         <td>
                                             <div>
@@ -150,7 +150,7 @@
                                     </tr>
                                                                         <tr id="err-subtopic"><td> </td><td class="err"> </td></tr>
                                     <tr class="line subtopic">
-                                        <td><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
+                                        <td class="tag"><label class="label-subtopic" for="input-subtopic">Subtopic2: </label></td>
                                         <td>
                                             <div>
                                                 <div class="subtopic filter input-group input-group-sm">
@@ -163,6 +163,7 @@
                                     </tr>
                                                                     </table>
                                 <hr>
+                                <div class="maxH240">
                                 <table id="match-filters">
                                     <tr class="match entry">
                                         <td class="tag">[Auto]</td>
@@ -190,8 +191,9 @@
                                         </td>
                                     </tr>
                                 </table>
+                                </div>
                                 <hr>
-                                <table>
+                                <table id="unmatch-filters">
                                     <tr class="unmatch entry">
                                         <td class="tag">[Auto]</td>
                                         <td>
@@ -251,17 +253,17 @@
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/download.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
-        <script src="/js/plugins/clusterize/clusterize.min.js"></script>
-        <script src="/js/plugins/selectize/js/selectize.js?v20181114135013"></script>
+        <script src="/js/plugins/clusterize/clusterize.min.js?v20181122153006"></script>
+        <script src="/js/plugins/selectize/js/selectize.js?v20181122153006"></script>
         <script>
             var jsonURLs = [
                 '/data/', 
-                '/json/ui-texts.json?v20181114135013', 
-                '/json/ui-docs.json?v20181114135013', 
-                '/json/brokers.json?v20181114135013',
-                '/json/configs.json?v20181114135013'
+                '/json/ui-texts.json?v20181122153006', 
+                '/json/ui-docs.json?v20181122153006', 
+                '/json/brokers.json?v20181122153006',
+                '/json/configs.json?v20181122153006'
                 ];
         </script>
-        <script src="/js/main.js?v20181114135013"></script>
+        <script src="/js/main.js?v20181122153006"></script>
     </body>
 </html> 

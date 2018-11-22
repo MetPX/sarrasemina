@@ -129,7 +129,9 @@
       return rows.length;
     }
     self.getScrollProgress = function() {
-      return this.options.scroll_top / ((rows.length-this.options.item_height) * this.options.item_height) * 100 || 0;
+      // implemented scrollTopMax in options to return an accurate progress with small number of items
+      return Math.round( this.options.scroll_top / this.options.scrollTopMax *100 );
+      // return this.options.scroll_top / ((rows.length-this.options.item_height) * this.options.item_height) * 100 || 0;
     }
 
     var add = function(where, _new_rows) {

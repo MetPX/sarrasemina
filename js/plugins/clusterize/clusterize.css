@@ -16,13 +16,13 @@
 /* Clusterize ordered list */
 .cluster-ol{ width: 100%; position: relative; border: 1px solid #ddd; margin-top: 5px; border-radius: 3px; }
 .cluster-ol ol{ margin-bottom: 0; margin-left: 20px; padding-left: 60px; white-space: nowrap; }
-.cluster-ol .progress-scroll { margin-top: 5px; max-width: 100%; border-radius: 5px; height: 7px; float: left; background-color: #09f; }
+.cluster-ol .progress-scroll { margin-top: 3px; max-width: 100%; border-radius: 5px; height: 7px; float: left; background-color: #a00; /*#09f;*/ }
 .cluster-ol .clusterize-no-data{ margin: 0; padding: 10px 20px; font-size: 18px; text-align: center; }     /* Centering message that appears when no data provided */
 
 /* Title in panes */
 .pane-title { color: #333; padding: 5px; font-size: 12px; line-height: 1.4em; display: inline-block; }
-.pane-title#files-label { padding-bottom: 0; }
-.pane-title#files-label ol { padding-left: 53px; list-style: none; font-size: 10px; font-weight: bold; }
+/* .pane-title#files-label { padding-bottom: 0; }
+.pane-title#files-label ol { padding-left: 53px; list-style: none; font-size: 10px; font-weight: bold; } */
 
 
 /* Visualise scroll progress */

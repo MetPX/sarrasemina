@@ -6,7 +6,7 @@
     Author        : Daniel Léveillé
                     SSC-SPC - Gouvernement du Canada
     created       : 2017-08-24 08:00:00
-    last-modified : 2018-11-19 08:20:09
+    last-modified : 2018-11-22 15:12:02
 
     +------------------------------------------------------+
     | IMPORTANT NOTE:                                      |
@@ -97,7 +97,7 @@
                 </div>
                 <p id="logger"></p>
             </div>
-            <ul class="nav nav-tabs">
+            <ul id="navs" class="nav nav-tabs">
                 <li><a class="hidden" id="editor-tab" href="#editor" data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="stats-tab"  href="#stats"  data-toggle="tab" tabindex="-1"></a></li>
                 <li><a class="hidden" id="topics-tab" href="#topics" data-toggle="tab" tabindex="-1"></a></li>
@@ -107,7 +107,7 @@
 <?php /*        BUILDER PANE
                 User creates its Sarra Config here
                 -------------------------------------------------------------------- */ ?>
-            <div class="tab-content clearfix">
+            <div id="wrapper" class="tab-content clearfix">
                 <div id="editor" class="tab-pane">
                     <div id="sarra-formula">
                         <div class="row">
@@ -216,7 +216,7 @@
                                 <hr>
 <?php /*            MATCHED  FILTERS - REGEX RULES
                     -------------------------------------------------------------------- */ ?>
-                                <div class="maxH300">
+                                <div class="maxH240">
                                 <table id="match-filters">
                                     <tr class="match entry">
                                         <td class="tag">[Auto]</td>
@@ -314,7 +314,7 @@
         <script src="/js/plugins/ua-parser.min.js"></script>
         <script src="/js/plugins/download.js"></script>
         <script src="/js/plugins/cookie/jquery.cookie.min.js"></script>
-        <script src="/js/plugins/clusterize/clusterize.min.js"></script>
+        <script src="/js/plugins/clusterize/clusterize.min.js<?= $v ?>"></script>
         <script src="/js/plugins/selectize/js/selectize.js<?= $v ?>"></script>
         <script>
             var jsonURLs = [
