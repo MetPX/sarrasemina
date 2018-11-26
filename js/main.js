@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-26 10:04:26
+// last-modified : 2018-11-26 10:38:15
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -520,8 +520,8 @@ function _initialize_() {
                         "en":"Your actual browser is:\n"
                     }
             },
-            "cookie":{ "fr":'<strong>Ce site utilise des témoins pour : </strong> &nbsp; 1- Conserver votre langue préférée. &nbsp; 2- Ne pas répéter les avertissements (vieux navigateurs). &nbsp; <strong>C’est tout!</strong>',
-                        "en":'<strong>This site use cookies to: </strong> &nbsp; 1- Remember your prefered language. &nbsp; 2- Keep shut warning dialogs (on old browsers). &nbsp; <strong>That’s it!</strong>'
+            "cookie":{  "fr":'<strong>Ce site utilise des témoins (cookies).</strong>',
+                        "en":'<strong>This site use cookies.</strong>'
             }
         },
         requests    = jsonURLs.map((url) => $.ajax(url)),               // Get JSON requests for GUI texts & catalogue lists from jsonURLs global var
