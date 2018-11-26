@@ -4,7 +4,7 @@
   Author        : Daniel Léveillé
                    SSC-SPC - Gouvernement du Canada
   created       : 2017-08-24 08:00:00
-  last-modified : 2018-11-22 08:16:33
+  last-modified : 2018-11-26 09:55:40
 -----------------------------------------------------------
 */
 
@@ -59,8 +59,6 @@ th, td { padding: 1px 0 0 0; line-height: 1em; }
 .modal-dialog.modal-sm .bootstrap-dialog-message ul { padding-left: 20px; }
 .modal-dialog.modal-sm .bootstrap-dialog-footer-buttons .btn { font-size: 12px; padding: 3px 8px; }
 .modal-dialog.modal-sm .configSampleSelector { margin: 0 auto; text-align: center; }
-.modal-dialog.modal-sm .configSampleSelector span { display:inline-block; font-size: 14px; font-weight: bold; color: #379; padding:10px; }
-.modal-dialog.modal-sm .configSampleSelector #configSampleSelector { width: auto; display:inline-block; }
 
 .modal.bootstrap-dialog.type-primary.fade.in.size-small { padding-right: 0 !important; }
 .modal.bootstrap-dialog.type-danger .modal-header { background-color: #d00; }
@@ -186,10 +184,7 @@ td.label, td.tag { width: 110px; }
 .unmatch.btn { border-radius: 0 3px 3px 0; }
 .unmatch.entry .input-group { display: inline-table; width: 100px; }
 
-.fr .unmatch.entry .tag strong {  }
-.fr .unmatch.entry .tag small  {  }
 .en .unmatch.entry .tag strong { letter-spacing: 2px; }
-.en .unmatch.entry .tag small  {  }
 /* ======================================= */
 
 .input-group-sm>.form-control,
@@ -223,7 +218,6 @@ td.label, td.tag { width: 110px; }
 #sarra-formula table { width: 100%; }
 #sarra-formula table td.right { width: 90%; }
 
-/* #catalogueSelector { display: inline-block; width: auto; box-shadow: none; max-width: 195px; margin-bottom: 0; padding: 2px 20px 2px 5px; height: 27px; border-radius: 0 3px 3px 0; } */
 #info-catalogue span { background-color: #fe9; padding: 1px 3px; }
 #info-catalogue span span { font-weight: bold; }
 
@@ -366,7 +360,39 @@ pre#config { line-height: 1.15em; }
 pre#config a[target="_blank"]:before { content:"\f08e   "; font-family:"FontAwesome"; }
 
 /* -------------------------------------------------------- */
-/* Files Tab                                               */
+/* Files Tab                                                */
 /* -------------------------------------------------------- */
 #scroll-files .content:hover { color: green; background-color: #ccc; cursor: pointer; }
 #scroll-files .content:hover .size { color: #333; background-color: #fff; cursor: default; }
+
+
+/* -------------------------------------------------------- */
+/* Sample selector                                          */
+/* -------------------------------------------------------- */
+.sam-selector {
+  background-color: #cef; border: .06em solid transparent; border-radius: 1em;
+  color: #567; cursor: pointer; display: inline-block;
+  margin-top: 20px; max-height: 2em; min-width: 12em; min-height: 2em;
+  outline: none; overflow: hidden; position: relative;
+  text-align: left; transition: 0.2s all ease-in-out; white-space: nowrap;
+}
+.sam-selector input { display: none; }
+.sam-selector label {
+  border-top: .06em solid #d9d9d9; cursor: pointer; display: block; height: 2em; line-height: 2em;
+  padding-left: 1em; padding-right: 3em; position: relative; transition: 0.1s color ease-in-out;
+}
+.sam-selector label:nth-child(2) { border-top: .06em solid #d9d9d9; margin-top: 2em; }
+.sam-selector input:checked + label { border-top: none; display: block; position: absolute; top: 0; }
+.sam-selector input:checked + label:nth-child(2) { margin-top: 0; position: relative; }
+.sam-selector::after { 
+  border: 0.3em solid #3694d7; border-color: #3694d7 transparent transparent transparent;
+  content: ""; position: absolute; right: 0.8em; top: 0.9em; transition: .4s all ease-in-out;
+}
+.sam-selector.expanded {
+  background: #fff; border: 0.06em solid #3694d7; border-radius: .25em; box-shadow: rgba(0, 0, 0, 0.1) 3px 3px 5px 0px;
+  max-height: 50em; padding: 0;
+}
+.sam-selector.expanded label { border-top: .06em solid #d9d9d9; }
+.sam-selector.expanded label:hover { color: #3694d7; background-color: #f6f6f6; }
+.sam-selector.expanded input:checked + label { color: #3694d7; }
+.sam-selector.expanded::after { top: .55em; transform: rotate(-180deg); }

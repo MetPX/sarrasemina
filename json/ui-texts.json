@@ -109,7 +109,7 @@
         "searchHits":      ["Aucun produit trouvé pour cette configuration"," produit trouvé pour cette configuration"," produits trouvés pour cette configuration"],
         "oldsearchHits":      ["Aucune correspondance"," correspondance"," correspondances"],
         "searchResults":    "Résultats de recherche",
-        "sampleConfigs":   {"dialogTitle":  "Exemples de configurations Sarracenia",
+        "sampleConfigs":   {"dialogTitle":  "Essayez un exemple de configuration Sarracenia",
                             "selectOne":    "Faites un choix...",
                             "reset":        "Réinitialiser les configurations",
                             "tryAconfig":   "Essayez une configuration :"
@@ -243,7 +243,7 @@
         "searchCancelled":  "Search cancelled by user",
         "searchHits":      ["No matchs"," match"," matchs"],
         "searchResults":    "Search results",
-        "sampleConfigs":   {"dialogTitle":  "Sarracenia Configuration Examples",
+        "sampleConfigs":   {"dialogTitle":  "Try a Sarracenia's Configuration Example",
                             "selectOne":    "Select one...",
                             "reset":        "Reset all configs",
                             "tryAconfig":   "Try a config:"

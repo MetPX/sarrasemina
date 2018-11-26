@@ -3,7 +3,7 @@
 // Author        : Daniel Léveillé
 //                  SSC-SPC - Gouvernement du Canada
 // created       : 2017-08-24 08:00:00
-// last-modified : 2018-11-22 15:30:05
+// last-modified : 2018-11-26 10:04:26
 //
 //  ### TODO ###
 //      -> Do some more cleanup in this file!
@@ -346,6 +346,7 @@ function setConfigCookie( withSampleConfigIndex=-1 ) {
     let in_5_Days = new Date();
     let filters   = getFilters();
     let config      = {
+            sampleIndex : withSampleConfigIndex < 0 ? 0:withSampleConfigIndex,
             filters     : $("#btn-case-insensitive").parent().hasClass('active'),
             catalogId   : $("#catalogueSelector").prop('selectedIndex'),
             topic       : $("#btn-topic").data("selected"),
@@ -1998,6 +1999,13 @@ $(document)
         $myBtn.blur();
     })
 
+    .on('click', '.sam-selector', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(this).toggleClass('expanded');
+        $('#'+$(e.target).attr('for')).prop('checked',true);
+    })
+
     .on('click', '.btn-add', function(e) {
         e.preventDefault();
         let splitter   = "__",
@@ -2172,14 +2180,12 @@ function BSDialogPrompt( dMessage, dTitle = "Information", dType=BootstrapDialog
 }
 
 function showConfigSampleSelector() {
-    let options = ""; //`<option value="-1">${t.sampleConfigs.selectOne}</option>`;
-    $.each( CONFIG.samples, (index, sample) => { options += `<option value="${index}">${sample.title}</option>` } )
-    let html = 
-            '<div class="configSampleSelector">'+
-                '<span>'+ t.sampleConfigs.tryAconfig +'</span><select id="configSampleSelector" class="custom form-control input-sm" tabindex="-1">'+
-                    options+
-                '</select>'+
-            '</div>';
+    let inputs = "", indexNum = getConfigCookie().sampleIndex || 0;
+    $.each( CONFIG.samples, (index, sample) => {
+        inputs += `<input type="radio" name="sortType" value="${index}" ${index==indexNum?'checked="checked"':''} id="config-${index}"><label for="config-${index}">${sample.title}</label>`;
+    });
+    let html = '<div class="configSampleSelector"><span class="sam-selector">'+ inputs +'</span></div>';
+           
     BootstrapDialog.show({
         title:    t.sampleConfigs.dialogTitle,
         message:  html,
@@ -2196,7 +2202,7 @@ function showConfigSampleSelector() {
             label: t.dialog.btn.ok,
             cssClass: 'btn-default btn-sm',
             action: function(dialog){
-                setSelectedConfigSample( $("#configSampleSelector").val() );
+                setSelectedConfigSample( $(".sam-selector input:checked").val() );
                 dialog.close();
             }
         }]
@@ -2633,3 +2639,4 @@ function measureCRP(id="start") {
 }
 
 // ==========================================================================================================================================
+
