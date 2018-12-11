@@ -219,7 +219,7 @@
         "forThisConfig":    "for this config",
         "include":          "Include: ",
         "include_hints":    "Include Hints",
-        "include_man":      "Include Manuals",
+        "include_manuals":  "Include Manuals",
         "initialState":     {"editor":"",
                              "stats"  :"Please first enter configuration parameters in the Edit tab to view a Sarracenia configuration.",
                              "topics" :"Please first enter configuration parameters in the Edit tab to display search results for directories (Subtopics).",
