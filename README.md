@@ -18,9 +18,9 @@
 
 | Links | &nbsp; |
 | ---- | ---- |
-| SarraSemina | http://github.com/MetPX/sarrasemina |
+| SarraSemina | https://github.com/MetPX/sarrasemina |
 | Sarracenia | https://github.com/MetPX/sarracenia |
-| Shared Services Canada | http://ssc-spc.gc.ca |
+| Shared Services Canada | https://www.canada.ca/en/shared-services.html |
 
 ### Documentation
 
@@ -38,9 +38,9 @@ TBD...
 
 |Liens| &nbsp; |
 | ---- | ---- |
-| SarraSemina | http://github.com/MetPX/sarrasemina |
+| SarraSemina | https://github.com/MetPX/sarrasemina |
 | Sarracenia | https://github.com/MetPX/sarracenia |
-| Services Partagés Canada | http://ssc-spc.gc.ca |
+| Services Partagés Canada | https://www.canada.ca/fr/services-partages.html |
 
 ### Documentation
 
